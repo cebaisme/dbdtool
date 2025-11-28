@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Dead by Daylight配分小遊戲</title>
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg2: #101321;
+      --bg3: #15192a;
+      --card: #181d2e;
+      --border: #2a3044;
+      --accent: #3f82ff;
+      --accent-soft: #7aa7ff;
+      --accent-danger: #ff4b5c;
+      --text: #f5f5f5;
+      --muted: #a6a9c0;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #262c45 0%, #050609 55%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 span.small {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .mode-tabs {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 4px;
+    }
+
+    .mode-tab {
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .mode-tab.active {
+      background: linear-gradient(120deg, var(--accent), var(--accent-soft));
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .layout {
+      margin-top: 18px;
+    }
+
+    .card {
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(12, 15, 25, 0.98), rgba(20, 25, 38, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7);
+      padding: 14px;
+    }
+
+    .card+.card {
+      margin-top: 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    select,
+    input[type="text"],
+    button {
+      background: #141726;
+      border: 1px solid #2a3044;
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 9px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    button:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(63, 130, 255, 0.5);
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-soft));
+      border: none;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    button.primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button.outline {
+      background: transparent;
+      border-color: rgba(255, 255, 255, 0.16);
+      color: var(--muted);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .flex-1 {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .flex-2 {
+      flex: 2;
+      min-width: 260px;
+    }
+
+    .mt-8 {
+      margin-top: 8px;
+    }
+
+    /* === 配分模式 layout === */
+
+    .points-layout {
+      display: grid;
+      grid-template-columns: 2.1fr 1.4fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 1040px) {
+      .points-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .list-container {
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 6px;
+      margin-top: 6px;
+    }
+
+    .addon-item,
+    .perk-item {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 10px;
+      padding: 8px 8px;
+      margin-bottom: 6px;
+      border-radius: 10px;
+      background: rgba(11, 13, 23, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: background 0.14s ease, border-color 0.14s ease, transform 0.06s;
+    }
+
+    .addon-item:hover,
+    .perk-item:hover {
+      background: rgba(21, 24, 36, 0.98);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .addon-item.selected,
+    .perk-item.selected {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(63, 130, 255, 0.5);
+      background: radial-gradient(circle at top left, rgba(63, 130, 255, 0.25), rgba(11, 13, 23, 0.98));
+    }
+
+    .thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #101320;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .list-main {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .list-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-zh {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--muted);
+    }
+
+    .tag-score {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #ffe08a;
+    }
+
+    .list-right {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+    }
+
+    .selected-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--chip-bg);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+    }
+
+    .selected-pill img {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
+    .pill-remove {
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .pill-remove:hover {
+      opacity: 1;
+    }
+
+    .selected-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .selected-pill {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: #101320;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .selected-pill img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .pill-remove {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      opacity: 0.8;
+      color: #fff;
+      text-shadow: 0 0 4px #000;
+    }
+
+    .pill-remove:hover {
+      opacity: 1;
+    }
+
+    .section-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* === 右側 Killer + 技能圖示 === */
+
+    .killer-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .build-main-layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-top: 8px;
+    }
+
+    .kill-avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .killer-avatar {
+      width: 250px;
+      height: 250px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #111422;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .killer-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .killer-name-main {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .killer-name-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .skills-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .skill-slot {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      background: #101320;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .skill-slot.filled {
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: radial-gradient(circle at top, rgba(63, 130, 255, 0.35), #05060a);
+    }
+
+    .skill-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .skill-slot span.placeholder {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      padding: 2px;
+    }
+
+    .skill-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .build-summary {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .build-summary strong {
+      color: #fff;
+    }
+
+    /* === 拉霸模式 === */
+
+    .slot-section {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .slot-machine {
+      width: 1150px;
+      max-width: 100%;
+      padding: 30px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #b49a62, #7d683e);
+      border: 8px solid #5e4a28;
+      box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.6),
+        0 0 18px rgba(255, 222, 150, 0.2),
+        0 0 32px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .slot-machine::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(120deg,
+          rgba(255, 255, 255, 0.02) 0px,
+          rgba(255, 255, 255, 0.02) 2px,
+          rgba(0, 0, 0, 0.12) 5px);
+      pointer-events: none;
+    }
+
+    .slot-machine.glow {
+      box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(255, 240, 200, 0.7),
+        0 0 60px rgba(255, 240, 200, 0.95);
+      animation: slotMachineGlow 1.3s ease-in-out infinite alternate;
+    }
+
+    @keyframes slotMachineGlow {
+      0% {
+        transform: scale(1);
+        filter: brightness(1);
+      }
+
+      100% {
+        transform: scale(1.01);
+        filter: brightness(1.08);
+      }
+    }
+
+    #cardContainer {
+      width: 100%;
+      max-width: 1150px;
+      margin: 8px auto 0;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    }
+
+    #cardContainer.card-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .slot-header {
+      margin-bottom: 10px;
+    }
+
+    .slot-title-main {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .slot-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .slot-inner {
+      margin-top: 8px;
+      background: #1a1a1a;
+      border-radius: 16px;
+      border: 5px solid #8f6e3c;
+      padding: 24px 18px 28px;
+      box-shadow:
+        inset 0 0 15px rgba(0, 0, 0, 0.7),
+        0 0 10px rgba(255, 210, 140, 0.25);
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .slot-board-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .slot-board {
+      display: grid;
+      grid-template-columns: repeat(7, 120px);
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .slot-cell {
+      width: 120px;
+      min-height: 160px;
+      border-radius: 14px;
+      background: #101320;
+      border: 1px solid var(--border);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 12px rgba(0, 0, 0, 0.7),
+        0 0 8px rgba(0, 0, 0, 0.8);
+    }
+
+
+    .slot-anim-out {
+      animation: slotFadeOutUp 0.3s ease forwards;
+    }
+
+    .slot-anim-in {
+      animation: slotFadeInUp 0.3s ease forwards;
+    }
+
+    @keyframes slotFadeOutUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes slotFadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slot-cell-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .slot-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: #05060a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px;
+    }
+
+    .slot-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .slot-name {
+      font-size: 11px;
+      text-align: center;
+      color: #ddd;
+      padding: 0 2px;
+    }
+
+    .lever-normal,
+    .lever-bottom {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 120px;
+      height: 260px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .lever-bottom {
+      display: none;
+    }
+
+    .lever-stick {
+      width: 22px;
+      height: 150px;
+      background: linear-gradient(180deg, #a98a4a, #6e5a33);
+      border-radius: 12px;
+      position: relative;
+      box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, 0.6),
+        0 10px 14px rgba(0, 0, 0, 0.6);
+    }
+
+    .lever-ball,
+    .bottom-ball {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff5a5a, #7a0000);
+      box-shadow:
+        inset 0 0 16px rgba(255, 255, 255, 0.3),
+        0 0 14px rgba(0, 0, 0, 0.8);
+    }
+
+    .lever-ball {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .bottom-ball {
+      margin-bottom: 5px;
+    }
+
+    .slot-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .slot-board.win-anim {
+      animation: slotGlow 0.8s ease-in-out 3;
+    }
+
+    @keyframes slotGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 32px 4px rgba(255, 215, 128, 0.7);
+        transform: scale(1.01);
+      }
+    }
+
+    .slot-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      font-size: 18px;
+      color: #ffe8a0;
+      text-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- 右上角問號按鈕 --- */
+    #help-btn {
+      position: fixed;
+      top: 22px;
+      right: 28px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.8px solid rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 9999;
+      transition: 0.15s ease;
+    }
+
+    #help-btn:hover {
+      transform: scale(1.08);
+      border-color: #3f82ff;
+    }
+
+    /* --- Modal 背景 --- */
+    #help-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    /* --- Modal 內容框 --- */
+    .help-content {
+      width: 420px;
+      max-height: 78vh;
+      background: #121622;
+      border-radius: 14px;
+      border: 1px solid #2a3044;
+      padding: 18px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+    }
+
+    /* --- Header --- */
+    .help-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    #help-close {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* --- 說明文本 --- */
+    .help-text {
+      font-size: 14px;
+      line-height: 1.6em;
+      color: #d3d6e4;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>
+      DBD 殺手配點 & 拉霸工具
+      <span class="small">（配分模式 + 拉霸模式）</span>
+    </h1>
+
+    <div class="top-row">
+      <div class="mode-tabs">
+        <button id="tabPoints" class="mode-tab active" type="button">配分模式</button>
+        <button id="tabSlot" class="mode-tab" type="button">拉霸模式</button>
+      </div>
+    </div>
+
+    <!-- === 配分模式 === -->
+    <div id="pointsMode" class="layout">
+      <div class="points-layout">
+        <!-- 左側：殺手選擇 + 配件 & 技能列表 -->
+        <div>
+          <!-- 殺手選擇區 -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">殺手選擇</div>
+                <div class="card-sub">可以用搜尋（中 / 英 / 別名）快速找到要的殺手</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="flex-2">
+                <div class="label">搜尋殺手</div>
+                <input id="killerSearch" type="text" placeholder="例：威廉、凜妹、閃電大帥哥…" />
+              </div>
+              <div class="flex-1">
+                <div class="label">選擇殺手</div>
+                <select id="killerSelect">
+                  <option value="">請選擇殺手…</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 配件列表 -->
+          <div class="card mt-8">
+            <div class="card-header">
+              <div>
+                <div class="card-title">配件列表</div>
+                <div id="addonSubTitle" class="card-sub"></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="flex-2">
+                <div class="label">配件搜尋（中 / 英 / 別名）</div>
+                <input id="addonSearch" type="text" placeholder="例：迷因配件、餅乾夾、永一…" />
+              </div>
+              <div style="width: 150px; margin-left: auto;">
+                <div class="label">分數過濾</div>
+                <select id="addonScoreFilter">
+                  <option value="">全部</option>
+                  <option value="0"> 0 分</option>
+                  <option value="1"> 1 分</option>
+                  <option value="2"> 2 分</option>
+                  <option value="3"> 3 分</option>
+                  <option value="4"> 4 分</option>
+                  <option value="5"> 5 分</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="addonList" class="list-container"></div>
+
+            <div class="section-note">點擊配件卡片即可加入 / 移除。</div>
+          </div>
+
+          <!-- 技能列表 -->
+          <div class="card mt-8">
+            <div class="card-header">
+              <div>
+                <div class="card-title">技能列表（Perks）</div>
+                <div id="perkSubTitle" class="card-sub">從全池中挑 4 個技能</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="flex-2">
+                <div class="label">技能搜尋（中 / 英 / 別名）</div>
+                <input id="perkSearch" type="text" placeholder="例：貞子眼、超長刀、天災鉤…" />
+              </div>
+              <div style="width: 150px; margin-left: auto;">
+                <div class="label">分數過濾</div>
+                <select id="perkScoreFilter">
+                  <option value="">全部</option>
+                  <option value="0"> 0 分</option>
+                  <option value="1"> 1 分</option>
+                  <option value="2"> 2 分</option>
+                  <option value="3"> 3 分</option>
+                  <option value="4"> 4 分</option>
+                  <option value="5"> 5 分</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="perkList" class="list-container"></div>
+
+            <div class="section-note">點擊技能卡片即可加入 / 移除。</div>
+          </div>
+        </div>
+
+        <!-- 右側：目前配置 -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">目前配置</div>
+                <div class="card-sub">顯示當前殺手、配件與技能（右側技能為 4 格圖示）</div>
+              </div>
+              <button id="clearBuildBtn" type="button" class="outline">清空目前配置</button>
+            </div>
+
+            <!-- 殺手 + 配件 版面 -->
+            <div class="build-main-layout">
+              <div class="kill-avatar-wrap">
+                <div class="killer-box">
+                  <div id="killerAvatar" class="killer-avatar">
+                    尚未選擇
+                  </div>
+                  <div>
+                    <div id="killerName" class="killer-name-main">—</div>
+                    <div id="killerZh" class="killer-name-sub">請先選擇殺手</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="label">已選配件</div>
+                <div id="selectedAddons" class="selected-grid"></div>
+              </div>
+            </div>
+
+            <!-- 技能 4 格圖示 -->
+            <div class="mt-8">
+              <div class="label">技能欄位</div>
+              <div class="skills-row" id="selectedPerkIcons">
+                <!-- 4 個 slot 會動態填 -->
+              </div>
+            </div>
+
+            <!-- 總結文字 -->
+            <div id="buildSummary" class="build-summary mt-8"></div>
+
+            <!-- 目前分數卡片 -->
+            <!-- ⭐ 獨立的目前配分卡片 -->
+            <div id="currentPointsCard" class="card mt-8">
+              <div class="card-title" style="font-size:15px; font-weight:600;">目前配分</div>
+              <div style="font-size:12px; color:#a6a9c0; margin-top:2px;">
+                A = B - ( C + D )
+              </div>
+
+              <!-- 四個大數字 -->
+              <div style="display:flex; gap:32px; margin-top:10px; align-items:flex-end;">
+                <div style="text-align:center;">
+                  <div id="cp_A" style="font-size:28px; font-weight:700;">—</div>
+                  <div style="font-size:12px; color:#a6a9c0;">剩餘分數</div>
+                </div>
+
+                <div style="text-align:center;">
+                  <div id="cp_B" style="font-size:22px; font-weight:600;">—</div>
+                  <div style="font-size:12px; color:#a6a9c0;">殺手上限</div>
+                </div>
+
+                <div style="text-align:center;">
+                  <div id="cp_C" style="font-size:22px; font-weight:600;">—</div>
+                  <div style="font-size:12px; color:#a6a9c0;">配件總分</div>
+                </div>
+
+                <div style="text-align:center;">
+                  <div id="cp_D" style="font-size:22px; font-weight:600;">—</div>
+                  <div style="font-size:12px; color:#a6a9c0;">技能總分</div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- === 拉霸模式 === -->
+    <div id="slotMode" class="slot-section hidden">
+      <div class="slot-machine">
+        <div class="slot-header">
+          <div class="slot-title-main">拉霸模式</div>
+          <div class="slot-sub">拉下拉桿就好了喔</div>
+        </div>
+
+        <div class="slot-inner">
+          <div class="slot-board-wrapper">
+            <div class="slot-board" id="slotBoard">
+              <!-- 7 格由 JS 動態產生 -->
+            </div>
+          </div>
+
+          <!-- 拉桿：正常狀態（上方紅球 + 桿子） -->
+          <div id="leverNormal" class="lever-normal">
+            <div class="lever-stick">
+              <div class="lever-ball"></div>
+            </div>
+          </div>
+
+          <!-- 拉桿：拉到底時只顯示底部紅球 -->
+          <div id="leverBottom" class="lever-bottom">
+            <div class="bottom-ball"></div>
+          </div>
+
+          <!-- 完成覆蓋訊息（抽滿 7 格時顯示） -->
+          <div id="slotOverlay" class="slot-overlay hidden" style="display:none;">
+            🎉 完成！（3 秒後自動重置）
+          </div>
+        </div>
+
+        <!-- 舊的按鈕改為隱藏，只給 JS 使用 -->
+        <button id="slotBtn" type="button" class="hidden">🎰 抽一格</button>
+        <button id="slotResetBtn" type="button" class="hidden">重置拉霸</button>
+
+        <div class="slot-hint"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 資料檔 -->
+  <script src="killers.js"></script>
+  <script src="addons.js"></script>
+  <script src="perks.js"></script>
+  <script src="card.js"></script>
+
+  <script>
+    // ========================================
+    //(ﾉ>ω<)ﾉ ✧        Ado          ✧ヽ(>ω<ヽ)
+    //(ﾉ>ω<)ﾉ ✧     超かわいい！     ✧ヽ(>ω<ヽ)
+    //(ﾉ>ω<)ﾉ ✧        Ado          ✧ヽ(>ω<ヽ)
+    //(ﾉ>ω<)ﾉ ✧    超かっこいい！    ✧ヽ(>ω<ヽ)
+    // ========================================
+
+    // ==========================
+    // 全域狀態 & DOM 參照
+    // ==========================
+    const killerSelect = document.getElementById('killerSelect');
+    const killerSearchInput = document.getElementById('killerSearch');
+
+    const addonSearchInput = document.getElementById('addonSearch');
+    const addonScoreFilter = document.getElementById('addonScoreFilter');
+    const addonListEl = document.getElementById('addonList');
+    const addonSubTitle = document.getElementById('addonSubTitle');
+
+    const perkSearchInput = document.getElementById('perkSearch');
+    const perkScoreFilter = document.getElementById('perkScoreFilter');
+    const perkListEl = document.getElementById('perkList');
+    const perkSubTitle = document.getElementById('perkSubTitle');
+
+    const killerAvatarEl = document.getElementById('killerAvatar');
+    const killerNameEl = document.getElementById('killerName');
+    const killerZhEl = document.getElementById('killerZh');
+
+    const selectedAddonsEl = document.getElementById('selectedAddons');
+    const selectedPerkIconsEl = document.getElementById('selectedPerkIcons');
+    const buildSummaryEl = document.getElementById('buildSummary');
+
+    const currentPointsValueEl = document.getElementById('currentPointsValue');
+    const currentPointsNoteEl = document.getElementById('currentPointsNote');
+
+    const tabPoints = document.getElementById('tabPoints');
+    const tabSlot = document.getElementById('tabSlot');
+    const pointsModeEl = document.getElementById('pointsMode');
+    const slotModeEl = document.getElementById('slotMode');
+
+    const clearBuildBtn = document.getElementById('clearBuildBtn');
+
+    const slotBoardEl = document.getElementById('slotBoard');
+    const slotBtn = document.getElementById('slotBtn');
+    const slotResetBtn = document.getElementById('slotResetBtn');
+    const slotOverlayEl = document.getElementById('slotOverlay');
+    const leverNormalEl = document.getElementById('leverNormal');
+    const leverBottomEl = document.getElementById('leverBottom');
+
+    let currentMode = 'points';
+    let currentKillerKey = null;
+
+    // 配分模式選中的配件 / 技能
+    let selectedAddons = []; // array of addon name
+    let selectedPerks = [];  // array of perk name
+
+    // 殺手原始列表（用於搜尋）
+    let allKillerEntries = [];
+
+    // 拉霸模式狀態
+    const slotState = {
+      killerKey: null,
+      addons: [], // 2
+      perks: [],  // 4
+      locked: false,
+      animTimeout: null,
+      afterFull: false,
+    };
+
+    // ==========================
+    // 初始化殺手下拉 + 搜尋
+    // ==========================
+    function initKillerData() {
+      if (!window.KILLERS) {
+        console.error('KILLERS 未定義，請確認 killers.js 已載入');
+        return;
+      }
+      allKillerEntries = Object.entries(KILLERS).map(([key, killer]) => ({ key, killer }));
+      rebuildKillerOptions('');
+    }
+
+    function rebuildKillerOptions(term) {
+      const lower = (term || '').trim().toLowerCase();
+      killerSelect.innerHTML = '<option value="">請選擇殺手…</option>';
+
+      for (const { key, killer } of allKillerEntries) {
+        if (lower) {
+          const haystack = [
+            key,
+            killer.zh || '',
+            ...(killer.aliases || [])
+          ].join(' ').toLowerCase();
+          if (!haystack.includes(lower)) continue;
+        }
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = killer.zh ? `${killer.zh} / ${key}` : key;
+        killerSelect.appendChild(opt);
+      }
+
+      if (currentKillerKey && Array.from(killerSelect.options).some(o => o.value === currentKillerKey)) {
+        killerSelect.value = currentKillerKey;
+      } else if (!currentKillerKey) {
+        killerSelect.value = '';
+      }
+    }
+
+    // ==========================
+    // 計算 / 顯示配分
+    // ==========================
+    function computePoints() {
+      if (!currentKillerKey || !window.KILLERS) return { limit: 0, usedAddons: 0, usedPerks: 0 };
+
+      const killer = KILLERS[currentKillerKey] || {};
+      const limit = Number(killer.limit ?? 0);
+
+      let usedAddons = 0;
+      for (const name of selectedAddons) {
+        const addon = ADDONS?.[name];
+        if (!addon) continue;
+        usedAddons += Number(addon.score ?? 0);
+      }
+
+      let usedPerks = 0;
+      for (const name of selectedPerks) {
+        const perk = PERKS?.[name];
+        if (!perk) continue;
+        usedPerks += Number(perk.score ?? 0);
+      }
+
+      return { limit, usedAddons, usedPerks };
+    }
+
+    // 只負責更新「目前分數」卡片
+    function updatePointsDisplay() {
+      const A = document.getElementById("cp_A");
+      const B = document.getElementById("cp_B");
+      const C = document.getElementById("cp_C");
+      const D = document.getElementById("cp_D");
+
+      if (!currentKillerKey) {
+        A.textContent = B.textContent = C.textContent = D.textContent = "—";
+        A.style.color = "#ffffff";
+        return;
+      }
+
+      const { limit, usedAddons, usedPerks } = computePoints();
+
+      // 依照圖片公式：A = B - (C + D)
+      const remaining = limit - (usedAddons + usedPerks);
+
+      // 四項大數字
+      A.textContent = remaining;
+      B.textContent = limit;
+      C.textContent = usedAddons;
+      D.textContent = usedPerks;
+
+      // 顏色（只影響 A）
+      if (remaining > 0) {
+        A.style.color = "#7CFF8A"; // 綠色
+      } else if (remaining === 0) {
+        A.style.color = "#FFFFFF"; // 白色
+      } else {
+        A.style.color = "#FF4B5C"; // 紅色
+      }
+    }
+
+
+    // ==========================
+    // 渲染右側：殺手、配件、技能圖示
+    // ==========================
+    function renderKillerInfo() {
+      if (!currentKillerKey || !window.KILLERS) {
+        killerAvatarEl.innerHTML = '尚未選擇';
+        killerNameEl.textContent = '—';
+        killerZhEl.textContent = '請先選擇殺手';
+        return;
+      }
+      const killer = KILLERS[currentKillerKey];
+      killerAvatarEl.innerHTML = '';
+      if (killer.img) {
+        const img = document.createElement('img');
+        img.src = killer.img;
+        img.alt = currentKillerKey;
+        killerAvatarEl.appendChild(img);
+      } else {
+        killerAvatarEl.textContent = 'No Img';
+      }
+      killerNameEl.textContent = currentKillerKey;
+      killerZhEl.textContent = killer.zh || '（無中文名稱）';
+    }
+
+    function renderSelectedAddons() {
+      selectedAddonsEl.innerHTML = '';
+      if (!selectedAddons.length) {
+        const span = document.createElement('span');
+        span.style.color = 'var(--muted)';
+        span.textContent = '尚未選擇配件';
+        selectedAddonsEl.appendChild(span);
+        return;
+      }
+      for (const name of selectedAddons) {
+        const addon = ADDONS?.[name];
+        if (!addon) continue;
+
+        const pill = document.createElement('div');
+        pill.className = 'selected-pill';
+
+        if (addon.img) {
+          const img = document.createElement('img');
+          img.src = addon.img;
+          img.alt = name;
+          pill.appendChild(img);
+        }
+
+        const remove = document.createElement('span');
+        remove.className = 'pill-remove';
+        remove.textContent = '×';
+        remove.title = '移除此配件';
+        remove.onclick = () => {
+          selectedAddons = selectedAddons.filter(n => n !== name);
+          renderSelectedAddons();
+          renderSelectedPerkIcons();
+          updatePointsDisplay();
+          renderAddonList();
+        };
+        pill.appendChild(remove);
+
+        selectedAddonsEl.appendChild(pill);
+      }
+    }
+
+    function renderSelectedPerkIcons() {
+      selectedPerkIconsEl.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'skill-slot';
+
+        const perkName = selectedPerks[i];
+        if (!perkName) {
+          const span = document.createElement('span');
+          span.className = 'placeholder';
+          span.textContent = '空';
+          slot.appendChild(span);
+        } else {
+          const perk = PERKS?.[perkName];
+          slot.classList.add('filled');
+          if (perk && perk.img) {
+            const img = document.createElement('img');
+            img.src = perk.img;
+            img.alt = perkName;
+            const zh = perk.zh || '';
+            const score = perk.score ?? 0;
+            img.title = `${perkName}${zh ? ' / ' + zh : ''}（${score} 分）\n點擊移除`;
+            img.onclick = () => {
+              selectedPerks = selectedPerks.filter(n => n !== perkName);
+              renderSelectedPerkIcons();
+              renderSelectedAddons();
+              updatePointsDisplay();
+              renderPerkList();
+            };
+            slot.appendChild(img);
+          } else {
+            const span = document.createElement('span');
+            span.className = 'placeholder';
+            span.textContent = perkName;
+            slot.appendChild(span);
+          }
+        }
+        selectedPerkIconsEl.appendChild(slot);
+      }
+
+      const { limit, usedAddons, usedPerks } = computePoints();
+      if (!currentKillerKey) {
+        buildSummaryEl.textContent = '';
+        return;
+      }
+      const totalUsed = usedAddons + usedPerks;
+      const remaining = limit - totalUsed;
+      buildSummaryEl.innerHTML =
+        `殺手：<strong>${currentKillerKey}</strong> ｜ 配件：<strong>${selectedAddons.length}</strong> 個（${usedAddons} 分）｜ ` +
+        `技能：<strong>${selectedPerks.length}</strong> 個（${usedPerks} 分）｜ 剩餘：<strong>${remaining}</strong>`;
+    }
+
+    // ==========================
+    // 配件 / 技能列表（左側）
+    // ==========================
+    function getFilteredAddons() {
+      if (!currentKillerKey || !window.ADDONS) return [];
+      const term = (addonSearchInput.value || '').trim().toLowerCase();
+      const scoreFilterValue = addonScoreFilter.value;
+      const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
+
+      const result = [];
+      for (const [name, addon] of Object.entries(ADDONS)) {
+        if (addon.killer !== currentKillerKey) continue;
+
+        const score = Number(addon.score ?? 0);
+        if (exactScore !== null && score !== exactScore) continue;
+
+        if (term) {
+          const zh = (addon.zh || '').toLowerCase();
+          const aliases = (addon.aliases || []).join(' ').toLowerCase();
+          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+          if (!combined.includes(term)) continue;
+        }
+        result.push([name, addon]);
+      }
+
+      result.sort((a, b) => {
+        const sA = Number(a[1].score ?? 0);
+        const sB = Number(b[1].score ?? 0);
+        if (sA !== sB) return sA - sB;
+        return a[0].localeCompare(b[0]);
+      });
+
+      return result;
+    }
+
+    function renderAddonList() {
+      addonListEl.innerHTML = '';
+      if (!currentKillerKey) {
+        addonSubTitle.textContent = '請先選擇殺手';
+        return;
+      }
+      const list = getFilteredAddons();
+      const total = Object.values(ADDONS || {}).filter(a => a.killer === currentKillerKey).length;
+      addonSubTitle.textContent = `顯示 ${list.length} / ${total} 個配件`;
+
+      if (!list.length) {
+        const div = document.createElement('div');
+        div.style.color = 'var(--muted)';
+        div.style.fontSize = '13px';
+        div.textContent = '沒有符合條件的配件。';
+        addonListEl.appendChild(div);
+        return;
+      }
+
+      for (const [name, addon] of list) {
+        const item = document.createElement('div');
+        const isSelected = selectedAddons.includes(name);
+        item.className = 'addon-item' + (isSelected ? ' selected' : '');
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        if (addon.img) {
+          const img = document.createElement('img');
+          img.src = addon.img;
+          img.alt = name;
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = 'No Img';
+        }
+
+        const main = document.createElement('div');
+        main.className = 'list-main';
+        const title = document.createElement('div');
+        title.className = 'list-name';
+        title.textContent = name;
+        const zh = document.createElement('div');
+        zh.className = 'list-zh';
+        zh.textContent = addon.zh || '（無中文名稱）';
+
+        main.appendChild(title);
+        main.appendChild(zh);
+
+        const tags = document.createElement('div');
+        tags.className = 'tags-row';
+
+        const scoreTag = document.createElement('span');
+        scoreTag.className = 'tag tag-score';
+        scoreTag.textContent = `分數：${addon.score ?? 0}`;
+        tags.appendChild(scoreTag);
+
+        const killerTag = document.createElement('span');
+        killerTag.className = 'tag';
+        const killer = KILLERS[addon.killer];
+        killerTag.textContent = killer?.zh ? `${killer.zh} / ${addon.killer}` : addon.killer;
+        tags.appendChild(killerTag);
+
+        main.appendChild(tags);
+
+        const right = document.createElement('div');
+        right.className = 'list-right';
+        const hint = document.createElement('div');
+        hint.textContent = isSelected ? '已加入' : '點擊加入';
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = isSelected ? '選中' : '未選中';
+        right.appendChild(hint);
+        right.appendChild(badge);
+
+        item.appendChild(thumb);
+        item.appendChild(main);
+        item.appendChild(right);
+
+        item.onclick = () => {
+          if (isSelected) {
+            selectedAddons = selectedAddons.filter(n => n !== name);
+          } else {
+            if (selectedAddons.length >= 2) {
+              alert('配件最多只能選 2 個。');
+              return;
+            }
+            selectedAddons.push(name);
+          }
+          renderSelectedAddons();
+          renderSelectedPerkIcons();
+          updatePointsDisplay();
+          renderAddonList();
+        };
+
+        addonListEl.appendChild(item);
+      }
+    }
+
+    function getFilteredPerks() {
+      if (!window.PERKS) return [];
+      const term = (perkSearchInput.value || '').trim().toLowerCase();
+      const scoreFilterValue = perkScoreFilter.value;
+      const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
+
+      const result = [];
+      for (const [name, perk] of Object.entries(PERKS)) {
+        const score = Number(perk.score ?? 0);
+        if (exactScore !== null && score !== exactScore) continue;
+
+        if (term) {
+          const zh = (perk.zh || '').toLowerCase();
+          const aliases = (perk.aliases || []).join(' ').toLowerCase();
+          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+          if (!combined.includes(term)) continue;
+        }
+        result.push([name, perk]);
+      }
+
+      result.sort((a, b) => {
+        const sA = Number(a[1].score ?? 0);
+        const sB = Number(b[1].score ?? 0);
+        if (sA !== sB) return sA - sB;
+        return a[0].localeCompare(b[0]);
+      });
+
+      return result;
+    }
+
+    function renderPerkList() {
+      perkListEl.innerHTML = '';
+      const list = getFilteredPerks();
+      perkSubTitle.textContent = `顯示 ${list.length} 個技能`;
+
+      if (!list.length) {
+        const div = document.createElement('div');
+        div.style.color = 'var(--muted)';
+        div.style.fontSize = '13px';
+        div.textContent = '沒有符合條件的技能。';
+        perkListEl.appendChild(div);
+        return;
+      }
+
+      for (const [name, perk] of list) {
+        const item = document.createElement('div');
+        const isSelected = selectedPerks.includes(name);
+        item.className = 'perk-item' + (isSelected ? ' selected' : '');
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        if (perk.img) {
+          const img = document.createElement('img');
+          img.src = perk.img;
+          img.alt = name;
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = 'No Img';
+        }
+
+        const main = document.createElement('div');
+        main.className = 'list-main';
+        const title = document.createElement('div');
+        title.className = 'list-name';
+        title.textContent = name;
+        const zh = document.createElement('div');
+        zh.className = 'list-zh';
+        zh.textContent = perk.zh || '（無中文名稱）';
+
+        main.appendChild(title);
+        main.appendChild(zh);
+
+        const tags = document.createElement('div');
+        tags.className = 'tags-row';
+
+        const scoreTag = document.createElement('span');
+        scoreTag.className = 'tag tag-score';
+        scoreTag.textContent = `分數：${perk.score ?? 0}`;
+        tags.appendChild(scoreTag);
+
+        main.appendChild(tags);
+
+        const right = document.createElement('div');
+        right.className = 'list-right';
+        const hint = document.createElement('div');
+        hint.textContent = isSelected ? '已加入' : '點擊加入';
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = isSelected ? '選中' : '未選中';
+        right.appendChild(hint);
+        right.appendChild(badge);
+
+        item.appendChild(thumb);
+        item.appendChild(main);
+        item.appendChild(right);
+
+        item.onclick = () => {
+          if (isSelected) {
+            selectedPerks = selectedPerks.filter(n => n !== name);
+          } else {
+            if (selectedPerks.length >= 4) {
+              alert('技能最多只能選 4 個。');
+              return;
+            }
+            selectedPerks.push(name);
+          }
+          renderSelectedPerkIcons();
+          renderSelectedAddons();
+          updatePointsDisplay();
+          renderPerkList();
+        };
+
+        perkListEl.appendChild(item);
+      }
+    }
+
+    // ==========================
+    // 拉霸模式
+    // ==========================
+    function initSlotBoard() {
+      slotBoardEl.innerHTML = '';
+
+      const labels = [
+        '殺手',
+        '配件 1',
+        '配件 2',
+        '技能 1',
+        '技能 2',
+        '技能 3',
+        '技能 4'
+      ];
+
+      for (let i = 0; i < 7; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'slot-cell';
+        cell.dataset.index = i;
+
+        const label = document.createElement('div');
+        label.className = 'slot-cell-label';
+        label.textContent = labels[i];
+
+        const icon = document.createElement('div');
+        icon.className = 'slot-icon';
+        icon.textContent = '—';
+
+        const name = document.createElement('div');
+        name.className = 'slot-name';
+        name.textContent = '';
+
+        cell.appendChild(label);
+        cell.appendChild(icon);
+        cell.appendChild(name);
+        slotBoardEl.appendChild(cell);
+      }
+    }
+
+    function renderSlotBoard() {
+      const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+
+      // killer slot
+      const killerCell = cells[0];
+      const killerIcon = killerCell.querySelector('.slot-icon');
+      const killerName = killerCell.querySelector('.slot-name');
+      killerIcon.innerHTML = '';
+      killerName.textContent = '';
+
+      if (slotState.killerKey && KILLERS[slotState.killerKey]) {
+        const killer = KILLERS[slotState.killerKey];
+        const img = document.createElement('img');
+        img.src = killer.img || '';
+        img.alt = slotState.killerKey;
+        img.title = killer.zh ? `${slotState.killerKey} / ${killer.zh}` : slotState.killerKey;
+        killerIcon.appendChild(img);
+        killerName.textContent = killer.zh ? `${killer.zh} / ${slotState.killerKey}` : slotState.killerKey;
+      } else {
+        killerIcon.textContent = '—';
+      }
+
+      // addon slots (1,2)
+      for (let i = 0; i < 2; i++) {
+        const cell = cells[1 + i];
+        const icon = cell.querySelector('.slot-icon');
+        const nameEl = cell.querySelector('.slot-name');
+        icon.innerHTML = '';
+        nameEl.textContent = '';
+
+        const addonName = slotState.addons[i];
+        if (addonName && ADDONS[addonName]) {
+          const addon = ADDONS[addonName];
+          const img = document.createElement('img');
+          img.src = addon.img || '';
+          img.alt = addonName;
+          const zh = addon.zh || '';
+          img.title = zh ? `${addonName} / ${zh}` : addonName;
+          icon.appendChild(img);
+          nameEl.textContent = zh ? `${addonName} / ${zh}` : addonName;
+        } else {
+          icon.textContent = '—';
+        }
+      }
+
+      // perk slots (3,4,5,6)
+      for (let i = 0; i < 4; i++) {
+        const cell = cells[3 + i];
+        const icon = cell.querySelector('.slot-icon');
+        const nameEl = cell.querySelector('.slot-name');
+        icon.innerHTML = '';
+        nameEl.textContent = '';
+
+        const perkName = slotState.perks[i];
+        if (perkName && PERKS[perkName]) {
+          const perk = PERKS[perkName];
+          const img = document.createElement('img');
+          img.src = perk.img || '';
+          img.alt = perkName;
+          const zh = perk.zh || '';
+          img.title = zh ? `${perkName} / ${zh}` : perkName;
+          icon.appendChild(img);
+          nameEl.textContent = zh ? `${perkName} / ${zh}` : perkName;
+        } else {
+          icon.textContent = '—';
+        }
+      }
+    }
+
+    function resetSlotState() {
+      slotState.killerKey = null;
+      slotState.addons = [];
+      slotState.perks = [];
+      slotState.locked = false;
+      slotState.afterFull = false;
+
+      if (slotState.animTimeout) {
+        clearTimeout(slotState.animTimeout);
+        slotState.animTimeout = null;
+      }
+
+      slotBoardEl.classList.remove('win-anim');
+      if (slotOverlayEl) slotOverlayEl.classList.add('hidden');
+
+      const machineEl = document.querySelector('.slot-machine');
+      if (machineEl) {
+        machineEl.classList.remove('glow');
+      }
+
+      slotBtn.disabled = false;
+      slotBtn.textContent = '🎰 抽一格';
+
+      renderSlotBoard();
+    }
+
+    function getRandomItem(arr) {
+      if (!arr.length) return null;
+      const idx = Math.floor(Math.random() * arr.length);
+      return arr[idx];
+    }
+
+    function drawOneSlot() {
+      if (slotState.locked || slotState.afterFull) return;
+
+      const filledCount =
+        (slotState.killerKey ? 1 : 0) +
+        slotState.addons.length +
+        slotState.perks.length;
+
+      if (filledCount >= 7) return;
+
+      const step = filledCount;
+
+      if (step === 0) {
+        const killerKeys = Object.keys(KILLERS || {});
+        if (!killerKeys.length) return;
+        slotState.killerKey = getRandomItem(killerKeys);
+
+      } else if (step === 1 || step === 2) {
+        const pool = Object.entries(ADDONS || {})
+          .filter(([name, a]) =>
+            a &&
+            a.killer === slotState.killerKey &&
+            !slotState.addons.includes(name)
+          )
+          .map(([name]) => name);
+
+        if (!pool.length) return;
+        const chosen = getRandomItem(pool);
+        if (chosen) slotState.addons.push(chosen);
+
+      } else {
+        const used = new Set(slotState.perks);
+        const pool = Object.entries(PERKS || {})
+          .filter(([perkName, perk]) => {
+            if (used.has(perkName)) return false;
+            if (!perk || typeof perk !== 'object') return false;
+            return true;
+          })
+          .map(([name]) => name);
+
+        if (!pool.length) return;
+        const chosen = getRandomItem(pool);
+        if (chosen) slotState.perks.push(chosen);
+      }
+
+
+      renderSlotBoard();
+
+      const newCount =
+        (slotState.killerKey ? 1 : 0) +
+        slotState.addons.length +
+        slotState.perks.length;
+
+      if (newCount >= 7) {
+        slotState.locked = true;
+        slotState.afterFull = true;
+
+        if (window.CardSystem && typeof CardSystem.startCardPhase === 'function') {
+          try {
+            CardSystem.startCardPhase(slotState, {
+              onApplied: (updatedState) => {
+                if (updatedState) {
+                  // 先記錄舊狀態，用來判斷哪些格子有變化
+                  const prevState = {
+                    killerKey: slotState.killerKey,
+                    addons: Array.isArray(slotState.addons) ? [...slotState.addons] : [],
+                    perks: Array.isArray(slotState.perks) ? [...slotState.perks] : []
+                  };
+
+                  const changedIndices = [];
+
+                  // 殺手格：index 0
+                  if (typeof updatedState.killerKey !== 'undefined' &&
+                    updatedState.killerKey !== prevState.killerKey) {
+                    changedIndices.push(0);
+                  }
+
+                  // 配件格：index 1,2
+                  if (Array.isArray(updatedState.addons)) {
+                    for (let i = 0; i < 2; i++) {
+                      const beforeAddon = prevState.addons[i] || null;
+                      const afterAddon = updatedState.addons[i] || null;
+                      if (beforeAddon !== afterAddon) {
+                        changedIndices.push(1 + i);
+                      }
+                    }
+                  }
+
+                  // 技能格：index 3,4,5,6
+                  if (Array.isArray(updatedState.perks)) {
+                    for (let i = 0; i < 4; i++) {
+                      const beforePerk = prevState.perks[i] || null;
+                      const afterPerk = updatedState.perks[i] || null;
+                      if (beforePerk !== afterPerk) {
+                        changedIndices.push(3 + i);
+                      }
+                    }
+                  }
+
+                  const uniqueChanged = [...new Set(changedIndices)];
+                  const hasChanged = uniqueChanged.length > 0;
+
+                  if (!hasChanged) {
+                    // 沒東西變化就正常套用
+                    if (typeof updatedState.killerKey !== 'undefined') {
+                      slotState.killerKey = updatedState.killerKey;
+                    }
+                    if (Array.isArray(updatedState.addons)) {
+                      slotState.addons = [...updatedState.addons];
+                    }
+                    if (Array.isArray(updatedState.perks)) {
+                      slotState.perks = [...updatedState.perks];
+                    }
+                    renderSlotBoard();
+                  } else {
+                    const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+                    const DURATION = 300;
+
+                    // 先讓舊的圖示往上淡出
+                    uniqueChanged.forEach((idx) => {
+                      const cell = cells[idx];
+                      if (cell) {
+                        cell.classList.add('slot-anim-out');
+                      }
+                    });
+
+                    setTimeout(() => {
+                      // 套用新狀態
+                      if (typeof updatedState.killerKey !== 'undefined') {
+                        slotState.killerKey = updatedState.killerKey;
+                      }
+                      if (Array.isArray(updatedState.addons)) {
+                        slotState.addons = [...updatedState.addons];
+                      }
+                      if (Array.isArray(updatedState.perks)) {
+                        slotState.perks = [...updatedState.perks];
+                      }
+
+                      // 重畫整個 board
+                      renderSlotBoard();
+
+                      // 讓新的圖示由下往上淡入
+                      const freshCells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+                      uniqueChanged.forEach((idx) => {
+                        const cell = freshCells[idx];
+                        if (cell) {
+                          cell.classList.remove('slot-anim-out');
+                          cell.classList.add('slot-anim-in');
+                          setTimeout(() => {
+                            cell.classList.remove('slot-anim-in');
+                          }, DURATION);
+                        }
+                      });
+                    }, DURATION);
+                  }
+                }
+                slotState.locked = false;
+              }
+            });
+          } catch (e) {
+            console.error('CardSystem.startCardPhase 發生錯誤：', e);
+            slotState.locked = false;
+          }
+        } else {
+          slotState.locked = false;
+        }
+      }
+    }
+
+    // ==========================
+    // 事件綁定 & 初始化
+    // ==========================
+    // 模式切換
+    tabPoints.addEventListener('click', () => {
+      if (currentMode === 'points') return;
+      currentMode = 'points';
+      tabPoints.classList.add('active');
+      tabSlot.classList.remove('active');
+      pointsModeEl.classList.remove('hidden');
+      slotModeEl.classList.add('hidden');
+
+      // 切到配分模式時，隱藏拉霸卡片區域（但不清除內容）
+      const cardContainer = document.getElementById('cardContainer');
+      if (cardContainer) {
+        cardContainer.classList.add('hidden');
+      }
+    });
+
+    tabSlot.addEventListener('click', () => {
+      if (currentMode === 'slot') return;
+      currentMode = 'slot';
+      tabSlot.classList.add('active');
+      tabPoints.classList.remove('active');
+      pointsModeEl.classList.add('hidden');
+      slotModeEl.classList.remove('hidden');
+
+      // 切回拉霸模式，如果之前有卡片，讓卡片容器重新顯示
+      const cardContainer = document.getElementById('cardContainer');
+      if (cardContainer && cardContainer.children.length > 0) {
+        cardContainer.classList.remove('hidden');
+      }
+    });
+    
+
+    // 殺手搜尋
+    killerSearchInput.addEventListener('input', () => {
+      rebuildKillerOptions(killerSearchInput.value);
+    });
+
+    // 殺手選擇
+    killerSelect.addEventListener('change', () => {
+      currentKillerKey = killerSelect.value || null;
+      selectedAddons = [];
+      selectedPerks = [];
+      renderKillerInfo();
+      renderSelectedAddons();
+      renderSelectedPerkIcons();
+      updatePointsDisplay();
+      renderAddonList();
+      renderPerkList();
+    });
+
+    // 配件搜尋 / 分數過濾
+    addonSearchInput.addEventListener('input', renderAddonList);
+    addonScoreFilter.addEventListener('change', renderAddonList);
+
+    // 技能搜尋 / 分數過濾
+    perkSearchInput.addEventListener('input', renderPerkList);
+    perkScoreFilter.addEventListener('change', renderPerkList);
+
+    // 清空目前配置
+    clearBuildBtn.addEventListener('click', () => {
+      selectedAddons = [];
+      selectedPerks = [];
+      renderSelectedAddons();
+      renderSelectedPerkIcons();
+      updatePointsDisplay();
+      renderAddonList();
+      renderPerkList();
+    });
+
+    // 拉霸：抽一格（隱藏按鈕）
+    slotBtn.addEventListener('click', () => {
+      drawOneSlot();
+    });
+
+    // 拉霸：手動重置
+    slotResetBtn.addEventListener('click', () => {
+      resetSlotState();
+    });
+
+    // 拉桿控制
+    if (leverNormalEl && leverBottomEl) {
+      leverNormalEl.addEventListener('mousedown', () => {
+        if (slotState.locked) return;
+
+        if (slotState.afterFull) {
+          slotState.afterFull = false;
+          leverNormalEl.style.display = 'none';
+          leverBottomEl.style.display = 'flex';
+          resetSlotState();
+          return;
+        }
+
+        leverNormalEl.style.display = 'none';
+        leverBottomEl.style.display = 'flex';
+        drawOneSlot();
+      });
+
+      leverBottomEl.addEventListener('mouseup', () => {
+        leverBottomEl.style.display = 'none';
+        leverNormalEl.style.display = 'flex';
+      });
+
+      leverBottomEl.addEventListener('mouseleave', () => {
+        leverBottomEl.style.display = 'none';
+        leverNormalEl.style.display = 'flex';
+      });
+    }
+
+    // 初始化
+    initKillerData();
+    renderKillerInfo();
+    renderSelectedAddons();
+    renderSelectedPerkIcons();
+    updatePointsDisplay();
+    renderAddonList();
+    renderPerkList();
+    initSlotBoard();
+    renderSlotBoard();
+  </script>
+
+
+</body>
+
+</html>
