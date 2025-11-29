@@ -20,7 +20,7 @@ window.KILLERS = {
   "The Nurse": {
     zh: "護士",
     limit: 10,
-    aliases: ["nurse"],
+    aliases: ["nurse", "唯一神"],
     img: "./images/killers/nurse.png"
   },
   "The Shape": {
@@ -38,7 +38,7 @@ window.KILLERS = {
   "The Doctor": {
     zh: "醫生",
     limit: 20,
-    aliases: ["楊教授", "老楊", "閃電大帥哥", "doctor"],
+    aliases: ["楊教授", "老楊", "閃電大帥哥", "赫曼", "doctor"],
     img: "./images/killers/doctor.png"
   },
   "The Huntress": {
@@ -122,7 +122,7 @@ window.KILLERS = {
   "The Blight": {
     zh: "枯萎者",
     limit: 12,
-    aliases: ["阿枯", "枯魔", "威廉柏金", "威廉博士", "blight"],
+    aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "blight"],
     img: "./images/killers/blight.png"
   },
   "The Twins": {
@@ -212,7 +212,7 @@ window.KILLERS = {
   "The Lich": {
     zh: "巫妖",
     limit: 12,
-    aliases: ["威可那", "威可拿", "紫色光頭", "lich"],
+    aliases: ["威可那", "威可拿", "威可納", "紫色光頭", "lich"],
     img: "./images/killers/vecna.png"
   },
   "The Dark Lord": {
@@ -236,7 +236,7 @@ window.KILLERS = {
   "The Animatronic": {
     zh: "機械玩偶",
     limit: 20,
-    aliases: ["彈簧陷阱", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "老登", "animatronic"],
+    aliases: ["彈簧陷阱", "老登", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "老登", "animatronic"],
     img: "./images/killers/springtrap.png"
   },
   "The Krasue": {
