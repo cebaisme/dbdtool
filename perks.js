@@ -302,21 +302,21 @@ zh: "勿忘我",
   },
   "Make Your Choice": {
 zh: "做出你的選擇",
-    score: 5,
+    score: 3,
     aliases: ["make your choice", "天平", "天秤"],
     killer: "The Pig",
     img: "./images/perks/makeyourchoice.png"
   },
   "Scourge Hook: Hangman's Trick": {
 zh: "禍害之鉤:行刑者的技巧",
-    score: 5,
+    score: 1,
     aliases: ["scourge hook: hangman's trick", "禍害之鉤", "行刑者的技巧", "天災鉤子:劊子手的把戲", "天災鉤"],
     killer: "The Pig",
     img: "./images/perks/scourgehookhangmanstrick.png"
   },
   "Surveillance": {
 zh: "了如指掌",
-    score: 5,
+    score: 3,
     aliases: ["surveillance", "發電機"],
     killer: "The Pig",
     img: "./images/perks/surveillance.png"
