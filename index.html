@@ -871,10 +871,36 @@
       color: #d3d6e4;
       white-space: pre-line;
     }
+
+    /* ==== 指令輸入欄（左下角）==== */
+    .cmd-panel {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      display: none;
+      /* slot 模式才會顯示 */
+      z-index: 99999;
+    }
+
+    #cmdInput {
+      width: 260px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      font-size: 14px;
+      backdrop-filter: blur(6px);
+    }
   </style>
 </head>
 
 <body>
+  <!-- 指令輸入欄（只在拉霸模式顯示） -->
+  <div id="cmdPanel" class="cmd-panel">
+    <input id="cmdInput" type="text" placeholder="killer + addon + perk…" />
+  </div>
+
   <div class="app">
     <h1>
       DBD 殺手配點 & 拉霸工具
@@ -1169,10 +1195,10 @@
     let allKillerEntries = [];
 
     // 拉霸模式狀態
-    const slotState = {
+    window.slotState = {
       killerKey: null,
-      addons: [], // 2
-      perks: [],  // 4
+      addons: [],
+      perks: [],
       locked: false,
       animTimeout: null,
       afterFull: false,
@@ -1380,7 +1406,6 @@
         }
         selectedPerkIconsEl.appendChild(slot);
       }
-      }
 
       const { limit, usedAddons, usedPerks } = computePoints();
       if (!currentKillerKey) {
@@ -1389,707 +1414,749 @@
       }
       const totalUsed = usedAddons + usedPerks;
       const remaining = limit - totalUsed;
-      const addonNames = selectedAddons
-        .map(a => {
-          const zh = ADDONS[a]?.zh ? ` / ${ADDONS[a].zh}` : "";
-          return `${a}${zh}`;
-        })
-        .join("、");
-
-      const perkNames = selectedPerks
-        .map(p => {
-          const zh = PERKS[p]?.zh ? ` / ${PERKS[p].zh}` : "";
-          return `${p}${zh}`;
-        })
-        .join("、");
-
       buildSummaryEl.innerHTML =
-        `殺手：<strong>${currentKillerKey}</strong><br>` +
-        `配件（${selectedAddons.length} 個 / ${usedAddons} 分）：<strong>${addonNames || "—"}</strong><br>` +
-        `技能（${selectedPerks.length} 個 / ${usedPerks} 分）：<strong>${perkNames || "—"}</strong><br>` +
-        `剩餘：<strong>${remaining}</strong>`;
+        `殺手：<strong>${currentKillerKey}</strong> ｜ 配件：<strong>${selectedAddons.length}</strong> 個（${usedAddons} 分）｜ ` +
+        `技能：<strong>${selectedPerks.length}</strong> 個（${usedPerks} 分）｜ 剩餘：<strong>${remaining}</strong>`;
+    }
 
+    // ==========================
+    // 配件 / 技能列表（左側）
+    // ==========================
+    function getFilteredAddons() {
+      if (!currentKillerKey || !window.ADDONS) return [];
+      const term = (addonSearchInput.value || '').trim().toLowerCase();
+      const scoreFilterValue = addonScoreFilter.value;
+      const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
 
-      // ==========================
-      // 配件 / 技能列表（左側）
-      // ==========================
-      function getFilteredAddons() {
-        if (!currentKillerKey || !window.ADDONS) return [];
-        const term = (addonSearchInput.value || '').trim().toLowerCase();
-        const scoreFilterValue = addonScoreFilter.value;
-        const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
+      const result = [];
+      for (const [name, addon] of Object.entries(ADDONS)) {
+        if (addon.killer !== currentKillerKey) continue;
 
-        const result = [];
-        for (const [name, addon] of Object.entries(ADDONS)) {
-          if (addon.killer !== currentKillerKey) continue;
+        const score = Number(addon.score ?? 0);
+        if (exactScore !== null && score !== exactScore) continue;
 
-          const score = Number(addon.score ?? 0);
-          if (exactScore !== null && score !== exactScore) continue;
-
-          if (term) {
-            const zh = (addon.zh || '').toLowerCase();
-            const aliases = (addon.aliases || []).join(' ').toLowerCase();
-            const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
-            if (!combined.includes(term)) continue;
-          }
-          result.push([name, addon]);
+        if (term) {
+          const zh = (addon.zh || '').toLowerCase();
+          const aliases = (addon.aliases || []).join(' ').toLowerCase();
+          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+          if (!combined.includes(term)) continue;
         }
-
-        result.sort((a, b) => {
-          const sA = Number(a[1].score ?? 0);
-          const sB = Number(b[1].score ?? 0);
-          if (sA !== sB) return sA - sB;
-          return a[0].localeCompare(b[0]);
-        });
-
-        return result;
+        result.push([name, addon]);
       }
 
-      function renderAddonList() {
-        addonListEl.innerHTML = '';
-        if (!currentKillerKey) {
-          addonSubTitle.textContent = '請先選擇殺手';
-          return;
-        }
-        const list = getFilteredAddons();
-        const total = Object.values(ADDONS || {}).filter(a => a.killer === currentKillerKey).length;
-        addonSubTitle.textContent = `顯示 ${list.length} / ${total} 個配件`;
+      result.sort((a, b) => {
+        const sA = Number(a[1].score ?? 0);
+        const sB = Number(b[1].score ?? 0);
+        if (sA !== sB) return sA - sB;
+        return a[0].localeCompare(b[0]);
+      });
 
-        if (!list.length) {
-          const div = document.createElement('div');
-          div.style.color = 'var(--muted)';
-          div.style.fontSize = '13px';
-          div.textContent = '沒有符合條件的配件。';
-          addonListEl.appendChild(div);
-          return;
-        }
+      return result;
+    }
 
-        for (const [name, addon] of list) {
-          const item = document.createElement('div');
-          const isSelected = selectedAddons.includes(name);
-          item.className = 'addon-item' + (isSelected ? ' selected' : '');
+    function renderAddonList() {
+      addonListEl.innerHTML = '';
+      if (!currentKillerKey) {
+        addonSubTitle.textContent = '請先選擇殺手';
+        return;
+      }
+      const list = getFilteredAddons();
+      const total = Object.values(ADDONS || {}).filter(a => a.killer === currentKillerKey).length;
+      addonSubTitle.textContent = `顯示 ${list.length} / ${total} 個配件`;
 
-          const thumb = document.createElement('div');
-          thumb.className = 'thumb';
-          if (addon.img) {
-            const img = document.createElement('img');
-            img.src = addon.img;
-            img.alt = name;
-            thumb.appendChild(img);
-          } else {
-            thumb.textContent = 'No Img';
-          }
-
-          const main = document.createElement('div');
-          main.className = 'list-main';
-          const title = document.createElement('div');
-          title.className = 'list-name';
-          title.textContent = name;
-          const zh = document.createElement('div');
-          zh.className = 'list-zh';
-          zh.textContent = addon.zh || '（無中文名稱）';
-
-          main.appendChild(title);
-          main.appendChild(zh);
-
-          const tags = document.createElement('div');
-          tags.className = 'tags-row';
-
-          const scoreTag = document.createElement('span');
-          scoreTag.className = 'tag tag-score';
-          scoreTag.textContent = `分數：${addon.score ?? 0}`;
-          tags.appendChild(scoreTag);
-
-          const killerTag = document.createElement('span');
-          killerTag.className = 'tag';
-          const killer = KILLERS[addon.killer];
-          killerTag.textContent = killer?.zh ? `${killer.zh} / ${addon.killer}` : addon.killer;
-          tags.appendChild(killerTag);
-
-          main.appendChild(tags);
-
-          const right = document.createElement('div');
-          right.className = 'list-right';
-          const hint = document.createElement('div');
-          hint.textContent = isSelected ? '已加入' : '點擊加入';
-          const badge = document.createElement('div');
-          badge.className = 'badge';
-          badge.textContent = isSelected ? '選中' : '未選中';
-          right.appendChild(hint);
-          right.appendChild(badge);
-
-          item.appendChild(thumb);
-          item.appendChild(main);
-          item.appendChild(right);
-
-          item.onclick = () => {
-            if (isSelected) {
-              selectedAddons = selectedAddons.filter(n => n !== name);
-            } else {
-              if (selectedAddons.length >= 2) {
-                alert('配件最多只能選 2 個。');
-                return;
-              }
-              selectedAddons.push(name);
-            }
-            renderSelectedAddons();
-            renderSelectedPerkIcons();
-            updatePointsDisplay();
-            renderAddonList();
-          };
-
-          addonListEl.appendChild(item);
-        }
+      if (!list.length) {
+        const div = document.createElement('div');
+        div.style.color = 'var(--muted)';
+        div.style.fontSize = '13px';
+        div.textContent = '沒有符合條件的配件。';
+        addonListEl.appendChild(div);
+        return;
       }
 
-      function getFilteredPerks() {
-        if (!window.PERKS) return [];
-        const term = (perkSearchInput.value || '').trim().toLowerCase();
-        const scoreFilterValue = perkScoreFilter.value;
-        const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
+      for (const [name, addon] of list) {
+        const item = document.createElement('div');
+        const isSelected = selectedAddons.includes(name);
+        item.className = 'addon-item' + (isSelected ? ' selected' : '');
 
-        const result = [];
-        for (const [name, perk] of Object.entries(PERKS)) {
-          const score = Number(perk.score ?? 0);
-          if (exactScore !== null && score !== exactScore) continue;
-
-          if (term) {
-            const zh = (perk.zh || '').toLowerCase();
-            const aliases = (perk.aliases || []).join(' ').toLowerCase();
-            const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
-            if (!combined.includes(term)) continue;
-          }
-          result.push([name, perk]);
-        }
-
-        result.sort((a, b) => {
-          const sA = Number(a[1].score ?? 0);
-          const sB = Number(b[1].score ?? 0);
-          if (sA !== sB) return sA - sB;
-          return a[0].localeCompare(b[0]);
-        });
-
-        return result;
-      }
-
-      function renderPerkList() {
-        perkListEl.innerHTML = '';
-        const list = getFilteredPerks();
-        perkSubTitle.textContent = `顯示 ${list.length} 個技能`;
-
-        if (!list.length) {
-          const div = document.createElement('div');
-          div.style.color = 'var(--muted)';
-          div.style.fontSize = '13px';
-          div.textContent = '沒有符合條件的技能。';
-          perkListEl.appendChild(div);
-          return;
-        }
-
-        for (const [name, perk] of list) {
-          const item = document.createElement('div');
-          const isSelected = selectedPerks.includes(name);
-          item.className = 'perk-item' + (isSelected ? ' selected' : '');
-
-          const thumb = document.createElement('div');
-          thumb.className = 'thumb';
-          if (perk.img) {
-            const img = document.createElement('img');
-            img.src = perk.img;
-            img.alt = name;
-            thumb.appendChild(img);
-          } else {
-            thumb.textContent = 'No Img';
-          }
-
-          const main = document.createElement('div');
-          main.className = 'list-main';
-          const title = document.createElement('div');
-          title.className = 'list-name';
-          title.textContent = name;
-          const zh = document.createElement('div');
-          zh.className = 'list-zh';
-          zh.textContent = perk.zh || '（無中文名稱）';
-
-          main.appendChild(title);
-          main.appendChild(zh);
-
-          const tags = document.createElement('div');
-          tags.className = 'tags-row';
-
-          const scoreTag = document.createElement('span');
-          scoreTag.className = 'tag tag-score';
-          scoreTag.textContent = `分數：${perk.score ?? 0}`;
-          tags.appendChild(scoreTag);
-
-          main.appendChild(tags);
-
-          const right = document.createElement('div');
-          right.className = 'list-right';
-          const hint = document.createElement('div');
-          hint.textContent = isSelected ? '已加入' : '點擊加入';
-          const badge = document.createElement('div');
-          badge.className = 'badge';
-          badge.textContent = isSelected ? '選中' : '未選中';
-          right.appendChild(hint);
-          right.appendChild(badge);
-
-          item.appendChild(thumb);
-          item.appendChild(main);
-          item.appendChild(right);
-
-          item.onclick = () => {
-            if (isSelected) {
-              selectedPerks = selectedPerks.filter(n => n !== name);
-            } else {
-              if (selectedPerks.length >= 4) {
-                alert('技能最多只能選 4 個。');
-                return;
-              }
-              selectedPerks.push(name);
-            }
-            renderSelectedPerkIcons();
-            renderSelectedAddons();
-            updatePointsDisplay();
-            renderPerkList();
-          };
-
-          perkListEl.appendChild(item);
-        }
-      }
-
-      // ==========================
-      // 拉霸模式
-      // ==========================
-      function initSlotBoard() {
-        slotBoardEl.innerHTML = '';
-
-        const labels = [
-          '殺手',
-          '配件 1',
-          '配件 2',
-          '技能 1',
-          '技能 2',
-          '技能 3',
-          '技能 4'
-        ];
-
-        for (let i = 0; i < 7; i++) {
-          const cell = document.createElement('div');
-          cell.className = 'slot-cell';
-          cell.dataset.index = i;
-
-          const label = document.createElement('div');
-          label.className = 'slot-cell-label';
-          label.textContent = labels[i];
-
-          const icon = document.createElement('div');
-          icon.className = 'slot-icon';
-          icon.textContent = '—';
-
-          const name = document.createElement('div');
-          name.className = 'slot-name';
-          name.textContent = '';
-
-          cell.appendChild(label);
-          cell.appendChild(icon);
-          cell.appendChild(name);
-          slotBoardEl.appendChild(cell);
-        }
-      }
-
-      function renderSlotBoard() {
-        const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
-
-        // killer slot
-        const killerCell = cells[0];
-        const killerIcon = killerCell.querySelector('.slot-icon');
-        const killerName = killerCell.querySelector('.slot-name');
-        killerIcon.innerHTML = '';
-        killerName.textContent = '';
-
-        if (slotState.killerKey && KILLERS[slotState.killerKey]) {
-          const killer = KILLERS[slotState.killerKey];
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        if (addon.img) {
           const img = document.createElement('img');
-          img.src = killer.img || '';
-          img.alt = slotState.killerKey;
-          img.title = killer.zh ? `${slotState.killerKey} / ${killer.zh}` : slotState.killerKey;
-          killerIcon.appendChild(img);
-          killerName.textContent = killer.zh ? `${killer.zh} / ${slotState.killerKey}` : slotState.killerKey;
+          img.src = addon.img;
+          img.alt = name;
+          thumb.appendChild(img);
         } else {
-          killerIcon.textContent = '—';
+          thumb.textContent = 'No Img';
         }
 
-        // addon slots (1,2)
-        for (let i = 0; i < 2; i++) {
-          const cell = cells[1 + i];
-          const icon = cell.querySelector('.slot-icon');
-          const nameEl = cell.querySelector('.slot-name');
-          icon.innerHTML = '';
-          nameEl.textContent = '';
+        const main = document.createElement('div');
+        main.className = 'list-main';
+        const title = document.createElement('div');
+        title.className = 'list-name';
+        title.textContent = name;
+        const zh = document.createElement('div');
+        zh.className = 'list-zh';
+        zh.textContent = addon.zh || '（無中文名稱）';
 
-          const addonName = slotState.addons[i];
-          if (addonName && ADDONS[addonName]) {
-            const addon = ADDONS[addonName];
-            const img = document.createElement('img');
-            img.src = addon.img || '';
-            img.alt = addonName;
-            const zh = addon.zh || '';
-            img.title = zh ? `${addonName} / ${zh}` : addonName;
-            icon.appendChild(img);
-            nameEl.textContent = zh ? `${addonName} / ${zh}` : addonName;
+        main.appendChild(title);
+        main.appendChild(zh);
+
+        const tags = document.createElement('div');
+        tags.className = 'tags-row';
+
+        const scoreTag = document.createElement('span');
+        scoreTag.className = 'tag tag-score';
+        scoreTag.textContent = `分數：${addon.score ?? 0}`;
+        tags.appendChild(scoreTag);
+
+        const killerTag = document.createElement('span');
+        killerTag.className = 'tag';
+        const killer = KILLERS[addon.killer];
+        killerTag.textContent = killer?.zh ? `${killer.zh} / ${addon.killer}` : addon.killer;
+        tags.appendChild(killerTag);
+
+        main.appendChild(tags);
+
+        const right = document.createElement('div');
+        right.className = 'list-right';
+        const hint = document.createElement('div');
+        hint.textContent = isSelected ? '已加入' : '點擊加入';
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = isSelected ? '選中' : '未選中';
+        right.appendChild(hint);
+        right.appendChild(badge);
+
+        item.appendChild(thumb);
+        item.appendChild(main);
+        item.appendChild(right);
+
+        item.onclick = () => {
+          if (isSelected) {
+            selectedAddons = selectedAddons.filter(n => n !== name);
           } else {
-            icon.textContent = '—';
+            if (selectedAddons.length >= 2) {
+              alert('配件最多只能選 2 個。');
+              return;
+            }
+            selectedAddons.push(name);
           }
-        }
+          renderSelectedAddons();
+          renderSelectedPerkIcons();
+          updatePointsDisplay();
+          renderAddonList();
+        };
 
-        // perk slots (3,4,5,6)
-        for (let i = 0; i < 4; i++) {
-          const cell = cells[3 + i];
-          const icon = cell.querySelector('.slot-icon');
-          const nameEl = cell.querySelector('.slot-name');
-          icon.innerHTML = '';
-          nameEl.textContent = '';
-
-          const perkName = slotState.perks[i];
-          if (perkName && PERKS[perkName]) {
-            const perk = PERKS[perkName];
-            const img = document.createElement('img');
-            img.src = perk.img || '';
-            img.alt = perkName;
-            const zh = perk.zh || '';
-            img.title = zh ? `${perkName} / ${zh}` : perkName;
-            icon.appendChild(img);
-            nameEl.textContent = zh ? `${perkName} / ${zh}` : perkName;
-          } else {
-            icon.textContent = '—';
-          }
-        }
+        addonListEl.appendChild(item);
       }
+    }
 
-      function resetSlotState() {
-        slotState.killerKey = null;
-        slotState.addons = [];
-        slotState.perks = [];
-        slotState.locked = false;
-        slotState.afterFull = false;
+function getFilteredPerks() {
+  if (!window.PERKS) return [];
+  const term = (perkSearchInput.value || '').trim().toLowerCase();
+  const scoreFilterValue = perkScoreFilter.value;
+  const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
 
-        if (slotState.animTimeout) {
-          clearTimeout(slotState.animTimeout);
-          slotState.animTimeout = null;
-        }
+  const result = [];
 
-        slotBoardEl.classList.remove('win-anim');
-        if (slotOverlayEl) slotOverlayEl.classList.add('hidden');
+  for (const [name, perk] of Object.entries(PERKS)) {
+    const score = Number(perk.score ?? 0);
+    if (exactScore !== null && score !== exactScore) continue;
 
-        const machineEl = document.querySelector('.slot-machine');
-        if (machineEl) {
-          machineEl.classList.remove('glow');
-        }
+    // 如果有輸入東西才做文字比對
+    if (term) {
+      const zh = (perk.zh || '').toLowerCase();
+      const aliases = (perk.aliases || []).join(' ').toLowerCase();
 
-        slotBtn.disabled = false;
-        slotBtn.textContent = '🎰 抽一格';
+      // === 把「技能所屬殺手」也塞進可搜尋文字裡 ===
+      let killerText = '';
+      const killerKey = perk.killer;
 
-        renderSlotBoard();
-      }
+      if (killerKey) {
+        const lowerKillerKey = String(killerKey).toLowerCase();
 
-      function getRandomItem(arr) {
-        if (!arr.length) return null;
-        const idx = Math.floor(Math.random() * arr.length);
-        return arr[idx];
-      }
-
-      function drawOneSlot() {
-        if (slotState.locked || slotState.afterFull) return;
-
-        const filledCount =
-          (slotState.killerKey ? 1 : 0) +
-          slotState.addons.length +
-          slotState.perks.length;
-
-        if (filledCount >= 7) return;
-
-        const step = filledCount;
-
-        if (step === 0) {
-          const killerKeys = Object.keys(KILLERS || {});
-          if (!killerKeys.length) return;
-          slotState.killerKey = getRandomItem(killerKeys);
-
-        } else if (step === 1 || step === 2) {
-          const pool = Object.entries(ADDONS || {})
-            .filter(([name, a]) =>
-              a &&
-              a.killer === slotState.killerKey &&
-              !slotState.addons.includes(name)
-            )
-            .map(([name]) => name);
-
-          if (!pool.length) return;
-          const chosen = getRandomItem(pool);
-          if (chosen) slotState.addons.push(chosen);
-
+        // General / 通用技能 特別處理
+        if (lowerKillerKey === 'general') {
+          killerText = 'general 通用 通用技能';
         } else {
-          const used = new Set(slotState.perks);
-          const pool = Object.entries(PERKS || {})
-            .filter(([perkName, perk]) => {
-              if (used.has(perkName)) return false;
-              if (!perk || typeof perk !== 'object') return false;
-              return true;
-            })
-            .map(([name]) => name);
+          const killer = window.KILLERS && window.KILLERS[killerKey];
+          const parts = [lowerKillerKey];
 
-          if (!pool.length) return;
-          const chosen = getRandomItem(pool);
-          if (chosen) slotState.perks.push(chosen);
+          if (killer && killer.zh) {
+            parts.push(killer.zh.toLowerCase());
+          }
+          if (killer && Array.isArray(killer.aliases)) {
+            parts.push(...killer.aliases.map(a => a.toLowerCase()));
+          }
+
+          killerText = parts.join(' ');
+        }
+      }
+
+      // 技能英文名 + 技能中文名 + 技能別名 + 殺手英文/中文/俗名 + General/通用
+      const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerText}`;
+
+      if (!combined.includes(term)) continue;
+    }
+
+    result.push([name, perk]);
+  }
+
+  // 排序：先分數，再名字
+  result.sort((a, b) => {
+    const sA = Number(a[1].score ?? 0);
+    const sB = Number(b[1].score ?? 0);
+    if (sA !== sB) return sA - sB;
+    return a[0].localeCompare(b[0]);
+  });
+
+  return result;
+}
+
+
+
+
+
+    function renderPerkList() {
+      perkListEl.innerHTML = '';
+      const list = getFilteredPerks();
+      perkSubTitle.textContent = `顯示 ${list.length} 個技能`;
+
+      if (!list.length) {
+        const div = document.createElement('div');
+        div.style.color = 'var(--muted)';
+        div.style.fontSize = '13px';
+        div.textContent = '沒有符合條件的技能。';
+        perkListEl.appendChild(div);
+        return;
+      }
+
+      for (const [name, perk] of list) {
+        const item = document.createElement('div');
+        const isSelected = selectedPerks.includes(name);
+        item.className = 'perk-item' + (isSelected ? ' selected' : '');
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        if (perk.img) {
+          const img = document.createElement('img');
+          img.src = perk.img;
+          img.alt = name;
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = 'No Img';
         }
 
+        const main = document.createElement('div');
+        main.className = 'list-main';
+        const title = document.createElement('div');
+        title.className = 'list-name';
+        title.textContent = name;
+        const zh = document.createElement('div');
+        zh.className = 'list-zh';
+        zh.textContent = perk.zh || '（無中文名稱）';
 
-        renderSlotBoard();
+        main.appendChild(title);
+        main.appendChild(zh);
 
-        const newCount =
-          (slotState.killerKey ? 1 : 0) +
-          slotState.addons.length +
-          slotState.perks.length;
+        const tags = document.createElement('div');
+        tags.className = 'tags-row';
 
-        if (newCount >= 7) {
-          slotState.locked = true;
-          slotState.afterFull = true;
+        const scoreTag = document.createElement('span');
+        scoreTag.className = 'tag tag-score';
+        scoreTag.textContent = `分數：${perk.score ?? 0}`;
+        tags.appendChild(scoreTag);
 
-          if (window.CardSystem && typeof CardSystem.startCardPhase === 'function') {
-            try {
-              CardSystem.startCardPhase(slotState, {
-                onApplied: (updatedState) => {
-                  if (updatedState) {
-                    // 先記錄舊狀態，用來判斷哪些格子有變化
-                    const prevState = {
-                      killerKey: slotState.killerKey,
-                      addons: Array.isArray(slotState.addons) ? [...slotState.addons] : [],
-                      perks: Array.isArray(slotState.perks) ? [...slotState.perks] : []
-                    };
+        main.appendChild(tags);
 
-                    const changedIndices = [];
+        const right = document.createElement('div');
+        right.className = 'list-right';
+        const hint = document.createElement('div');
+        hint.textContent = isSelected ? '已加入' : '點擊加入';
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = isSelected ? '選中' : '未選中';
+        right.appendChild(hint);
+        right.appendChild(badge);
 
-                    // 殺手格：index 0
-                    if (typeof updatedState.killerKey !== 'undefined' &&
-                      updatedState.killerKey !== prevState.killerKey) {
-                      changedIndices.push(0);
-                    }
+        item.appendChild(thumb);
+        item.appendChild(main);
+        item.appendChild(right);
 
-                    // 配件格：index 1,2
-                    if (Array.isArray(updatedState.addons)) {
-                      for (let i = 0; i < 2; i++) {
-                        const beforeAddon = prevState.addons[i] || null;
-                        const afterAddon = updatedState.addons[i] || null;
-                        if (beforeAddon !== afterAddon) {
-                          changedIndices.push(1 + i);
-                        }
+        item.onclick = () => {
+          if (isSelected) {
+            selectedPerks = selectedPerks.filter(n => n !== name);
+          } else {
+            if (selectedPerks.length >= 4) {
+              alert('技能最多只能選 4 個。');
+              return;
+            }
+            selectedPerks.push(name);
+          }
+          renderSelectedPerkIcons();
+          renderSelectedAddons();
+          updatePointsDisplay();
+          renderPerkList();
+        };
+
+        perkListEl.appendChild(item);
+      }
+    }
+
+    // ==========================
+    // 拉霸模式
+    // ==========================
+    function initSlotBoard() {
+      slotBoardEl.innerHTML = '';
+
+      const labels = [
+        '殺手',
+        '配件 1',
+        '配件 2',
+        '技能 1',
+        '技能 2',
+        '技能 3',
+        '技能 4'
+      ];
+
+      for (let i = 0; i < 7; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'slot-cell';
+        cell.dataset.index = i;
+
+        const label = document.createElement('div');
+        label.className = 'slot-cell-label';
+        label.textContent = labels[i];
+
+        const icon = document.createElement('div');
+        icon.className = 'slot-icon';
+        icon.textContent = '—';
+
+        const name = document.createElement('div');
+        name.className = 'slot-name';
+        name.textContent = '';
+
+        cell.appendChild(label);
+        cell.appendChild(icon);
+        cell.appendChild(name);
+        slotBoardEl.appendChild(cell);
+      }
+    }
+
+    function renderSlotBoard() {
+      const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+
+      // killer slot
+      const killerCell = cells[0];
+      const killerIcon = killerCell.querySelector('.slot-icon');
+      const killerName = killerCell.querySelector('.slot-name');
+      killerIcon.innerHTML = '';
+      killerName.textContent = '';
+
+      if (slotState.killerKey && KILLERS[slotState.killerKey]) {
+        const killer = KILLERS[slotState.killerKey];
+        const img = document.createElement('img');
+        img.src = killer.img || '';
+        img.alt = slotState.killerKey;
+        img.title = killer.zh ? `${slotState.killerKey} / ${killer.zh}` : slotState.killerKey;
+        killerIcon.appendChild(img);
+        killerName.textContent = killer.zh ? `${killer.zh} / ${slotState.killerKey}` : slotState.killerKey;
+      } else {
+        killerIcon.textContent = '—';
+      }
+
+      // addon slots (1,2)
+      for (let i = 0; i < 2; i++) {
+        const cell = cells[1 + i];
+        const icon = cell.querySelector('.slot-icon');
+        const nameEl = cell.querySelector('.slot-name');
+        icon.innerHTML = '';
+        nameEl.textContent = '';
+
+        const addonName = slotState.addons[i];
+        if (addonName && ADDONS[addonName]) {
+          const addon = ADDONS[addonName];
+          const img = document.createElement('img');
+          img.src = addon.img || '';
+          img.alt = addonName;
+          const zh = addon.zh || '';
+          img.title = zh ? `${addonName} / ${zh}` : addonName;
+          icon.appendChild(img);
+          nameEl.textContent = zh ? `${addonName} / ${zh}` : addonName;
+        } else {
+          icon.textContent = '—';
+        }
+      }
+
+      // perk slots (3,4,5,6)
+      for (let i = 0; i < 4; i++) {
+        const cell = cells[3 + i];
+        const icon = cell.querySelector('.slot-icon');
+        const nameEl = cell.querySelector('.slot-name');
+        icon.innerHTML = '';
+        nameEl.textContent = '';
+
+        const perkName = slotState.perks[i];
+        if (perkName && PERKS[perkName]) {
+          const perk = PERKS[perkName];
+          const img = document.createElement('img');
+          img.src = perk.img || '';
+          img.alt = perkName;
+          const zh = perk.zh || '';
+          img.title = zh ? `${perkName} / ${zh}` : perkName;
+          icon.appendChild(img);
+          nameEl.textContent = zh ? `${perkName} / ${zh}` : perkName;
+        } else {
+          icon.textContent = '—';
+        }
+      }
+    }
+
+    function resetSlotState() {
+      slotState.killerKey = null;
+      slotState.addons = [];
+      slotState.perks = [];
+      slotState.locked = false;
+      slotState.afterFull = false;
+
+      if (slotState.animTimeout) {
+        clearTimeout(slotState.animTimeout);
+        slotState.animTimeout = null;
+      }
+
+      slotBoardEl.classList.remove('win-anim');
+      if (slotOverlayEl) slotOverlayEl.classList.add('hidden');
+
+      const machineEl = document.querySelector('.slot-machine');
+      if (machineEl) {
+        machineEl.classList.remove('glow');
+      }
+
+      slotBtn.disabled = false;
+      slotBtn.textContent = '🎰 抽一格';
+
+      renderSlotBoard();
+    }
+
+    function getRandomItem(arr) {
+      if (!arr.length) return null;
+      const idx = Math.floor(Math.random() * arr.length);
+      return arr[idx];
+    }
+
+    function drawOneSlot() {
+      if (slotState.locked || slotState.afterFull) return;
+
+      const filledCount =
+        (slotState.killerKey ? 1 : 0) +
+        slotState.addons.length +
+        slotState.perks.length;
+
+      if (filledCount >= 7) return;
+
+      const step = filledCount;
+
+      if (step === 0) {
+        const killerKeys = Object.keys(KILLERS || {});
+        if (!killerKeys.length) return;
+        slotState.killerKey = getRandomItem(killerKeys);
+
+      } else if (step === 1 || step === 2) {
+        const pool = Object.entries(ADDONS || {})
+          .filter(([name, a]) =>
+            a &&
+            a.killer === slotState.killerKey &&
+            !slotState.addons.includes(name)
+          )
+          .map(([name]) => name);
+
+        if (!pool.length) return;
+        const chosen = getRandomItem(pool);
+        if (chosen) slotState.addons.push(chosen);
+
+      } else {
+        const used = new Set(slotState.perks);
+        const pool = Object.entries(PERKS || {})
+          .filter(([perkName, perk]) => {
+            if (used.has(perkName)) return false;
+            if (!perk || typeof perk !== 'object') return false;
+            return true;
+          })
+          .map(([name]) => name);
+
+        if (!pool.length) return;
+        const chosen = getRandomItem(pool);
+        if (chosen) slotState.perks.push(chosen);
+      }
+
+
+      renderSlotBoard();
+
+      const newCount =
+        (slotState.killerKey ? 1 : 0) +
+        slotState.addons.length +
+        slotState.perks.length;
+
+      if (newCount >= 7) {
+        slotState.locked = true;
+        slotState.afterFull = true;
+
+        const cs = window.CardSystem;
+
+        // ★ 指令模式：跳過卡片流程，避免卡死
+        if (cs && cs.skipForCommand) {
+          cs.skipForCommand = false;    // 用完關掉
+          slotState.locked = false;     // 解鎖
+          // afterFull = true → 下一次拉桿會重置
+          return;
+        }
+
+        // 一般模式：進入卡片流程
+        if (cs && typeof cs.startCardPhase === "function") {
+          try {
+            cs.startCardPhase(slotState, {
+              onApplied: (updatedState) => {
+                if (updatedState) {
+                  const prevState = {
+                    killerKey: slotState.killerKey,
+                    addons: [...slotState.addons],
+                    perks: [...slotState.perks]
+                  };
+
+                  const changed = [];
+
+                  if (updatedState.killerKey !== undefined &&
+                    updatedState.killerKey !== prevState.killerKey) {
+                    changed.push(0);
+                  }
+
+                  if (Array.isArray(updatedState.addons)) {
+                    for (let i = 0; i < 2; i++) {
+                      if ((updatedState.addons[i] || null) !== (prevState.addons[i] || null)) {
+                        changed.push(1 + i);
                       }
-                    }
-
-                    // 技能格：index 3,4,5,6
-                    if (Array.isArray(updatedState.perks)) {
-                      for (let i = 0; i < 4; i++) {
-                        const beforePerk = prevState.perks[i] || null;
-                        const afterPerk = updatedState.perks[i] || null;
-                        if (beforePerk !== afterPerk) {
-                          changedIndices.push(3 + i);
-                        }
-                      }
-                    }
-
-                    const uniqueChanged = [...new Set(changedIndices)];
-                    const hasChanged = uniqueChanged.length > 0;
-
-                    if (!hasChanged) {
-                      // 沒東西變化就正常套用
-                      if (typeof updatedState.killerKey !== 'undefined') {
-                        slotState.killerKey = updatedState.killerKey;
-                      }
-                      if (Array.isArray(updatedState.addons)) {
-                        slotState.addons = [...updatedState.addons];
-                      }
-                      if (Array.isArray(updatedState.perks)) {
-                        slotState.perks = [...updatedState.perks];
-                      }
-                      renderSlotBoard();
-                    } else {
-                      const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
-                      const DURATION = 300;
-
-                      // 先讓舊的圖示往上淡出
-                      uniqueChanged.forEach((idx) => {
-                        const cell = cells[idx];
-                        if (cell) {
-                          cell.classList.add('slot-anim-out');
-                        }
-                      });
-
-                      setTimeout(() => {
-                        // 套用新狀態
-                        if (typeof updatedState.killerKey !== 'undefined') {
-                          slotState.killerKey = updatedState.killerKey;
-                        }
-                        if (Array.isArray(updatedState.addons)) {
-                          slotState.addons = [...updatedState.addons];
-                        }
-                        if (Array.isArray(updatedState.perks)) {
-                          slotState.perks = [...updatedState.perks];
-                        }
-
-                        // 重畫整個 board
-                        renderSlotBoard();
-
-                        // 讓新的圖示由下往上淡入
-                        const freshCells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
-                        uniqueChanged.forEach((idx) => {
-                          const cell = freshCells[idx];
-                          if (cell) {
-                            cell.classList.remove('slot-anim-out');
-                            cell.classList.add('slot-anim-in');
-                            setTimeout(() => {
-                              cell.classList.remove('slot-anim-in');
-                            }, DURATION);
-                          }
-                        });
-                      }, DURATION);
                     }
                   }
-                  slotState.locked = false;
+
+                  if (Array.isArray(updatedState.perks)) {
+                    for (let i = 0; i < 4; i++) {
+                      if ((updatedState.perks[i] || null) !== (prevState.perks[i] || null)) {
+                        changed.push(3 + i);
+                      }
+                    }
+                  }
+
+                  if (!changed.length) {
+                    if (updatedState.killerKey !== undefined)
+                      slotState.killerKey = updatedState.killerKey;
+                    if (Array.isArray(updatedState.addons))
+                      slotState.addons = [...updatedState.addons];
+                    if (Array.isArray(updatedState.perks))
+                      slotState.perks = [...updatedState.perks];
+
+                    renderSlotBoard();
+                  } else {
+                    const DURATION = 300;
+                    const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+
+                    changed.forEach(i => cells[i]?.classList.add('slot-anim-out'));
+
+                    setTimeout(() => {
+                      if (updatedState.killerKey !== undefined)
+                        slotState.killerKey = updatedState.killerKey;
+                      if (Array.isArray(updatedState.addons))
+                        slotState.addons = [...updatedState.addons];
+                      if (Array.isArray(updatedState.perks))
+                        slotState.perks = [...updatedState.perks];
+
+                      renderSlotBoard();
+
+                      const fresh = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+                      changed.forEach(i => {
+                        const cell = fresh[i];
+                        if (cell) {
+                          cell.classList.remove('slot-anim-out');
+                          cell.classList.add('slot-anim-in');
+                          setTimeout(() => cell.classList.remove('slot-anim-in'), DURATION);
+                        }
+                      });
+                    }, DURATION);
+                  }
                 }
-              });
-            } catch (e) {
-              console.error('CardSystem.startCardPhase 發生錯誤：', e);
-              slotState.locked = false;
-            }
-          } else {
+
+                slotState.locked = false;
+              }
+            });
+          } catch (e) {
+            console.error("CardSystem.startCardPhase 發生錯誤：", e);
             slotState.locked = false;
           }
+        } else {
+          slotState.locked = false;
         }
       }
 
-      // ==========================
-      // 事件綁定 & 初始化
-      // ==========================
-      // 模式切換
-      tabPoints.addEventListener('click', () => {
-        if (currentMode === 'points') return;
-        currentMode = 'points';
-        tabPoints.classList.add('active');
-        tabSlot.classList.remove('active');
-        pointsModeEl.classList.remove('hidden');
-        slotModeEl.classList.add('hidden');
 
-        // 切到配分模式時，隱藏拉霸卡片區域（但不清除內容）
-        const cardContainer = document.getElementById('cardContainer');
-        if (cardContainer) {
-          cardContainer.classList.add('hidden');
-        }
-      });
+    }
 
-      tabSlot.addEventListener('click', () => {
-        if (currentMode === 'slot') return;
-        currentMode = 'slot';
-        tabSlot.classList.add('active');
-        tabPoints.classList.remove('active');
-        pointsModeEl.classList.add('hidden');
-        slotModeEl.classList.remove('hidden');
+    // ==========================
+    // 事件綁定 & 初始化
+    // ==========================
+    // 模式切換
+    tabPoints.addEventListener('click', () => {
+      const cmdPanel = document.getElementById('cmdPanel');
+      if (cmdPanel) cmdPanel.style.display = 'none';
+      if (currentMode === 'points') return;
+      currentMode = 'points';
+      tabPoints.classList.add('active');
+      tabSlot.classList.remove('active');
+      pointsModeEl.classList.remove('hidden');
+      slotModeEl.classList.add('hidden');
 
-        // 切回拉霸模式，如果之前有卡片，讓卡片容器重新顯示
-        const cardContainer = document.getElementById('cardContainer');
-        if (cardContainer && cardContainer.children.length > 0) {
-          cardContainer.classList.remove('hidden');
-        }
-      });
-
-
-      // 殺手搜尋
-      killerSearchInput.addEventListener('input', () => {
-        rebuildKillerOptions(killerSearchInput.value);
-      });
-
-      // 殺手選擇
-      killerSelect.addEventListener('change', () => {
-        currentKillerKey = killerSelect.value || null;
-        selectedAddons = [];
-        selectedPerks = [];
-        renderKillerInfo();
-        renderSelectedAddons();
-        renderSelectedPerkIcons();
-        updatePointsDisplay();
-        renderAddonList();
-        renderPerkList();
-      });
-
-      // 配件搜尋 / 分數過濾
-      addonSearchInput.addEventListener('input', renderAddonList);
-      addonScoreFilter.addEventListener('change', renderAddonList);
-
-      // 技能搜尋 / 分數過濾
-      perkSearchInput.addEventListener('input', renderPerkList);
-      perkScoreFilter.addEventListener('change', renderPerkList);
-
-      // 清空目前配置
-      clearBuildBtn.addEventListener('click', () => {
-        selectedAddons = [];
-        selectedPerks = [];
-        renderSelectedAddons();
-        renderSelectedPerkIcons();
-        updatePointsDisplay();
-        renderAddonList();
-        renderPerkList();
-      });
-
-      // 拉霸：抽一格（隱藏按鈕）
-      slotBtn.addEventListener('click', () => {
-        drawOneSlot();
-      });
-
-      // 拉霸：手動重置
-      slotResetBtn.addEventListener('click', () => {
-        resetSlotState();
-      });
-
-      // 拉桿控制
-      if (leverNormalEl && leverBottomEl) {
-        leverNormalEl.addEventListener('mousedown', () => {
-          if (slotState.locked) return;
-
-          if (slotState.afterFull) {
-            slotState.afterFull = false;
-            leverNormalEl.style.display = 'none';
-            leverBottomEl.style.display = 'flex';
-            resetSlotState();
-            return;
-          }
-
-          leverNormalEl.style.display = 'none';
-          leverBottomEl.style.display = 'flex';
-          drawOneSlot();
-        });
-
-        leverBottomEl.addEventListener('mouseup', () => {
-          leverBottomEl.style.display = 'none';
-          leverNormalEl.style.display = 'flex';
-        });
-
-        leverBottomEl.addEventListener('mouseleave', () => {
-          leverBottomEl.style.display = 'none';
-          leverNormalEl.style.display = 'flex';
-        });
+      // 切到配分模式時，隱藏拉霸卡片區域（但不清除內容）
+      const cardContainer = document.getElementById('cardContainer');
+      if (cardContainer) {
+        cardContainer.classList.add('hidden');
       }
+    });
 
-      // 初始化
-      initKillerData();
+    tabSlot.addEventListener('click', () => {
+      const cmdPanel = document.getElementById('cmdPanel');
+      if (cmdPanel) cmdPanel.style.display = 'block';
+      if (currentMode === 'slot') return;
+      currentMode = 'slot';
+      tabSlot.classList.add('active');
+      tabPoints.classList.remove('active');
+      pointsModeEl.classList.add('hidden');
+      slotModeEl.classList.remove('hidden');
+
+      // 切回拉霸模式，如果之前有卡片，讓卡片容器重新顯示
+      const cardContainer = document.getElementById('cardContainer');
+      if (cardContainer && cardContainer.children.length > 0) {
+        cardContainer.classList.remove('hidden');
+      }
+    });
+
+
+    // 殺手搜尋
+    killerSearchInput.addEventListener('input', () => {
+      rebuildKillerOptions(killerSearchInput.value);
+    });
+
+    // 殺手選擇
+    killerSelect.addEventListener('change', () => {
+      currentKillerKey = killerSelect.value || null;
+      selectedAddons = [];
+      selectedPerks = [];
       renderKillerInfo();
       renderSelectedAddons();
       renderSelectedPerkIcons();
       updatePointsDisplay();
       renderAddonList();
       renderPerkList();
-      initSlotBoard();
-      renderSlotBoard();
+    });
+
+    // 配件搜尋 / 分數過濾
+    addonSearchInput.addEventListener('input', renderAddonList);
+    addonScoreFilter.addEventListener('change', renderAddonList);
+
+    // 技能搜尋 / 分數過濾
+    perkSearchInput.addEventListener('input', renderPerkList);
+    perkScoreFilter.addEventListener('change', renderPerkList);
+
+    // 清空目前配置
+    clearBuildBtn.addEventListener('click', () => {
+      selectedAddons = [];
+      selectedPerks = [];
+      renderSelectedAddons();
+      renderSelectedPerkIcons();
+      updatePointsDisplay();
+      renderAddonList();
+      renderPerkList();
+    });
+
+    // 拉霸：抽一格（隱藏按鈕）
+    slotBtn.addEventListener('click', () => {
+      drawOneSlot();
+    });
+
+    // 拉霸：手動重置
+    slotResetBtn.addEventListener('click', () => {
+      resetSlotState();
+    });
+
+    // 拉桿控制
+    if (leverNormalEl && leverBottomEl) {
+      leverNormalEl.addEventListener('mousedown', () => {
+        if (slotState.locked) return;
+
+        if (slotState.afterFull) {
+          slotState.afterFull = false;
+          leverNormalEl.style.display = 'none';
+          leverBottomEl.style.display = 'flex';
+          resetSlotState();
+          return;
+        }
+
+        leverNormalEl.style.display = 'none';
+        leverBottomEl.style.display = 'flex';
+        drawOneSlot();
+      });
+
+      leverBottomEl.addEventListener('mouseup', () => {
+        leverBottomEl.style.display = 'none';
+        leverNormalEl.style.display = 'flex';
+      });
+
+      leverBottomEl.addEventListener('mouseleave', () => {
+        leverBottomEl.style.display = 'none';
+        leverNormalEl.style.display = 'flex';
+      });
+    }
+
+
+    // =====================
+    // 指令輸入欄功能
+    // =====================
+    const cmdInput = document.getElementById("cmdInput");
+    cmdInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+
+      if (currentMode !== "slot") {
+        alert("❌ 指令只能在拉霸模式使用！");
+        return;
+      }
+
+      const cmd = cmdInput.value.trim();
+      if (!cmd) return;
+
+      if (typeof rebuildByCommand === "function") {
+        rebuildByCommand(cmd);
+      } else {
+        alert("指令系統未載入（card.js 尚未整合）");
+      }
+
+      cmdInput.value = "";
+    });
+
+    // 初始化
+    initKillerData();
+    renderKillerInfo();
+    renderSelectedAddons();
+    renderSelectedPerkIcons();
+    updatePointsDisplay();
+    renderAddonList();
+    renderPerkList();
+    initSlotBoard();
+    renderSlotBoard();
+
+    const initCmdPanel = document.getElementById('cmdPanel');
+    if (initCmdPanel) initCmdPanel.style.display = 'none';
   </script>
+
+
+
+
 
 
 </body>
