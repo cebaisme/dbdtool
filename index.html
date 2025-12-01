@@ -1563,19 +1563,16 @@ function getFilteredPerks() {
     const score = Number(perk.score ?? 0);
     if (exactScore !== null && score !== exactScore) continue;
 
-    // 如果有輸入東西才做文字比對
     if (term) {
       const zh = (perk.zh || '').toLowerCase();
       const aliases = (perk.aliases || []).join(' ').toLowerCase();
 
-      // === 把「技能所屬殺手」也塞進可搜尋文字裡 ===
       let killerText = '';
       const killerKey = perk.killer;
 
       if (killerKey) {
         const lowerKillerKey = String(killerKey).toLowerCase();
 
-        // General / 通用技能 特別處理
         if (lowerKillerKey === 'general') {
           killerText = 'general 通用 通用技能';
         } else {
@@ -1593,7 +1590,6 @@ function getFilteredPerks() {
         }
       }
 
-      // 技能英文名 + 技能中文名 + 技能別名 + 殺手英文/中文/俗名 + General/通用
       const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerText}`;
 
       if (!combined.includes(term)) continue;
@@ -1602,7 +1598,6 @@ function getFilteredPerks() {
     result.push([name, perk]);
   }
 
-  // 排序：先分數，再名字
   result.sort((a, b) => {
     const sA = Number(a[1].score ?? 0);
     const sB = Number(b[1].score ?? 0);
@@ -2153,11 +2148,6 @@ function getFilteredPerks() {
     const initCmdPanel = document.getElementById('cmdPanel');
     if (initCmdPanel) initCmdPanel.style.display = 'none';
   </script>
-
-
-
-
-
 
 </body>
 
