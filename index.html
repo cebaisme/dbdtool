@@ -871,36 +871,10 @@
       color: #d3d6e4;
       white-space: pre-line;
     }
-
-    /* ==== 指令輸入欄（左下角）==== */
-    .cmd-panel {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      display: none;
-      /* slot 模式才會顯示 */
-      z-index: 99999;
-    }
-
-    #cmdInput {
-      width: 260px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: white;
-      font-size: 14px;
-      backdrop-filter: blur(6px);
-    }
   </style>
 </head>
 
 <body>
-  <!-- 指令輸入欄（只在拉霸模式顯示） -->
-  <div id="cmdPanel" class="cmd-panel">
-    <input id="cmdInput" type="text" placeholder="killer + addon + perk…" />
-  </div>
-
   <div class="app">
     <h1>
       DBD 殺手配點 & 拉霸工具
@@ -1081,6 +1055,17 @@
               </div>
             </div>
 
+            <!-- 幸運神籤：配分模式底部 -->
+            <div id="fortuneRow"
+              style="margin-top:16px; display:flex; align-items:center; gap:16px; justify-content:flex-end;">
+              <img id="fortuneTubeBtn" src="./images/other/籤筒.png" alt="抽神籤"
+                style="width:56px; height:56px; cursor:pointer; filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));">
+              <div id="fortuneResultIcon"
+                style="width:56px; height:56px; border-radius:12px; border:1px solid rgba(255,255,255,0.25); background:#111320; display:none; cursor:pointer; overflow:hidden;">
+                <img id="fortuneResultPerkImg" src="" alt="幸運技能" style="width:100%; height:100%; object-fit:contain;">
+              </div>
+            </div>
+
 
           </div>
         </div>
@@ -1195,10 +1180,10 @@
     let allKillerEntries = [];
 
     // 拉霸模式狀態
-    window.slotState = {
+    const slotState = {
       killerKey: null,
-      addons: [],
-      perks: [],
+      addons: [], // 2
+      perks: [],  // 4
       locked: false,
       animTimeout: null,
       afterFull: false,
@@ -1414,10 +1399,32 @@
       }
       const totalUsed = usedAddons + usedPerks;
       const remaining = limit - totalUsed;
+      // ======== 新增：取得配件中文＋英文 ========
+      const addonNames = selectedAddons
+        .map(a => {
+          const data = ADDONS[a];
+          const zh = data?.zh ? ` / ${data.zh}` : "";
+          return `${a}${zh}`;
+        })
+        .join("、");
+
+      // ======== 新增：取得技能中文＋英文 ========
+      const perkNames = selectedPerks
+        .map(p => {
+          const data = PERKS[p];
+          const zh = data?.zh ? ` / ${data.zh}` : "";
+          return `${p}${zh}`;
+        })
+        .join("、");
+
       buildSummaryEl.innerHTML =
-        `殺手：<strong>${currentKillerKey}</strong> ｜ 配件：<strong>${selectedAddons.length}</strong> 個（${usedAddons} 分）｜ ` +
-        `技能：<strong>${selectedPerks.length}</strong> 個（${usedPerks} 分）｜ 剩餘：<strong>${remaining}</strong>`;
+        `殺手：<strong>${currentKillerKey}</strong><br>` +
+        `配件（${selectedAddons.length} 個 / ${usedAddons} 分）：<strong>${addonNames || "—"}</strong><br>` +
+        `技能（${selectedPerks.length} 個 / ${usedPerks} 分）：<strong>${perkNames || "—"}</strong><br>` +
+        `剩餘：<strong>${remaining}</strong>`;
     }
+
+
 
     // ==========================
     // 配件 / 技能列表（左側）
@@ -1551,66 +1558,35 @@
       }
     }
 
-function getFilteredPerks() {
-  if (!window.PERKS) return [];
-  const term = (perkSearchInput.value || '').trim().toLowerCase();
-  const scoreFilterValue = perkScoreFilter.value;
-  const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
+    function getFilteredPerks() {
+      if (!window.PERKS) return [];
+      const term = (perkSearchInput.value || '').trim().toLowerCase();
+      const scoreFilterValue = perkScoreFilter.value;
+      const exactScore = scoreFilterValue === '' ? null : Number(scoreFilterValue);
 
-  const result = [];
+      const result = [];
+      for (const [name, perk] of Object.entries(PERKS)) {
+        const score = Number(perk.score ?? 0);
+        if (exactScore !== null && score !== exactScore) continue;
 
-  for (const [name, perk] of Object.entries(PERKS)) {
-    const score = Number(perk.score ?? 0);
-    if (exactScore !== null && score !== exactScore) continue;
-
-    if (term) {
-      const zh = (perk.zh || '').toLowerCase();
-      const aliases = (perk.aliases || []).join(' ').toLowerCase();
-
-      let killerText = '';
-      const killerKey = perk.killer;
-
-      if (killerKey) {
-        const lowerKillerKey = String(killerKey).toLowerCase();
-
-        if (lowerKillerKey === 'general') {
-          killerText = 'general 通用 通用技能';
-        } else {
-          const killer = window.KILLERS && window.KILLERS[killerKey];
-          const parts = [lowerKillerKey];
-
-          if (killer && killer.zh) {
-            parts.push(killer.zh.toLowerCase());
-          }
-          if (killer && Array.isArray(killer.aliases)) {
-            parts.push(...killer.aliases.map(a => a.toLowerCase()));
-          }
-
-          killerText = parts.join(' ');
+        if (term) {
+          const zh = (perk.zh || '').toLowerCase();
+          const aliases = (perk.aliases || []).join(' ').toLowerCase();
+          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+          if (!combined.includes(term)) continue;
         }
+        result.push([name, perk]);
       }
 
-      const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerText}`;
+      result.sort((a, b) => {
+        const sA = Number(a[1].score ?? 0);
+        const sB = Number(b[1].score ?? 0);
+        if (sA !== sB) return sA - sB;
+        return a[0].localeCompare(b[0]);
+      });
 
-      if (!combined.includes(term)) continue;
+      return result;
     }
-
-    result.push([name, perk]);
-  }
-
-  result.sort((a, b) => {
-    const sA = Number(a[1].score ?? 0);
-    const sB = Number(b[1].score ?? 0);
-    if (sA !== sB) return sA - sB;
-    return a[0].localeCompare(b[0]);
-  });
-
-  return result;
-}
-
-
-
-
 
     function renderPerkList() {
       perkListEl.innerHTML = '';
@@ -1896,102 +1872,116 @@ function getFilteredPerks() {
         slotState.locked = true;
         slotState.afterFull = true;
 
-        const cs = window.CardSystem;
-
-        // ★ 指令模式：跳過卡片流程，避免卡死
-        if (cs && cs.skipForCommand) {
-          cs.skipForCommand = false;    // 用完關掉
-          slotState.locked = false;     // 解鎖
-          // afterFull = true → 下一次拉桿會重置
-          return;
-        }
-
-        // 一般模式：進入卡片流程
-        if (cs && typeof cs.startCardPhase === "function") {
+        if (window.CardSystem && typeof CardSystem.startCardPhase === 'function') {
           try {
-            cs.startCardPhase(slotState, {
+            CardSystem.startCardPhase(slotState, {
               onApplied: (updatedState) => {
                 if (updatedState) {
+                  // 先記錄舊狀態，用來判斷哪些格子有變化
                   const prevState = {
                     killerKey: slotState.killerKey,
-                    addons: [...slotState.addons],
-                    perks: [...slotState.perks]
+                    addons: Array.isArray(slotState.addons) ? [...slotState.addons] : [],
+                    perks: Array.isArray(slotState.perks) ? [...slotState.perks] : []
                   };
 
-                  const changed = [];
+                  const changedIndices = [];
 
-                  if (updatedState.killerKey !== undefined &&
+                  // 殺手格：index 0
+                  if (typeof updatedState.killerKey !== 'undefined' &&
                     updatedState.killerKey !== prevState.killerKey) {
-                    changed.push(0);
+                    changedIndices.push(0);
                   }
 
+                  // 配件格：index 1,2
                   if (Array.isArray(updatedState.addons)) {
                     for (let i = 0; i < 2; i++) {
-                      if ((updatedState.addons[i] || null) !== (prevState.addons[i] || null)) {
-                        changed.push(1 + i);
+                      const beforeAddon = prevState.addons[i] || null;
+                      const afterAddon = updatedState.addons[i] || null;
+                      if (beforeAddon !== afterAddon) {
+                        changedIndices.push(1 + i);
                       }
                     }
                   }
 
+                  // 技能格：index 3,4,5,6
                   if (Array.isArray(updatedState.perks)) {
                     for (let i = 0; i < 4; i++) {
-                      if ((updatedState.perks[i] || null) !== (prevState.perks[i] || null)) {
-                        changed.push(3 + i);
+                      const beforePerk = prevState.perks[i] || null;
+                      const afterPerk = updatedState.perks[i] || null;
+                      if (beforePerk !== afterPerk) {
+                        changedIndices.push(3 + i);
                       }
                     }
                   }
 
-                  if (!changed.length) {
-                    if (updatedState.killerKey !== undefined)
-                      slotState.killerKey = updatedState.killerKey;
-                    if (Array.isArray(updatedState.addons))
-                      slotState.addons = [...updatedState.addons];
-                    if (Array.isArray(updatedState.perks))
-                      slotState.perks = [...updatedState.perks];
+                  const uniqueChanged = [...new Set(changedIndices)];
+                  const hasChanged = uniqueChanged.length > 0;
 
+                  if (!hasChanged) {
+                    // 沒東西變化就正常套用
+                    if (typeof updatedState.killerKey !== 'undefined') {
+                      slotState.killerKey = updatedState.killerKey;
+                    }
+                    if (Array.isArray(updatedState.addons)) {
+                      slotState.addons = [...updatedState.addons];
+                    }
+                    if (Array.isArray(updatedState.perks)) {
+                      slotState.perks = [...updatedState.perks];
+                    }
                     renderSlotBoard();
                   } else {
-                    const DURATION = 300;
                     const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+                    const DURATION = 300;
 
-                    changed.forEach(i => cells[i]?.classList.add('slot-anim-out'));
+                    // 先讓舊的圖示往上淡出
+                    uniqueChanged.forEach((idx) => {
+                      const cell = cells[idx];
+                      if (cell) {
+                        cell.classList.add('slot-anim-out');
+                      }
+                    });
 
                     setTimeout(() => {
-                      if (updatedState.killerKey !== undefined)
+                      // 套用新狀態
+                      if (typeof updatedState.killerKey !== 'undefined') {
                         slotState.killerKey = updatedState.killerKey;
-                      if (Array.isArray(updatedState.addons))
+                      }
+                      if (Array.isArray(updatedState.addons)) {
                         slotState.addons = [...updatedState.addons];
-                      if (Array.isArray(updatedState.perks))
+                      }
+                      if (Array.isArray(updatedState.perks)) {
                         slotState.perks = [...updatedState.perks];
+                      }
 
+                      // 重畫整個 board
                       renderSlotBoard();
 
-                      const fresh = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
-                      changed.forEach(i => {
-                        const cell = fresh[i];
+                      // 讓新的圖示由下往上淡入
+                      const freshCells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+                      uniqueChanged.forEach((idx) => {
+                        const cell = freshCells[idx];
                         if (cell) {
                           cell.classList.remove('slot-anim-out');
                           cell.classList.add('slot-anim-in');
-                          setTimeout(() => cell.classList.remove('slot-anim-in'), DURATION);
+                          setTimeout(() => {
+                            cell.classList.remove('slot-anim-in');
+                          }, DURATION);
                         }
                       });
                     }, DURATION);
                   }
                 }
-
                 slotState.locked = false;
               }
             });
           } catch (e) {
-            console.error("CardSystem.startCardPhase 發生錯誤：", e);
+            console.error('CardSystem.startCardPhase 發生錯誤：', e);
             slotState.locked = false;
           }
         } else {
           slotState.locked = false;
         }
       }
-
-
     }
 
     // ==========================
@@ -1999,8 +1989,6 @@ function getFilteredPerks() {
     // ==========================
     // 模式切換
     tabPoints.addEventListener('click', () => {
-      const cmdPanel = document.getElementById('cmdPanel');
-      if (cmdPanel) cmdPanel.style.display = 'none';
       if (currentMode === 'points') return;
       currentMode = 'points';
       tabPoints.classList.add('active');
@@ -2016,8 +2004,6 @@ function getFilteredPerks() {
     });
 
     tabSlot.addEventListener('click', () => {
-      const cmdPanel = document.getElementById('cmdPanel');
-      if (cmdPanel) cmdPanel.style.display = 'block';
       if (currentMode === 'slot') return;
       currentMode = 'slot';
       tabSlot.classList.add('active');
@@ -2109,31 +2095,6 @@ function getFilteredPerks() {
       });
     }
 
-
-    // =====================
-    // 指令輸入欄功能
-    // =====================
-    const cmdInput = document.getElementById("cmdInput");
-    cmdInput.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter") return;
-
-      if (currentMode !== "slot") {
-        alert("❌ 指令只能在拉霸模式使用！");
-        return;
-      }
-
-      const cmd = cmdInput.value.trim();
-      if (!cmd) return;
-
-      if (typeof rebuildByCommand === "function") {
-        rebuildByCommand(cmd);
-      } else {
-        alert("指令系統未載入（card.js 尚未整合）");
-      }
-
-      cmdInput.value = "";
-    });
-
     // 初始化
     initKillerData();
     renderKillerInfo();
@@ -2144,9 +2105,210 @@ function getFilteredPerks() {
     renderPerkList();
     initSlotBoard();
     renderSlotBoard();
+  </script>
 
-    const initCmdPanel = document.getElementById('cmdPanel');
-    if (initCmdPanel) initCmdPanel.style.display = 'none';
+
+
+  <!-- 幸運神籤：放大神籤視窗 -->
+  <div id="fortuneModal"
+    style="position:fixed; inset:0; background:rgba(0,0,0,0.65); display:none; align-items:center; justify-content:center; z-index:2000;">
+
+    <div style="
+      position:relative;
+      width:400px;
+      height:600px;
+      background:url('./images/other/籤.png') center/cover no-repeat;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:32px 24px;
+      box-shadow:0 12px 32px rgba(0,0,0,0.6);
+      border-radius:18px;
+  ">
+
+      <!-- 技能圖示 -->
+      <img id="fortuneModalPerkIcon" src="" alt="幸運技能"
+        style="width:200px; height:200px; margin-top:7px; margin-bottom:8px;">
+
+      <!-- 標題 -->
+      <div id="fortuneMainTitle" style="font-size:24px; font-weight:800; margin-bottom:2px; text-align:center;">
+        本場幸運技能
+      </div>
+
+      <!-- 技能名稱（中文 + 英文） -->
+      <div id="fortuneSkillName"
+        style="font-size:32px; font-weight:700; margin-bottom:2px; text-align:center; white-space:pre-line; line-height:1.2;">
+      </div>
+
+      <!-- 籤詩（直書） -->
+      <div id="fortunePoem" style="
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:flex-start;
+    gap:40px;
+    width:100%;
+    margin-top:8px;
+">
+
+      </div>
+
+
+
+    </div>
+
+  </div>
+
+  <!-- 關閉紐 -->
+  <button id="fortuneModalClose" type="button" style="position:absolute; right:16px; top:16px; border:none; background:rgba(0,0,0,0.55); color:#f5f5f5;
+      border-radius:999px; padding:4px 10px; font-size:12px; cursor:pointer;">✕</button>
+
+  </div>
+  </div>
+
+
+  <script>
+    (function () {
+      const tube = document.getElementById('fortuneTubeBtn');
+      const resultIcon = document.getElementById('fortuneResultIcon');
+      const resultImg = document.getElementById('fortuneResultPerkImg');
+      const modal = document.getElementById('fortuneModal');
+      const modalIcon = document.getElementById('fortuneModalPerkIcon');
+      const modalName = document.getElementById('fortuneModalName');
+      const modalDesc = document.getElementById('fortuneModalDesc');
+      const modalClose = document.getElementById('fortuneModalClose');
+
+      if (!tube) return;
+
+      let currentFortune = null;
+
+      function drawFortune() {
+        const perks = window.PERKS || {};
+        const keys = Object.keys(perks);
+        if (!keys.length) return;
+
+        const key = keys[Math.floor(Math.random() * keys.length)];
+        const perk = perks[key];
+
+        currentFortune = { key, perk };
+
+        if (perk && perk.img) {
+          resultImg.src = perk.img;
+        } else {
+          resultImg.src = '';
+        }
+
+        resultIcon.style.display = 'block';
+      }
+
+      function openModal() {
+        if (!currentFortune) return;
+        const { key, perk } = currentFortune;
+
+
+        const zh = (perk && perk.zh) ? perk.zh : '';
+
+        const fortune = (window.pickFortune && perk)
+          ? window.pickFortune(perk)
+          : '';
+
+        if (perk && perk.img) {
+          modalIcon.src = perk.img;
+        } else {
+          modalIcon.src = '';
+        }
+
+        document.getElementById("fortuneMainTitle").textContent = "本場幸運技能";
+
+        document.getElementById("fortuneSkillName").textContent = zh || '未知技能';
+
+
+        // === 正確切成 5 / 7 / 5 「句子」而不是 slice 字 ===
+        const parts = fortune.split("　"); // 全形空格切句
+        const p1 = parts[0] || "";
+        const p2 = parts[1] || "";
+        const p3 = parts[2] || "";
+
+        function makePoemColumn(text) {
+          return `
+    <div style="
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      font-size: 28px;
+      line-height: 32px;
+      width: 32px;
+      text-align: center;
+    ">
+      ${text}
+    </div>
+  `;
+        }
+
+        document.getElementById("fortunePoem").innerHTML = `
+  ${makePoemColumn(p1)}
+  ${makePoemColumn(p2)}
+  ${makePoemColumn(p3)}
+`;
+
+
+
+        modal.style.display = 'flex';
+      }
+
+
+
+      function closeModal() {
+        modal.style.display = 'none';
+      }
+
+      tube.addEventListener('click', drawFortune);
+      resultIcon.addEventListener('click', openModal);
+      modalClose.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
+
+  <!-- Fortune System Updated -->
+  <script>
+    // 和風 5-7-5 幸運神籤池
+    const FORTUNE_POOL = [
+      "地道無所遁　霧深影靜心自明　所尋皆可至",
+      "氣脈忽震動　放手之時雷聲破　亂勢亦成機",
+      "棕影沉深處　箱魂不語留沉謐　手足空無獲",
+      "森幽寂如常　菌聲微動引真跡　藏亦難逃形",
+      "心勢如鋒定　機先一步智勝敵　算盡皆成你",
+      "櫃影藏機密　木扉輕合聞氣息　匿蹤見真形",
+      "板影忽生變　惡靈暗手牽行路　木心應風折",
+      "怨息纏足下　幽手牽影縛奔勢　步緩命難脫",
+      "神心自悠然　焦躁化煙隨風散　所行皆順遂",
+      "鋒意自相應　刀追人影無一差　流光破暗行",
+      "絲線束命運　錯綜程式今夜穩　故障不來擾",
+      "氣和風自順　對手心念無波瀾　戲局少乖張",
+      "鐵意染刃端　污濁亦能斬百險　所指皆命中"
+    ];
+
+    // 有條件籤文（厄咒 / 天災）
+    const FORTUNE_CONDITION = {
+      hex: "符紋藏咒息　厄咒深隱難覓蹤　命理自相護",
+      scourge: "風鳴引業影　天災鉤現君側畔　運勢今照身"
+    };
+
+    // 依照技能決定詩籤
+    window.pickFortune = function (perk) {
+      const als = perk.aliases || [];
+      const hasHex = als.some(a => /厄咒|hex/i.test(a));
+      const hasScourge = als.some(a => /天災|scourge/i.test(a));
+
+      if (hasHex) return FORTUNE_CONDITION.hex;
+      if (hasScourge) return FORTUNE_CONDITION.scourge;
+
+      return FORTUNE_POOL[Math.floor(Math.random() * FORTUNE_POOL.length)];
+    };
   </script>
 
 </body>
