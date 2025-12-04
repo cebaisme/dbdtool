@@ -1392,32 +1392,35 @@
         selectedPerkIconsEl.appendChild(slot);
       }
 
-      const { limit, usedAddons, usedPerks } = computePoints();
-      if (!currentKillerKey) {
-        buildSummaryEl.textContent = '';
-        return;
-      }
-      const totalUsed = usedAddons + usedPerks;
-      const remaining = limit - totalUsed;
-
-
-      function getAddonZh(a) {
-        const key = a.key || a; // 如果 a 是物件用 a.key；如果是字串直接用
-        return window.ADDONS[key]?.zh || "";
+      // ======== 新增：取得配件中文＋英文 ========
+      function getAddonInfo(a) {
+        const key = a.key || a;
+        const data = window.ADDONS[key];
+        if (!data) return "";
+        return `${data.zh}(${data.score})`;
       }
 
-      function getPerkZh(p) {
+      function getPerkInfo(p) {
         const key = p.key || p;
-        return window.PERKS[key]?.zh || "";
+        const data = window.PERKS[key];
+        if (!data) return "";
+        return `${data.zh}(${data.score})`;
       }
 
-      const addonNamesZh = selectedAddons.map(getAddonZh).filter(n => n !== "").join("、");
-      const perkNamesZh = selectedPerks.map(getPerkZh).filter(n => n !== "").join("、");
+      const addonNames = selectedAddons
+        .map(getAddonInfo)
+        .filter(n => n !== "")
+        .join("、");
+
+      const perkNames = selectedPerks
+        .map(getPerkInfo)
+        .filter(n => n !== "")
+        .join("、");
 
       buildSummaryEl.innerHTML = `
       <div style="line-height:1.8; font-size:14px;">
-        <div><strong>配件：</strong>${addonNamesZh || "—"}</div>
-        <div><strong>技能：</strong>${perkNamesZh || "—"}</div>
+        <div><strong>配件：</strong>${addonNames || "—"}</div>
+        <div><strong>技能：</strong>${perkNames || "—"}</div>
       </div>
     `;
     }
