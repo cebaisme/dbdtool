@@ -1400,30 +1400,19 @@
       const totalUsed = usedAddons + usedPerks;
       const remaining = limit - totalUsed;
 
-      
-      const addonNames = selectedAddons
-        .map(a => {
-          const data = ADDONS[a];
-          const zh = data?.zh ? ` / ${data.zh}` : "";
-          return `${a}${zh}`;
-        })
-        .join("、");
 
-      const addonNamesZh = selectedAddons
-        .map(a => {
-          const key = a.key || a;
-          return window.ADDONS[key]?.zh || "";
-        })
-        .filter(n => n !== "")
-        .join("、");
+      function getAddonZh(a) {
+        const key = a.key || a; // 如果 a 是物件用 a.key；如果是字串直接用
+        return window.ADDONS[key]?.zh || "";
+      }
 
-      const perkNamesZh = selectedPerks
-        .map(p => {
-          const key = p.key || p;
-          return window.PERKS[key]?.zh || "";
-        })
-        .filter(n => n !== "")
-        .join("、");
+      function getPerkZh(p) {
+        const key = p.key || p;
+        return window.PERKS[key]?.zh || "";
+      }
+
+      const addonNamesZh = selectedAddons.map(getAddonZh).filter(n => n !== "").join("、");
+      const perkNamesZh = selectedPerks.map(getPerkZh).filter(n => n !== "").join("、");
 
       buildSummaryEl.innerHTML = `
       <div style="line-height:1.8; font-size:14px;">
