@@ -1399,7 +1399,8 @@
       }
       const totalUsed = usedAddons + usedPerks;
       const remaining = limit - totalUsed;
-      // ======== 新增：取得配件中文＋英文 ========
+
+      
       const addonNames = selectedAddons
         .map(a => {
           const data = ADDONS[a];
@@ -1408,20 +1409,28 @@
         })
         .join("、");
 
-      // ======== 新增：取得技能中文＋英文 ========
-      const perkNames = selectedPerks
-        .map(p => {
-          const data = PERKS[p];
-          const zh = data?.zh ? ` / ${data.zh}` : "";
-          return `${p}${zh}`;
+      const addonNamesZh = selectedAddons
+        .map(a => {
+          const key = a.key || a;
+          return window.ADDONS[key]?.zh || "";
         })
+        .filter(n => n !== "")
         .join("、");
 
-      buildSummaryEl.innerHTML =
-        `殺手：<strong>${currentKillerKey}</strong><br>` +
-        `配件（${selectedAddons.length} 個 / ${usedAddons} 分）：<strong>${addonNames || "—"}</strong><br>` +
-        `技能（${selectedPerks.length} 個 / ${usedPerks} 分）：<strong>${perkNames || "—"}</strong><br>` +
-        `剩餘：<strong>${remaining}</strong>`;
+      const perkNamesZh = selectedPerks
+        .map(p => {
+          const key = p.key || p;
+          return window.PERKS[key]?.zh || "";
+        })
+        .filter(n => n !== "")
+        .join("、");
+
+      buildSummaryEl.innerHTML = `
+      <div style="line-height:1.8; font-size:14px;">
+        <div><strong>配件：</strong>${addonNamesZh || "—"}</div>
+        <div><strong>技能：</strong>${perkNamesZh || "—"}</div>
+      </div>
+    `;
     }
 
 
