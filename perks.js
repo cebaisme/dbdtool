@@ -99,7 +99,7 @@ zh: "欣喜若狂",
   },
   "Brutal Strength": {
 zh: "所向無敵",
-    score: 5,
+    score: 4,
     aliases: ["brutal strength", "快踹", "快踢", "破壞速度", "20%"],
     killer: "The Trapper",
     img: "./images/perks/brutalstrength.png"
@@ -211,7 +211,7 @@ zh: "厄咒:毀滅",
   },
   "Hex: The Third Seal": {
 zh: "厄咒:第三封印",
-    score: 4,
+    score: 5,
     aliases: ["hex: the third seal", "第三封印", "厄咒", "盲目", "4"],
     killer: "The Hag",
     img: "./images/perks/hexthethirdseal.png"
@@ -281,21 +281,21 @@ zh: "擊倒出局",
   },
   "Blood Warden": {
 zh: "血腥獄長",
-    score: 5,
+    score: 4,
     aliases: ["blood warden", "封門", "終局"],
     killer: "The Nightmare",
     img: "./images/perks/bloodwarden.png"
   },
   "Fire Up": {
 zh: "怒火中燒",
-    score: 5,
+    score: 4,
     aliases: ["fire up", "賽亞人", "發電機", "破壞速度", "跨越速度", "互動速度"],
     killer: "The Nightmare",
     img: "./images/perks/fireup.png"
   },
   "Remember Me": {
 zh: "勿忘我",
-    score: 5,
+    score: 3,
     aliases: ["rememer me", "記憶猶新", "開關", "血祭品", "終局"],
     killer: "The Nightmare",
     img: "./images/perks/rememberme.png"
@@ -323,21 +323,21 @@ zh: "了如指掌",
   },
   "Bamboozle": {
 zh: "花言巧語",
-    score: 5,
+    score: 4,
     aliases: ["bamboozle", "封窗", "北部粽"],
     killer: "The Clown",
     img: "./images/perks/bamboozle.png"
   },
   "Coulrophobia": {
 zh: "小丑恐懼症",
-    score: 5,
+    score: 3,
     aliases: ["coulrophobia", "小丑恐", "哈奇恐懼症", "治療", "補血", "QTE"],
     killer: "The Clown",
     img: "./images/perks/coulrophobia.png"
   },
   "Pop Goes the Weasel": {
 zh: "心驚肉跳",
-    score: 5,
+    score: 4,
     aliases: ["pop goes the wease", "小丑腳", "POP", "pop"],
     killer: "The Clown",
     img: "./images/perks/popgoestheweasel.png"
