@@ -9,7 +9,7 @@ zh: "苦澀低語",
   "Deerstalker": {
 zh: "獵鹿者",
     score: 5,
-    aliases: ["獵鹿人"],
+    aliases: ["獵鹿人", "魂牽夢縈"],
     killer: "General",
     img: "./images/perks/deerstalker.png"
   },
