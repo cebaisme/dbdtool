@@ -245,5 +245,11 @@ window.KILLERS = {
     aliases: ["克拉蘇", "飛頭", "krasue"],
     img: "./images/killers/krasue.png"
   },
+  /*"The First": {
+    zh: "原初者",
+    limit: 12,
+    aliases: ["一號", "1", "威可那", "威可拿", "威可納", "herny creel", "亨利克里爾"],
+    img: "./images/killers/henrycreel.png"
+  },*/
 };
 
