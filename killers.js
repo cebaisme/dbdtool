@@ -128,7 +128,7 @@ window.KILLERS = {
   "The Twins": {
     zh: "雙胞胎",
     limit: 17,
-    aliases: ["連體嬰", "垃圾", "bug", "夏洛特", "夏洛蒂", "維克多", "嬰兒", "charlotte", "Charlotte", "victor", "Victor", "twins"],
+    aliases: ["連體嬰", "垃圾", "bug", "夏洛特", "夏洛蒂", "維克多", "嬰兒", "charlotte", "Charlotte", "victor", "Victor", "twins", "威弟"],
     img: "./images/killers/twins.png"
   },
   "The Trickster": {
