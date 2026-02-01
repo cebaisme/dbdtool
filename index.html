@@ -1392,37 +1392,36 @@
         selectedPerkIconsEl.appendChild(slot);
       }
 
+      const { limit, usedAddons, usedPerks } = computePoints();
+      if (!currentKillerKey) {
+        buildSummaryEl.textContent = '';
+        return;
+      }
+      const totalUsed = usedAddons + usedPerks;
+      const remaining = limit - totalUsed;
       // ======== 新增：取得配件中文＋英文 ========
-      function getAddonInfo(a) {
-        const key = a.key || a;
-        const data = window.ADDONS[key];
-        if (!data) return "";
-        return `${data.zh}(${data.score})`;
-      }
-
-      function getPerkInfo(p) {
-        const key = p.key || p;
-        const data = window.PERKS[key];
-        if (!data) return "";
-        return `${data.zh}(${data.score})`;
-      }
-
       const addonNames = selectedAddons
-        .map(getAddonInfo)
-        .filter(n => n !== "")
+        .map(a => {
+          const data = ADDONS[a];
+          const zh = data?.zh ? ` / ${data.zh}` : "";
+          return `${a}${zh}`;
+        })
         .join("、");
 
+      // ======== 新增：取得技能中文＋英文 ========
       const perkNames = selectedPerks
-        .map(getPerkInfo)
-        .filter(n => n !== "")
+        .map(p => {
+          const data = PERKS[p];
+          const zh = data?.zh ? ` / ${data.zh}` : "";
+          return `${p}${zh}`;
+        })
         .join("、");
 
-      buildSummaryEl.innerHTML = `
-      <div style="line-height:1.8; font-size:14px;">
-        <div><strong>配件：</strong>${addonNames || "—"}</div>
-        <div><strong>技能：</strong>${perkNames || "—"}</div>
-      </div>
-    `;
+      buildSummaryEl.innerHTML =
+        `殺手：<strong>${currentKillerKey}</strong><br>` +
+        `配件（${selectedAddons.length} 個 / ${usedAddons} 分）：<strong>${addonNames || "—"}</strong><br>` +
+        `技能（${selectedPerks.length} 個 / ${usedPerks} 分）：<strong>${perkNames || "—"}</strong><br>` +
+        `剩餘：<strong>${remaining}</strong>`;
     }
 
 
@@ -1573,9 +1572,23 @@
         if (term) {
           const zh = (perk.zh || '').toLowerCase();
           const aliases = (perk.aliases || []).join(' ').toLowerCase();
-          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+
+          // 允許用「殺手名稱/中文/代稱」搜尋技能（包含 General/通用）
+          const killerKey = (perk.killer || '').toString();
+          let killerCombined = '';
+          if (!killerKey || killerKey.toLowerCase() === 'general') {
+            killerCombined = 'general 通用 通用技能';
+          } else {
+            const k = (window.KILLERS && window.KILLERS[killerKey]) ? window.KILLERS[killerKey] : null;
+            const kZh = (k && k.zh) ? String(k.zh).toLowerCase() : '';
+            const kAliases = (k && Array.isArray(k.aliases)) ? k.aliases.join(' ').toLowerCase() : '';
+            killerCombined = `${killerKey.toLowerCase()} ${kZh} ${kAliases}`;
+          }
+
+          const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerCombined}`;
           if (!combined.includes(term)) continue;
         }
+
         result.push([name, perk]);
       }
 
