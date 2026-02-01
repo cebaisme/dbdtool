@@ -122,7 +122,7 @@ window.KILLERS = {
   "The Blight": {
     zh: "枯萎者",
     limit: 12,
-    aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "blight"],
+    aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "blight", "威哥"],
     img: "./images/killers/blight.png"
   },
   "The Twins": {
@@ -212,7 +212,7 @@ window.KILLERS = {
   "The Lich": {
     zh: "巫妖",
     limit: 12,
-    aliases: ["威可那", "威可拿", "威可納", "紫色光頭", "lich"],
+    aliases: ["威可那", "威可拿", "威可納", "威哥", "紫色光頭", "lich"],
     img: "./images/killers/vecna.png"
   },
   "The Dark Lord": {
@@ -236,7 +236,7 @@ window.KILLERS = {
   "The Animatronic": {
     zh: "機械玩偶",
     limit: 20,
-    aliases: ["彈簧陷阱", "老登", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "老登", "animatronic"],
+    aliases: ["彈簧陷阱", "老登", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "老登", "animatronic", "威哥"],
     img: "./images/killers/springtrap.png"
   },
   "The Krasue": {
