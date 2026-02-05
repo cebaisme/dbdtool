@@ -803,7 +803,7 @@
   }
 
   // ==========================
-  // 4. 卡片抽選（含特殊卡 0.5%）
+  // 4. 卡片抽選（含特殊卡 0.75%）
   // ==========================
   function drawOneCardWeighted(excludeIds) {
     // 盡量容錯：就算 index 的 SlotSettings 腳本壞掉，也能從 localStorage 抓到設定
@@ -825,13 +825,13 @@
 
     excludeIds = excludeIds || [];
 
-    // 特殊卡：目前支援 card1 / card28（總機率 0.5%）
+    // 特殊卡：目前支援 card1 / card28（總機率 0.75%）
     const specialIds = ['card1', 'card28', 'card30', 'card33'];
     const specials = CARDS.filter(c => specialIds.includes(c.id));
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
     if (specialEnabled) {
-      const p = 0.005; // 0.5%
+      const p = 0.0075; // 0.75%
       const availableSpecials = specials.filter(c => !excludeIds.includes(c.id));
       if (availableSpecials.length && Math.random() < p) {
         return getRandomItem(availableSpecials);
