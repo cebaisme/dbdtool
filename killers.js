@@ -122,13 +122,13 @@ window.KILLERS = {
   "The Blight": {
     zh: "枯萎者",
     limit: 12,
-    aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "blight", "威哥"],
+    aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "威", "blight"],
     img: "./images/killers/blight.png"
   },
   "The Twins": {
     zh: "雙胞胎",
     limit: 17,
-    aliases: ["連體嬰", "垃圾", "bug", "夏洛特", "夏洛蒂", "維克多", "嬰兒", "charlotte", "Charlotte", "victor", "Victor", "twins", "威弟"],
+    aliases: ["連體嬰", "垃圾", "bug", "夏洛特", "夏洛蒂", "維克多", "威克多", "威", "嬰兒", "charlotte", "Charlotte", "victor", "Victor", "twins"],
     img: "./images/killers/twins.png"
   },
   "The Trickster": {
@@ -170,7 +170,7 @@ window.KILLERS = {
   "The Mastermind": {
     zh: "首腦",
     limit: 17,
-    aliases: ["威斯卡", "威哥", "克里斯雷德菲爾", "Chris Redfield", "wesker", "mastermind"],
+    aliases: ["威斯卡", "威哥", "威", "克里斯雷德菲爾", "Chris Redfield", "wesker", "mastermind"],
     img: "./images/killers/wesker.png"
   },
   "The Knight": {
@@ -212,7 +212,7 @@ window.KILLERS = {
   "The Lich": {
     zh: "巫妖",
     limit: 12,
-    aliases: ["威可那", "威可拿", "威可納", "威哥", "紫色光頭", "lich"],
+    aliases: ["威可那", "威可拿", "威可納", "威", "紫色光頭", "lich"],
     img: "./images/killers/vecna.png"
   },
   "The Dark Lord": {
@@ -236,20 +236,20 @@ window.KILLERS = {
   "The Animatronic": {
     zh: "機械玩偶",
     limit: 20,
-    aliases: ["彈簧陷阱", "老登", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "老登", "animatronic", "威哥"],
+    aliases: ["彈簧陷阱", "老登", "Purple Guy", "purple guy", "William Afton", "william afton", "威廉阿夫頓", "威", "老登", "animatronic"],
     img: "./images/killers/springtrap.png"
   },
   "The Krasue": {
     zh: "卡蘇",
-    limit: 12,
+    limit: 15,
     aliases: ["克拉蘇", "飛頭", "krasue"],
     img: "./images/killers/krasue.png"
   },
-  /*"The First": {
+  "The First": {
     zh: "原初者",
-    limit: 12,
-    aliases: ["一號", "1", "威可那", "威可拿", "威可納", "herny creel", "亨利克里爾"],
+    limit: 15,
+    aliases: ["一號", "1", "威可那", "威可拿", "威可納", "威", "herny creel", "亨利克里爾"],
     img: "./images/killers/henrycreel.png"
-  },*/
+  },
 };
 

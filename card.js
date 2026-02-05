@@ -265,8 +265,123 @@
       colorType: 'all-neutral',
       summary: '固定被選擇的欄位，其餘技能與配件欄位全部重抽。',
       effect: { type: 'keep_selected_reroll_others', data: {} }
-    }
-  ];
+    },
+
+    // 26. 配件提升一等（白->綠->藍->紫->紅->白）
+    {
+      id: 'card26',
+      zh: '神奇糖果',
+      target: 'addon',
+      colorType: 'addon',
+      summary: '選擇的配件升一級。',
+      effect: { type: 'upgrade_addons_color', data: {} }
+    },
+
+    // 27. 學習裝置：選擇的配件升兩等，另一個升一等（白->綠->藍->紫->紅->白）
+    {
+      id: 'card27',
+      zh: '學習裝置',
+      target: 'addon',
+      colorType: 'addon',
+      summary: '選擇的配件升兩級，另一個配件升一級。',
+      effect: { type: 'upgrade_addons_color_split', data: { selectedSteps: 2, otherSteps: 1 } }
+    },
+
+    // 28. 特殊卡：幫撐十秒（技能組強制改寫 + 圖片過場）
+    {
+      id: 'card28',
+      zh: '幫撐十秒',
+      target: 'any',
+      colorType: 'all-colored',
+      summary: '...',
+      effect: {
+        type: 'card28_hold10s',
+        data: {
+          // 你可以把這張換成 PNG/JPG/GIF（GIF 可以直接放，<img> 會自動播放）
+          image: './images/other/星爆氣流斬.gif',
+          timeoutMs: 10220,
+          perkSetsZh: [
+            ['牢牢緊握', '瘋狂勇氣', '欣喜若狂'],
+            ['把最好的留在最後', '招聘']
+          ]
+        }
+      }
+    },
+
+    // 29. 普通卡：偷天換日（指定殺手 + 其餘重抽；技能不會抽到 5 分）
+    {
+      id: 'card29',
+      zh: '偷天換日',
+      target: 'any',
+      colorType: 'all-colored',
+      summary: '抽出 5 位殺手自選 1 位，並重抽兩個配件（配件抽不到 5 分），技能四個不變。',
+      effect: { type: 'card29_steal_day_swap', data: { killerKey: null } }
+    },
+
+    // 30. 特殊卡：觀看廣告（不可跳過 5 張圖片輪播，結束後給獎勵）
+    {
+      id: 'card30',
+      zh: '觀看廣告',
+      target: 'any',
+      colorType: 'all-neutral-dark',
+      summary: '使用此卡觀看廣告來獲得豐厚獎勵。',
+      effect: {
+        type: 'card30_watch_ad',
+        data: {
+          // 5 張輪播圖片（可用 PNG/JPG/GIF；GIF 會自動播放）
+          images: [
+            './images/other/ad1.png',
+            './images/other/ad2.png',
+            './images/other/ad3.png',
+            './images/other/ad4.png',
+            './images/other/ad5.png'
+          ],
+          intervalMs: 1500,   // 每張 1.5 秒
+          unlockDelayMs: 1000 // 最後一張出現後再等 1 秒才可關閉
+        }
+      }
+    },
+  
+// 31. 普通卡：竟敢無視（指定技能 -> 厄咒技能）
+{
+  id: 'card31',
+  zh: '竟敢無視',
+  target: 'perk',
+  colorType: 'perk',
+  summary: '將指定欄位的技能變為隨機厄咒技能。',
+  effect: { type: 'card31_replace_curse', data: {} }
+},
+
+// 32. 普通卡：怨者上鉤（指定技能 -> 天災鉤技能）
+{
+  id: 'card32',
+  zh: '怨者上鉤',
+  target: 'perk',
+  colorType: 'perk',
+  summary: '將指定欄位的技能變為隨機天災技能。',
+  effect: { type: 'card32_replace_scourge', data: {} }
+},
+
+// 33. 特殊卡：老威集合（殺手 -> aliases 含「威」；技能 -> 該殺手技能）
+{
+  id: 'card33',
+  zh: '老威集合',
+  target: 'any',
+  colorType: 'all-colored',
+  summary: '所有威家人集合一起獵殺人類吧',
+  effect: { type: 'card33_will_family', data: {} }
+},
+
+// 34. 普通卡：願望清單（5 隻殺手自選 1 隻，指定技能變成該殺手的隨機專屬技能）
+{
+  id: 'card34',
+  zh: '願望清單',
+  target: 'perk',
+  colorType: 'perk',
+  summary: '隨機選出 5 位殺手，讓你自選 1 位，將指定欄位變成該殺手的隨機一個技能。',
+  effect: { type: 'card34_wishlist', data: {} }
+},
+];
 
   // ==========================
   // 2. 共用工具
@@ -330,6 +445,22 @@
     return (p && p.zh) || '';
   }
 
+  // 透過中文名稱找回 PERKS 的 key（方便你用中文直接指定技能）
+  function findPerkKeyByZh(zhName) {
+    const entries = Object.entries(window.PERKS || {});
+    for (const [key, perk] of entries) {
+      if (!perk) continue;
+      if ((perk.zh || '') === zhName) return key;
+    }
+    // 若遇到些微不一致，做一次模糊包含（保守）
+    for (const [key, perk] of entries) {
+      const zh = (perk && perk.zh) ? perk.zh : '';
+      if (zh && zh.includes(zhName)) return key;
+    }
+    return null;
+  }
+
+
   function getPerkImg(name) {
     const p = window.PERKS && window.PERKS[name];
     return (p && p.img) || '';
@@ -344,6 +475,23 @@
     const a = window.ADDONS && window.ADDONS[name];
     return (a && a.img) || '';
   }
+
+  function getKillerZh(key) {
+    const k = window.KILLERS && window.KILLERS[key];
+    return (k && k.zh) || key || '';
+  }
+
+  function getKillerImg(key) {
+    const k = window.KILLERS && window.KILLERS[key];
+    return (k && k.img) || '';
+  }
+
+  function getKillerScore(key) {
+    const k = window.KILLERS && window.KILLERS[key];
+    return (k && typeof k.score === 'number') ? k.score : null;
+  }
+
+
 
   function getPerkScore(name) {
     const p = window.PERKS && window.PERKS[name];
@@ -557,7 +705,43 @@
         opacity: 0.7;
       }
 
-      /* 無效卡片彈窗 */
+      
+
+/* 觀看廣告（卡30）過場：全螢幕輪播，不可跳過 */
+#cardAdOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+#cardAdOverlay .card-ad-img {
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+  display: block;
+}
+#cardAdOverlay .card-ad-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 6px 10px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+#cardAdOverlay.can-close .card-ad-hint {
+  opacity: 1;
+}
+
+/* 無效卡片彈窗 */
       #cardInvalidOverlay {
         position: fixed;
         inset: 0;
@@ -622,12 +806,36 @@
   // 4. 卡片抽選（含特殊卡 0.5%）
   // ==========================
   function drawOneCardWeighted(excludeIds) {
-    excludeIds = excludeIds || [];
-    const rare = CARDS.find(c => c.id === 'card1');
-    const normals = CARDS.filter(c => c.id !== 'card1');
+    // 盡量容錯：就算 index 的 SlotSettings 腳本壞掉，也能從 localStorage 抓到設定
+    let settings = window.SlotSettings || null;
+    if (!settings) {
+      try {
+        const raw = localStorage.getItem('dbd_slot_settings');
+        if (raw) settings = JSON.parse(raw);
+      } catch (e) { /* ignore */ }
+    }
+    settings = settings || {};
 
-    if (rare && !excludeIds.includes('card1')) {
-      if (Math.random() < 0.005) return rare;
+    const specialEnabled = !!(
+      settings.specialCardsEnabled ??
+      settings.enableSpecialCards ??
+      settings.enableSpecial ??
+      settings.ssEnableSpecialCards
+    );
+
+    excludeIds = excludeIds || [];
+
+    // 特殊卡：目前支援 card1 / card28（總機率 0.5%）
+    const specialIds = ['card1', 'card28', 'card30', 'card33'];
+    const specials = CARDS.filter(c => specialIds.includes(c.id));
+    const normals = CARDS.filter(c => !specialIds.includes(c.id));
+
+    if (specialEnabled) {
+      const p = 0.005; // 0.5%
+      const availableSpecials = specials.filter(c => !excludeIds.includes(c.id));
+      if (availableSpecials.length && Math.random() < p) {
+        return getRandomItem(availableSpecials);
+      }
     }
 
     let pool = normals.filter(c => !excludeIds.includes(c.id));
@@ -693,6 +901,9 @@
       if (type === 'perk') {
         zh = getPerkZh(name) || name;
         imgSrc = getPerkImg(name);
+      } else if (type === 'killer') {
+        zh = getKillerZh(name) || name;
+        imgSrc = getKillerImg(name);
       } else {
         zh = getAddonZh(name) || name;
         imgSrc = getAddonImg(name);
@@ -887,6 +1098,16 @@
   // 8. 主入口：startCardPhase
   // ==========================
   function startCardPhase(state, options) {
+    const settings = window.SlotSettings || {};
+    if (settings.cardsEnabled === false) {
+      // cards disabled: apply immediately
+      try {
+        if (options && typeof options.onApplied === 'function') {
+          options.onApplied(state || {});
+        }
+      } catch (e) { }
+      return;
+    }
     ensureStyles();
     ensureCardContainer();
 
@@ -973,10 +1194,6 @@
   function applyCardOnSlot(card, slotIndex) {
     const type = card.effect && card.effect.type;
     let ok = true;
-    if (card.id === "card1") {
-      showCard1UsePopup(card);
-    }
-
     switch (type) {
       case 'none':
         finishCardPhase();
@@ -1025,12 +1242,44 @@
       case 'replace_addons_by_color':
         ok = doReplaceAddonsByColor(card.effect.data && card.effect.data.colors);
         break;
+      case 'upgrade_addons_color':
+        ok = doUpgradeAddonsColor(slotIndex, 1, 0);
+        break;
+
+      case 'upgrade_addons_color_split':
+        ok = doUpgradeAddonsColorSplit(slotIndex, (card.effect.data && card.effect.data.selectedSteps) || 2, (card.effect.data && card.effect.data.otherSteps) || 1);
+        break;
+
       case 'reroll_all_addon_perk':
         ok = doRerollAllAddonPerk();
         break;
       case 'become_wraith_fixed_addons_random_perks':
         ok = doBecomeWraith(card.effect.data);
         break;
+
+      case 'card28_hold10s':
+        doCard28Hold10Seconds(card);
+        return;
+
+      case 'card29_steal_day_swap':
+        doCard29StealDaySwap(card);
+        return;
+
+      case 'card30_watch_ad':
+        doCard30WatchAd(card);
+        return;
+case 'card31_replace_curse':
+  ok = doCard31ReplaceCurse(slotIndex);
+  break;
+case 'card32_replace_scourge':
+  ok = doCard32ReplaceScourge(slotIndex);
+  break;
+case 'card33_will_family':
+  ok = doCard33WillFamily();
+  break;
+case 'card34_wishlist':
+  doCard34Wishlist(card, slotIndex);
+  return;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -1054,59 +1303,62 @@
       return;
     }
 
+    // card1：使用後立刻生效，但用全螢幕圖片做結算提示（點任意處關閉）
+    if (card && card.id === 'card1') {
+      showCard1UseFullscreen(() => finishCardPhase());
+      return;
+    }
+
     finishCardPhase();
   }
-  function showCard1UsePopup() {
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.inset = "0";
-    overlay.style.background = "rgba(0,0,0,0.65)";
-    overlay.style.display = "flex";
-    overlay.style.alignItems = "center";
-    overlay.style.justifyContent = "center";
-    overlay.style.zIndex = "99999";
 
-    const panel = document.createElement("div");
-    panel.style.background = "#1b1b1b";
-    panel.style.padding = "24px 30px";
-    panel.style.borderRadius = "12px";
-    panel.style.color = "#fff";
-    panel.style.fontSize = "18px";
-    panel.style.boxShadow = "0 12px 28px rgba(0,0,0,0.6)";
-    panel.style.textAlign = "center";
-    panel.style.maxWidth = "420px";
-    panel.style.whiteSpace = "pre-line";
+  // ==========================
+  // 10.x card1 全螢幕圖片提示
+  // ==========================
+  function showFullscreenImage(src, onClose, timeoutMs) {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '20000';
+    overlay.style.background = 'rgba(0,0,0,0.92)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.cursor = 'pointer';
 
-    const msg = document.createElement("div");
-    msg.style.fontSize = "20px";
-    msg.style.fontWeight = "800";
-    msg.style.marginBottom = "16px";
-    msg.textContent = "你已成為福音戰士 向人類發送福音吧\n少年阿 成為神話吧!";
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '100%';
+    img.style.objectFit = 'contain';
+    img.style.pointerEvents = 'none';
 
-    const btn = document.createElement("div");
-    btn.style.display = "inline-block";
-    btn.style.padding = "8px 18px";
-    btn.style.borderRadius = "7px";
-    btn.style.background = "#f6b73c";
-    btn.style.color = "#222";
-    btn.style.fontSize = "15px";
-    btn.style.fontWeight = "700";
-    btn.style.cursor = "pointer";
-    btn.textContent = "知道了";
-
-    btn.onclick = () => {
-      document.body.removeChild(overlay);
-    };
-
-    panel.appendChild(msg);
-    panel.appendChild(btn);
-    overlay.appendChild(panel);
+    overlay.appendChild(img);
     document.body.appendChild(overlay);
+
+    let closed = false;
+    let t = null;
+
+    function closeOnce() {
+      if (closed) return;
+      closed = true;
+      if (t) clearTimeout(t);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onClose === 'function') onClose();
+    }
+
+    if (typeof timeoutMs === 'number' && timeoutMs > 0) {
+      t = setTimeout(closeOnce, timeoutMs);
+    }
+
+    overlay.addEventListener('click', closeOnce);
   }
 
+  function showCard1UseFullscreen(onClose) {
+    const imgSrc = './images/other/彩蛋1.png';
+    showFullscreenImage(imgSrc, onClose);
+  }
 
-
-  // ---- 10.1 具體效果 （前面的重抽邏輯跟你原本 v7 一樣，以下照抄）----
   function doRerollAllIncludingKiller() {
     const killerKeys = Object.keys(window.KILLERS || {});
     if (killerKeys.length === 0) return false;
@@ -1181,7 +1433,7 @@
     currentState.perks = newPerks;
     return true;
   }
-  
+
   function doRerollTargetPerk(slotIndex) {
     if (slotIndex < 3 || slotIndex > 6) return false;
     if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
@@ -1779,6 +2031,78 @@
     return true;
   }
 
+
+  // 配件顏色提升：白->綠->藍->紫->紅->白（循環）
+  // - card26：只提升「被選擇的配件」(selectedSteps=1, otherSteps=0)
+  // - card27：選擇的配件 +2，另一個 +1
+  function doUpgradeAddonsColor(slotIndex, selectedSteps, otherSteps) {
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+
+    // 只允許配件格（slotIndex 1 / 2）
+    if (slotIndex !== 1 && slotIndex !== 2) return false;
+
+    const cycle = ['白配', '綠配', '藍配', '紫配', '紅配'];
+
+    const getAddonColor = (addonName) => {
+      const a = window.ADDONS && window.ADDONS[addonName];
+      const aliases = (a && a.aliases) || [];
+      for (const c of cycle) {
+        if (aliases.includes(c)) return c;
+      }
+      return null;
+    };
+
+    const advanceColor = (color, steps) => {
+      const idx = cycle.indexOf(color);
+      if (idx === -1) return null;
+      const s = ((steps % cycle.length) + cycle.length) % cycle.length;
+      return cycle[(idx + s) % cycle.length];
+    };
+
+    const upgradeOne = (addonName, steps, excludeNames) => {
+      if (!addonName || !steps) return addonName;
+
+      const curColor = getAddonColor(addonName);
+      if (!curColor) return addonName;
+
+      const targetColor = advanceColor(curColor, steps);
+      if (!targetColor) return addonName;
+
+      const pool = getAddonsByAliasForKiller(killerKey, targetColor, excludeNames);
+      if (!pool.length) return addonName;
+
+      return getRandomItem(pool) || addonName;
+    };
+
+    const original = (currentState.addons || []).slice(0, 2);
+    const results = original.slice();
+
+    const selectedIdx = slotIndex - 1;
+    const otherIdx = selectedIdx === 0 ? 1 : 0;
+
+    // 先處理選中的那格（避免抽到原本兩個 + 另一格目前內容）
+    const excludeForSelected = original.slice(); // 排除原本兩個
+    results[selectedIdx] = upgradeOne(original[selectedIdx], selectedSteps, excludeForSelected);
+
+    // 再處理另一格（若 otherSteps=0 就不動）
+    if (otherSteps && otherSteps !== 0) {
+      const excludeForOther = original.concat([results[selectedIdx]]);
+      results[otherIdx] = upgradeOne(original[otherIdx], otherSteps, excludeForOther);
+    }
+
+    // 最終保底
+    currentState.addons = [
+      results[0] || original[0] || null,
+      results[1] || original[1] || null
+    ];
+    return true;
+  }
+
+  function doUpgradeAddonsColorSplit(slotIndex, selectedSteps, otherSteps) {
+    return doUpgradeAddonsColor(slotIndex, selectedSteps, otherSteps);
+  }
+
   function doRerollAllAddonPerk() {
     const killerKey = currentState.killerKey;
     if (!killerKey) return false;
@@ -1836,6 +2160,332 @@
   // ==========================
   // 11. 結束卡片階段
   // ==========================
+
+  // 28 號：幫撐十秒（強制指定技能組 + 全螢幕圖片，點任意處關閉或 10.22 秒自動關）
+  function doCard28Hold10Seconds(card) {
+    if (!currentState) return;
+
+    const data = (card && card.effect && card.effect.data) ? card.effect.data : {};
+    const timeoutMs = typeof data.timeoutMs === 'number' ? data.timeoutMs : 10220;
+    const imgSrc = data.image || './images/cards/card28_hold10s.gif';
+
+    const perkSetsZh = Array.isArray(data.perkSetsZh) ? data.perkSetsZh : [];
+    if (!perkSetsZh.length) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    // ✅ 立刻生效：先把技能組改掉
+    const pickedSetZh = getRandomItem(perkSetsZh) || [];
+    const forced = [];
+
+    pickedSetZh.forEach(zhName => {
+      const key = findPerkKeyByZh(zhName);
+      if (key && !forced.includes(key)) forced.push(key);
+    });
+
+    // 強制清單如果因為名稱對不上而變空 → 當作無效卡
+    if (!forced.length) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    // 補滿 4 格（避免 UI/流程怪掉）
+    const need = Math.max(0, 4 - forced.length);
+    if (need > 0) {
+      const restPool = getAllPerksExcept(forced);
+      const extra = shuffle(restPool).slice(0, need);
+      currentState.perks = forced.concat(extra);
+    } else {
+      currentState.perks = forced.slice(0, 4);
+    }
+
+
+
+    // ✅ 同時把配件改成兩個藍配（抽不到兩個藍配就當作無效卡）
+    if (currentState && currentState.killerKey) {
+      const okAddons = doReplaceAddonsByColor(['藍配', '藍配']);
+      if (!okAddons) {
+        showInvalidCardPopup(card);
+        return;
+      }
+    } else {
+      showInvalidCardPopup(card);
+      return;
+    }
+    // ✅ 全螢幕圖片（GIF 可以；就是一張 <img>）
+    // 關閉後才結束卡片階段，避免直接把卡片階段收掉看不到過場
+    showFullscreenImage(imgSrc, () => {
+      finishCardPhase();
+    }, timeoutMs);
+  }
+  // 29 號：偷天換日（指定殺手 + 其餘重抽；技能不會抽到 5 分）
+  function doCard29StealDaySwap(card) {
+    if (!currentState) return;
+
+    const data = (card && card.effect && card.effect.data) ? card.effect.data : {};
+    const settings = window.SlotSettings || {};
+
+    // 若使用者開了「自選殺手鎖定」，就直接用鎖定殺手，不再跳選擇
+    const lockedKiller = (settings.lockKiller && settings.lockKillerKey) ? settings.lockKillerKey : null;
+
+    // 保留原本四個技能（本卡不會改技能）
+    const originalPerks = Array.isArray(currentState.perks) ? currentState.perks.slice() : [];
+
+    function applyWithKiller(killerKey) {
+      if (!killerKey) return false;
+      if (!window.KILLERS || !window.KILLERS[killerKey]) return false;
+
+      // 指定殺手（若被鎖定，外部 index 會覆蓋回去；但這裡仍照流程寫入 currentState）
+      currentState.killerKey = killerKey;
+
+      // 重抽兩個配件（從該殺手配件池中抽，不重複；配件抽不到 5 分）
+      const addonPool = getAddonNamesForKiller(killerKey).filter(n => getAddonScore(n) !== 5);
+      if (!addonPool || addonPool.length < 2) return false;
+      const newAddons = shuffle(addonPool).slice(0, 2);
+      if (newAddons.length !== 2) return false;
+      currentState.addons = newAddons;
+
+      // ✅ 技能不變：直接還原原本四個技能
+      currentState.perks = Array.isArray(originalPerks) ? originalPerks.slice() : [];
+      return true;
+    }
+
+    // 有鎖定殺手 → 直接套用（不彈窗）
+    if (lockedKiller) {
+      const ok = applyWithKiller(lockedKiller);
+      if (!ok) {
+        showInvalidCardPopup(card);
+        return;
+      }
+      finishCardPhase();
+      return;
+    }
+
+    // 玩家自選：先抽 5 位殺手讓他選
+    const killerKeys = Object.keys(window.KILLERS || {});
+    if (!killerKeys.length) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    const candidates = shuffle(Array.from(new Set(killerKeys))).slice(0, 5);
+    if (candidates.length < 1) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    // 只有 1 個候選就直接用（保險）
+    if (candidates.length === 1) {
+      const ok = applyWithKiller(candidates[0]);
+      if (!ok) {
+        showInvalidCardPopup(card);
+        return;
+      }
+      finishCardPhase();
+      return;
+    }
+
+    showChoiceOverlay({
+      type: 'killer',
+      candidates,
+      title: '選擇要指定的殺手（偷天換日）：',
+      onPick: (picked) => {
+        data.killerKey = picked; // 記錄一下（方便未來除錯/顯示）
+        const ok = applyWithKiller(picked);
+        if (!ok) {
+          showInvalidCardPopup(card);
+          return;
+        }
+        finishCardPhase();
+      }
+    });
+  }
+
+  // 30 號：觀看廣告（不可跳過 5 張圖片輪播；最後一張顯示 1 秒後才可關閉；關閉後套用獎勵）
+  // 新效果：
+  // - 殺手不變
+  // - 技能：玩家自選 2 個「4 或 5 分」技能，另外 2 個隨機（不重複）
+  // - 配件：重抽 2 個「3 分以上」配件
+  function doCard30WatchAd(card) {
+    if (!currentState) return;
+
+    const data = (card && card.effect && card.effect.data) ? card.effect.data : {};
+    const images = Array.isArray(data.images) ? data.images.filter(Boolean) : [];
+    const intervalMs = (typeof data.intervalMs === 'number' && data.intervalMs > 0) ? data.intervalMs : 1000;
+    const unlockDelayMs = (typeof data.unlockDelayMs === 'number' && data.unlockDelayMs >= 0) ? data.unlockDelayMs : 1000;
+
+    if (!images.length) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    const killerKey = currentState.killerKey;
+    if (!killerKey) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    // 先播放廣告輪播（不可跳過），使用者關閉後再進入「自選技能」流程
+    showAdSlideshowOverlay(
+      images,
+      intervalMs,
+      unlockDelayMs,
+      () => {
+        // onUnlocked：等使用者關閉後再處理獎勵
+      },
+      () => {
+        // onClose：玩家自選 4 次（每次 5 選 1）的 4–5 分技能，然後套用獎勵
+        const perk45PoolAll = getPerkNamesByScores([4, 5]);
+        if (!perk45PoolAll || perk45PoolAll.length < 4) {
+          showInvalidCardPopup(card);
+          finishCardPhase();
+          return;
+        }
+
+        const picked = [];
+
+        function pickNext(round) {
+          const remain = perk45PoolAll.filter(p => !picked.includes(p));
+          const candidates = shuffle(remain).slice(0, 5); // 每次抽 5 個給玩家選
+          if (!candidates.length) {
+            showInvalidCardPopup(card);
+            finishCardPhase();
+            return;
+          }
+
+          showChoiceOverlay({
+            type: 'perk',
+            title: `選擇第 ${round} 個（4–5 分）技能：`,
+            candidates,
+            onPick: (name) => {
+              picked.push(name);
+
+              if (picked.length < 4) {
+                pickNext(round + 1);
+                return;
+              }
+
+              // 配件：兩個 3 分以上（依當前殺手）
+              const currentAddons = Array.isArray(currentState.addons) ? currentState.addons.slice() : [];
+              const addonPoolBase = getAddonNamesForKiller(killerKey);
+
+              let addonPool = addonPoolBase.filter(a => {
+                const s = getAddonScore(a);
+                return typeof s === 'number' && s >= 3;
+              });
+
+              // 優先避免抽到原本的配件，若不夠再放回去
+              const addonPoolNoDup = addonPool.filter(a => !currentAddons.includes(a));
+              if (addonPoolNoDup.length >= 2) addonPool = addonPoolNoDup;
+
+              if (!addonPool || addonPool.length < 2) {
+                showInvalidCardPopup(card);
+                finishCardPhase();
+                return;
+              }
+              const pickedAddons = shuffle(addonPool).slice(0, 2);
+
+              // ✅ 套用獎勵（殺手不變）
+              currentState.addons = pickedAddons.slice(0, 2);
+              currentState.perks = picked.slice(0, 4);
+
+              finishCardPhase();
+            }
+          });
+        }
+
+        pickNext(1);
+      }
+    );
+  }
+
+  // 全螢幕廣告輪播：每 intervalMs 換一張，最後一張顯示 unlockDelayMs 後才可關閉
+  function showAdSlideshowOverlay(images, intervalMs, unlockDelayMs, onUnlocked, onClose) {
+    // 清掉可能殘留的 overlay
+    const old = document.getElementById('cardAdOverlay');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'cardAdOverlay';
+
+    const img = document.createElement('img');
+    img.className = 'card-ad-img';
+    img.alt = 'ad';
+    overlay.appendChild(img);
+
+    const hint = document.createElement('div');
+    hint.className = 'card-ad-hint';
+    hint.textContent = '點擊任意處關閉';
+    overlay.appendChild(hint);
+
+    let canClose = false;
+    let idx = 0;
+    let t = null;
+
+    function setImage(i) {
+      const src = images[i];
+      img.src = src || '';
+    }
+
+    function cleanup() {
+      if (t) {
+        clearTimeout(t);
+        t = null;
+      }
+      document.removeEventListener('keydown', onKeyDown, true);
+      overlay.removeEventListener('click', onClick, true);
+      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }
+
+    function onKeyDown(e) {
+      // 避免 ESC 提前關掉
+      if (!canClose && (e.key === 'Escape' || e.key === 'Esc')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+
+    function onClick(e) {
+      if (!canClose) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      cleanup();
+      if (typeof onClose === 'function') onClose();
+    }
+
+    document.addEventListener('keydown', onKeyDown, true);
+    overlay.addEventListener('click', onClick, true);
+    document.body.appendChild(overlay);
+
+    // 開始輪播
+    setImage(0);
+
+    function next() {
+      idx++;
+      if (idx >= images.length) {
+        // 已在最後一張 → 等 unlockDelayMs 後解鎖關閉
+        t = setTimeout(() => {
+          canClose = true;
+          overlay.classList.add('can-close');
+          if (typeof onUnlocked === 'function') onUnlocked();
+        }, unlockDelayMs);
+        return;
+      }
+      setImage(idx);
+      t = setTimeout(next, intervalMs);
+    }
+
+    // 第一張也顯示 intervalMs，再換到下一張
+    t = setTimeout(next, intervalMs);
+  }
+
+
+
+
+
   function finishCardPhase() {
     isActive = false;
     dragInfo = null;
@@ -1856,6 +2506,190 @@
       applyCallback(finalState);
     }
   }
+
+
+// ==========================
+// 10.x 新增卡片：31 / 32 / 33
+// ==========================
+function getPerkKeysByAlias(aliasText) {
+  return Object.entries(window.PERKS || {})
+    .filter(([_, p]) => p && Array.isArray(p.aliases) && p.aliases.includes(aliasText))
+    .map(([name]) => name);
+}
+
+function doCard31ReplaceCurse(slotIndex) {
+  if (slotIndex < 3 || slotIndex > 6) return false;
+  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
+
+  const idx = slotIndex - 3;
+  const poolAll = getPerkKeysByAlias('厄咒');
+  if (!poolAll.length) return false;
+
+  const used = new Set(currentState.perks);
+  used.delete(currentState.perks[idx]);
+
+  let pool = poolAll.filter(p => !used.has(p));
+  if (!pool.length) pool = poolAll;
+
+  const picked = getRandomItem(pool);
+  if (!picked) return false;
+
+  currentState.perks[idx] = picked;
+  return true;
+}
+
+function doCard32ReplaceScourge(slotIndex) {
+  if (slotIndex < 3 || slotIndex > 6) return false;
+  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
+
+  const idx = slotIndex - 3;
+  const poolAll = getPerkKeysByAlias('天災鉤');
+  if (!poolAll.length) return false;
+
+  const used = new Set(currentState.perks);
+  used.delete(currentState.perks[idx]);
+
+  let pool = poolAll.filter(p => !used.has(p));
+  if (!pool.length) pool = poolAll;
+
+  const picked = getRandomItem(pool);
+  if (!picked) return false;
+
+  currentState.perks[idx] = picked;
+  return true;
+}
+
+function doCard33WillFamily() {
+  if (!currentState) return false;
+
+  // 1) 找出 aliases 內含「威」的殺手
+  const killerKeys = Object.keys(window.KILLERS || {});
+  const willKillers = killerKeys.filter(k => {
+    const kk = window.KILLERS && window.KILLERS[k];
+    const aliases = kk && Array.isArray(kk.aliases) ? kk.aliases : [];
+    return aliases.includes('威');
+  });
+  if (!willKillers.length) return false;
+
+  // 2) 從候選中挑一個「至少有 2 個配件」的殺手（避免必定失敗）
+  let pickedKiller = null;
+  for (let i = 0; i < 50; i++) {
+    const candidate = getRandomItem(willKillers);
+    const addonPool = getAddonNamesForKiller(candidate);
+    if (addonPool && addonPool.length >= 2) {
+      pickedKiller = candidate;
+      break;
+    }
+  }
+  if (!pickedKiller) return false;
+
+  // 3) 技能：從「所有威家殺手」的技能池抽 4 個（不重複）
+  //    （DBD 每個殺手通常只有 3 個專屬技能，所以這樣才能湊滿 4 格）
+  const willPerkPool = Object.entries(window.PERKS || {})
+    .filter(([_, p]) => p && willKillers.includes(p.killer))
+    .map(([name]) => name);
+
+  const pickedPerks = [];
+  const used = new Set();
+
+  // 先從威家技能池抽
+  const shuffledWill = shuffle(Array.from(new Set(willPerkPool)));
+  for (const name of shuffledWill) {
+    if (pickedPerks.length >= 4) break;
+    if (used.has(name)) continue;
+    used.add(name);
+    pickedPerks.push(name);
+  }
+
+  // 不足 4 個：用通用技能補滿（保底不碎卡）
+  if (pickedPerks.length < 4) {
+    const allPerks = Object.keys(window.PERKS || {});
+    const shuffledAll = shuffle(allPerks);
+    for (const name of shuffledAll) {
+      if (pickedPerks.length >= 4) break;
+      if (used.has(name)) continue;
+      used.add(name);
+      pickedPerks.push(name);
+    }
+  }
+
+  if (pickedPerks.length < 4) return false;
+
+  // 4) 配件：改成新殺手的任意兩配
+  const addonPool = getAddonNamesForKiller(pickedKiller);
+  if (!addonPool || addonPool.length < 2) return false;
+  const newAddons = shuffle(addonPool).slice(0, 2);
+
+  currentState.killerKey = pickedKiller;
+  currentState.perks = pickedPerks;
+  currentState.addons = newAddons;
+  return true;
+}
+
+
+function doCard34Wishlist(card, slotIndex) {
+  const isPerk = slotIndex >= 3 && slotIndex <= 6;
+  if (!isPerk) {
+    showInvalidCardPopup(card);
+    return;
+  }
+  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
+    showInvalidCardPopup(card);
+    return;
+  }
+
+  const perkIdx = slotIndex - 3;
+
+  // 從所有殺手中找出「至少有 1 個專屬技能」的殺手
+  const killerKeys = Object.keys(window.KILLERS || {});
+  const killersWithPerks = killerKeys.filter(k => {
+    for (const p of Object.values(window.PERKS || {})) {
+      if (p && p.killer === k) return true;
+    }
+    return false;
+  });
+
+  if (killersWithPerks.length < 1) {
+    showInvalidCardPopup(card);
+    return;
+  }
+
+  // 隨機抽出 5 位殺手（不足就用全部）
+  const candidates = shuffle(killersWithPerks).slice(0, Math.min(5, killersWithPerks.length));
+
+  showChoiceOverlay({
+    type: 'killer',
+    candidates,
+    title: '願望清單：從 5 位殺手中選 1 位',
+    onPick: (killerKey) => {
+      // 把指定技能欄位換成該殺手的隨機 1 個專屬技能
+      const poolAll = Object.entries(window.PERKS || {})
+        .filter(([_, p]) => p && p.killer === killerKey)
+        .map(([name]) => name);
+
+      if (!poolAll.length) {
+        showInvalidCardPopup(card);
+        return;
+      }
+
+      const currentPerks = currentState.perks.slice();
+      const used = new Set(currentPerks);
+      used.delete(currentPerks[perkIdx]);
+
+      let pool = poolAll.filter(p => !used.has(p));
+      if (!pool.length) pool = poolAll;
+
+      const picked = getRandomItem(pool);
+      if (!picked) {
+        showInvalidCardPopup(card);
+        return;
+      }
+
+      currentState.perks[perkIdx] = picked;
+      finishCardPhase();
+    }
+  });
+}
 
   // ==========================
   // 12. 對外介面

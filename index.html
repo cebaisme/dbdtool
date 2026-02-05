@@ -871,6 +871,457 @@
       color: #d3d6e4;
       white-space: pre-line;
     }
+
+    /* === Dice (Scoring mode only) === */
+    /* === Dice (Fake 3D cube) === */
+    #diceFlying {
+      position: fixed;
+      width: 64px;
+      height: 64px;
+      left: -80px;
+      top: -80px;
+      transform: translate(0, 0);
+      transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+      z-index: 9999;
+      pointer-events: none;
+      display: none;
+      perspective: 1100px;
+      perspective-origin: 50% 50%;
+    }
+
+    #diceFlying .dice-cube {
+      width: 64px;
+      height: 64px;
+      position: relative;
+      transform-style: preserve-3d;
+      /* ✅ 讓立方體以中心為旋轉中心（很關鍵） */
+      transform: translateZ(-32px);
+      transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+      will-change: transform;
+    }
+
+    #diceFlying .face-front {
+      background-image: url("./images/other/骰子1.png");
+    }
+
+    #diceFlying .face-back {
+      background-image: url("./images/other/骰子6.png");
+    }
+
+    #diceFlying .face-right {
+      background-image: url("./images/other/骰子3.png");
+    }
+
+    #diceFlying .face-left {
+      background-image: url("./images/other/骰子4.png");
+    }
+
+    #diceFlying .face-top {
+      background-image: url("./images/other/骰子2.png");
+    }
+
+    #diceFlying .face-bottom {
+      background-image: url("./images/other/骰子5.png");
+    }
+
+    #diceFlying .dice-face {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      backface-visibility: hidden;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+      /* ✅ 邊緣/陰影，讓它「不是一張平面圖」 */
+      outline: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 10px 22px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Place faces (cube half-size = 32px) */
+    #diceFlying .face-front {
+      transform: rotateY(0deg) translateZ(32px);
+      filter: brightness(1.05);
+    }
+
+    #diceFlying .face-back {
+      transform: rotateY(180deg) translateZ(32px);
+      filter: brightness(0.85);
+    }
+
+    #diceFlying .face-right {
+      transform: rotateY(90deg) translateZ(32px);
+      filter: brightness(0.95);
+    }
+
+    #diceFlying .face-left {
+      transform: rotateY(-90deg) translateZ(32px);
+      filter: brightness(0.90);
+    }
+
+    #diceFlying .face-top {
+      transform: rotateX(90deg) translateZ(32px);
+      filter: brightness(1.10);
+    }
+
+    #diceFlying .face-bottom {
+      transform: rotateX(-90deg) translateZ(32px);
+      filter: brightness(0.80);
+    }
+
+    #diceModal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .55);
+      z-index: 10000;
+    }
+
+    #diceModal .box {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 18px 22px;
+      border-radius: 12px;
+      min-width: 260px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+    }
+
+    #diceModal button {
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 0;
+      background: #3f82ff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+
+
+    /* Dice (left/right) */
+    #diceRightBtn.dice-number {
+      background: #2a3044;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      font-variant-numeric: tabular-nums;
+      width: 56px;
+      height: 56px;
+
+      /* ✅ 置中修正（避免全域 button padding 讓文字歪） */
+      padding: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .dice-icon {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* ✅ Dice buttons: 統一置中（避免全域 button padding 影響） */
+    #diceLeftBtn,
+    #diceRightBtn {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+
+      padding: 0 !important;
+      width: 56px;
+      height: 56px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #diceLeftBtn:focus,
+    #diceRightBtn:focus,
+    #diceLeftBtn:active,
+    #diceRightBtn:active {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    /* ✅ 數字狀態：顯示像神籤一樣的框框（覆蓋上面 transparent 規則） */
+    #diceRightBtn.dice-number {
+      background: #2a3044 !important;
+      border: 1px solid rgba(255, 255, 255, 0.35) !important;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255,255,255,0.08) !important;
+      border-radius: 12px !important;
+      color: #fff !important;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+
+    /* ✅ 骰子圖示狀態：像籤筒一樣沒有框框（保留數字狀態的框） */
+    #diceLeftBtn:not(.dice-number),
+    #diceRightBtn:not(.dice-number) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    /* === Dice rolling animation (separate from translate) === */
+    @keyframes diceRollSpin {
+      0% {
+        transform: translateZ(-32px) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+      }
+
+      100% {
+        transform: translateZ(-32px) rotateX(1080deg) rotateY(1440deg) rotateZ(720deg);
+      }
+    }
+
+    #diceFlying.rolling .dice-cube {
+      /* animation replaced by JS controller for smooth damping stop */
+      animation: none;
+    }
+
+    /* === Slot Settings (Slot mode only) === */
+    .slot-settings-btn {
+      position: fixed;
+      /* ✅ 貼在整個畫面右下角 */
+      right: 24px;
+      bottom: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      z-index: 9999;
+    }
+
+    .slot-settings-btn:hover {
+      transform: scale(1.06);
+      border-color: rgba(122, 167, 255, 0.8);
+    }
+
+    .slot-settings-icon {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      display: none;
+      /* 沒載入圖示就先不顯示 */
+    }
+
+    .slot-settings-fallback {
+      font-size: 22px;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .slot-settings-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .slot-settings-modal.hidden {
+      display: none !important;
+    }
+
+    .slot-settings-panel {
+      width: min(92vw, 1000px);
+      max-width: calc(100% - 28px);
+      background: #121622;
+      border-radius: 14px;
+      border: 1px solid #2a3044;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+
+    .slot-settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .slot-settings-header button {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .slot-settings-body {
+      padding: 14px;
+      color: #d3d6e4;
+      font-size: 13px;
+      line-height: 1.6em;
+    }
+
+    /* Slot settings: sections */
+    .slot-settings-section {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .slot-settings-section:last-child {
+      border-bottom: none;
+    }
+
+    .slot-settings-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+    }
+
+    .slot-settings-toggle input {
+      width: 16px;
+      height: 16px;
+    }
+
+    .slot-settings-sub {
+      margin-top: 10px;
+      padding: 10px 10px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+    }
+
+    .slot-settings-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slot-settings-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .slot-settings-hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .slot-settings-search {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .slot-settings-perkgrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-height: 42vh;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    @media (max-width: 520px) {
+      .slot-settings-perkgrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .ss-perk-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(11, 13, 23, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: transform .06s, border-color .14s, background .14s;
+    }
+
+    .ss-perk-item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(122, 167, 255, 0.65);
+      background: rgba(21, 24, 36, 0.98);
+    }
+
+    .ss-perk-item.selected {
+      border-color: rgba(122, 167, 255, 0.95);
+      box-shadow: 0 0 0 1px rgba(63, 130, 255, 0.35);
+      background: radial-gradient(circle at top left, rgba(63, 130, 255, 0.22), rgba(11, 13, 23, 0.98));
+    }
+
+    .ss-perk-thumb {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #101320;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .ss-perk-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .ss-perk-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ss-perk-name {
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ss-perk-zh {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slot-settings-toggle input:disabled+span {
+      opacity: 0.6;
+    }
   </style>
 </head>
 
@@ -1058,6 +1509,16 @@
             <!-- 幸運神籤：配分模式底部 -->
             <div id="fortuneRow"
               style="margin-top:16px; display:flex; align-items:center; gap:16px; justify-content:flex-end;">
+              <!-- Dice Controls -->
+              <button id="diceLeftBtn" type="button" title="清空目前配置"
+                style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;"><img
+                  src="./images/other/骰子.png" alt="dice" class="dice-icon"></button>
+              <button id="diceRightBtn" type="button" title="擲骰(7~25)"
+                style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;">
+                <img src="./images/other/骰子.png" alt="dice" class="dice-icon">
+              </button>
+
+
               <img id="fortuneTubeBtn" src="./images/other/籤筒.png" alt="抽神籤"
                 style="width:56px; height:56px; cursor:pointer; filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));">
               <div id="fortuneResultIcon"
@@ -1110,6 +1571,71 @@
         <button id="slotResetBtn" type="button" class="hidden">重置拉霸</button>
 
         <div class="slot-hint"></div>
+
+
+
+      </div>
+
+      <!-- Slot settings (Slot mode only) -->
+      <button id="slotSettingsBtn" class="slot-settings-btn" type="button" title="設定">
+        <img id="slotSettingsIcon" class="slot-settings-icon" src="./images/other/設定.png" alt="settings"
+          onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <span class="slot-settings-fallback">⚙</span>
+      </button>
+
+      <div id="slotSettingsModal" class="slot-settings-modal hidden" role="dialog" aria-modal="true">
+        <div class="slot-settings-panel">
+          <div class="slot-settings-header">
+            <span>拉霸設定</span>
+            <button id="closeSlotSettings" type="button" aria-label="關閉">✕</button>
+          </div>
+          <div class="slot-settings-body">
+            <div class="slot-settings-section">
+              <label class="slot-settings-toggle">
+                <input id="ssLockKiller" type="checkbox" />
+                <span>自選殺手</span>
+              </label>
+              <div id="ssLockKillerPanel" class="slot-settings-sub hidden">
+                <div class="slot-settings-row">
+                  <div class="slot-settings-label">選擇殺手</div>
+                  <select id="ssKillerSelect">
+                    <option value="">請選擇殺手…</option>
+                  </select>
+                </div>
+                <div class="slot-settings-hint">開啟後：拉霸會固定使用你選的殺手；卡片造成的「換殺手」效果將被忽略。</div>
+              </div>
+            </div>
+
+            <div class="slot-settings-section">
+              <label class="slot-settings-toggle">
+                <input id="ssCustomPerks" type="checkbox" />
+                <span>自選技能池</span>
+              </label>
+              <div id="ssCustomPerksPanel" class="slot-settings-sub hidden">
+                <input id="ssPerkSearch" class="slot-settings-search" type="text" placeholder="搜尋技能（中 / 英 / 別名）" />
+                <div class="slot-settings-perkgrid" id="ssPerkGrid"></div>
+                <div class="slot-settings-hint">開啟後：拉霸技能只會從你勾選的技能中抽取（不顯示配分）。</div>
+              </div>
+            </div>
+
+            <div class="slot-settings-section">
+              <label class="slot-settings-toggle">
+                <input id="ssDisableCards" type="checkbox" />
+                <span>停用卡片系統</span>
+              </label>
+              <div class="slot-settings-hint">打勾後：拉霸抽滿後不會出現卡片（直接結算）。</div>
+            </div>
+
+            <div class="slot-settings-section">
+              <label class="slot-settings-toggle">
+                <input id="ssEnableSpecialCards" type="checkbox" />
+                <span>啟用特殊卡</span>
+              </label>
+              <div class="slot-settings-hint">打勾後：特殊卡才會加入卡池；取消打勾則永遠不會抽到。</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1169,6 +1695,307 @@
     const leverNormalEl = document.getElementById('leverNormal');
     const leverBottomEl = document.getElementById('leverBottom');
 
+
+    // ==========================
+    // Slot 設定鍵（僅拉霸模式）
+    // ==========================
+    const slotSettingsBtn = document.getElementById('slotSettingsBtn');
+    const slotSettingsModal = document.getElementById('slotSettingsModal');
+    const closeSlotSettingsBtn = document.getElementById('closeSlotSettings');
+
+    function closeSlotSettings() {
+      if (slotSettingsModal) slotSettingsModal.classList.add('hidden');
+    }
+
+    function openSlotSettings() {
+      if (slotSettingsModal) slotSettingsModal.classList.remove('hidden');
+    }
+
+    if (slotSettingsBtn && slotSettingsModal && closeSlotSettingsBtn) {
+      slotSettingsBtn.addEventListener('click', openSlotSettings);
+      closeSlotSettingsBtn.addEventListener('click', closeSlotSettings);
+
+      // 點遮罩關閉（點 panel 不關）
+      slotSettingsModal.addEventListener('click', (e) => {
+        if (e.target === slotSettingsModal) closeSlotSettings();
+      });
+
+      // ESC 關閉
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSlotSettings();
+      });
+    }
+
+    // 預設在配分模式：先把右下角設定鍵藏起來
+    if (slotSettingsBtn) slotSettingsBtn.classList.add('hidden');
+
+    /* 圖示載入成功就顯示圖片，失敗就用備用 ⚙ */
+    const slotSettingsIcon = document.getElementById('slotSettingsIcon');
+    const slotSettingsFallback = slotSettingsBtn ? slotSettingsBtn.querySelector('.slot-settings-fallback') : null;
+    if (slotSettingsIcon && slotSettingsFallback) {
+      slotSettingsIcon.addEventListener('load', () => {
+        slotSettingsIcon.style.display = 'block';
+        slotSettingsFallback.style.display = 'none';
+      });
+      slotSettingsIcon.addEventListener('error', () => {
+        slotSettingsIcon.style.display = 'none';
+        slotSettingsFallback.style.display = 'block';
+      });
+    }
+
+    // ==========================
+    // Slot Settings 狀態（供拉霸/卡片使用）
+    // ==========================
+    (function initSlotSettings() {
+      const DEFAULTS = {
+        lockKiller: false,
+        lockKillerKey: '',
+        customPerksEnabled: false,
+        allowedPerks: null, // array of perk keys (when enabled)
+        cardsEnabled: true,
+        specialCardsEnabled: false
+      };
+
+      function load() {
+        try {
+          const raw = localStorage.getItem('dbd_slot_settings');
+          if (!raw) return { ...DEFAULTS };
+          const parsed = JSON.parse(raw);
+          return { ...DEFAULTS, ...(parsed || {}) };
+        } catch (e) {
+          return { ...DEFAULTS };
+        }
+      }
+
+      function save() {
+        try {
+          localStorage.setItem('dbd_slot_settings', JSON.stringify(window.SlotSettings || DEFAULTS));
+        } catch (e) { }
+      }
+
+      window.SlotSettings = load();
+      window.saveSlotSettings = save;
+
+      // ---- UI wiring ----
+      const elLockKiller = document.getElementById('ssLockKiller');
+      const elLockKillerPanel = document.getElementById('ssLockKillerPanel');
+      const elKillerSelect = document.getElementById('ssKillerSelect');
+
+      const elCustomPerks = document.getElementById('ssCustomPerks');
+      const elCustomPerksPanel = document.getElementById('ssCustomPerksPanel');
+      const elPerkSearch = document.getElementById('ssPerkSearch');
+      const elPerkGrid = document.getElementById('ssPerkGrid');
+
+      const elDisableCards = document.getElementById('ssDisableCards');
+      const elEnableSpecial = document.getElementById('ssEnableSpecialCards');
+
+      function setHidden(node, hidden) {
+        if (!node) return;
+        node.classList.toggle('hidden', !!hidden);
+      }
+
+      function populateKillerSelect() {
+        if (!elKillerSelect || !window.KILLERS) return;
+        elKillerSelect.innerHTML = '<option value="">請選擇殺手…</option>';
+        const entries = Object.entries(window.KILLERS || {});
+        for (const [key, killer] of entries) {
+          const opt = document.createElement('option');
+          opt.value = key;
+          opt.textContent = killer && killer.zh ? `${killer.zh} / ${key}` : key;
+          elKillerSelect.appendChild(opt);
+        }
+      }
+
+      function perkHaystack(perkKey) {
+        const p = window.PERKS && window.PERKS[perkKey];
+        const parts = [perkKey, (p && p.zh) || ''];
+        const aliases = (p && p.aliases) || [];
+        for (const a of aliases) parts.push(a);
+
+        // === include killer info for searching perks by killer ===
+        if (p && p.killer && window.KILLERS && window.KILLERS[p.killer]) {
+          const k = window.KILLERS[p.killer];
+          parts.push(p.killer);
+          if (k.zh) parts.push(k.zh);
+          const kAliases = k.aliases || [];
+          for (const ka of kAliases) parts.push(ka);
+        }
+        return parts.join(' ').toLowerCase();
+      }
+
+      function ensureAllowedPerksDefault() {
+        if (!window.PERKS) return;
+        if (!Array.isArray(window.SlotSettings.allowedPerks) || window.SlotSettings.allowedPerks.length === 0) {
+          window.SlotSettings.allowedPerks = Object.keys(window.PERKS || {});
+        }
+      }
+
+      function renderPerkGrid(term) {
+        if (!elPerkGrid || !window.PERKS) return;
+
+        const lower = (term || '').trim().toLowerCase();
+        const allowedSet = new Set(Array.isArray(window.SlotSettings.allowedPerks) ? window.SlotSettings.allowedPerks : []);
+
+        elPerkGrid.innerHTML = '';
+        const keys = Object.keys(window.PERKS || {}); // 保持程式內順序
+
+        for (const perkKey of keys) {
+          if (lower) {
+            if (!perkHaystack(perkKey).includes(lower)) continue;
+          }
+
+          const p = window.PERKS[perkKey] || {};
+          const item = document.createElement('div');
+          item.className = 'ss-perk-item' + (allowedSet.has(perkKey) ? ' selected' : '');
+          item.dataset.perkKey = perkKey;
+
+          const thumb = document.createElement('div');
+          thumb.className = 'ss-perk-thumb';
+          if (p.img) {
+            const img = document.createElement('img');
+            img.src = p.img;
+            img.alt = p.zh || perkKey;
+            thumb.appendChild(img);
+          } else {
+            thumb.textContent = 'no img';
+          }
+
+          const text = document.createElement('div');
+          text.className = 'ss-perk-text';
+          const name = document.createElement('div');
+          name.className = 'ss-perk-name';
+          name.textContent = p.zh || perkKey;
+
+          const zh = document.createElement('div');
+          zh.className = 'ss-perk-zh';
+          zh.textContent = (p.zh && p.zh !== perkKey) ? perkKey : (p.zh2 || ''); // 讓英文能被看到一點，但不顯示分數
+
+          text.appendChild(name);
+          text.appendChild(zh);
+
+          item.appendChild(thumb);
+          item.appendChild(text);
+
+          item.addEventListener('click', () => {
+            if (!window.SlotSettings.customPerksEnabled) return;
+
+            const set = new Set(Array.isArray(window.SlotSettings.allowedPerks) ? window.SlotSettings.allowedPerks : []);
+            if (set.has(perkKey)) set.delete(perkKey);
+            else set.add(perkKey);
+
+            window.SlotSettings.allowedPerks = Array.from(set);
+            save();
+            renderPerkGrid(elPerkSearch ? elPerkSearch.value : '');
+          });
+
+          elPerkGrid.appendChild(item);
+        }
+      }
+
+      function syncUIFromSettings() {
+        if (elLockKiller) elLockKiller.checked = !!window.SlotSettings.lockKiller;
+        if (elCustomPerks) elCustomPerks.checked = !!window.SlotSettings.customPerksEnabled;
+        if (elDisableCards) elDisableCards.checked = (window.SlotSettings.cardsEnabled === false);
+        if (elEnableSpecial) elEnableSpecial.checked = !!window.SlotSettings.specialCardsEnabled;
+
+        setHidden(elLockKillerPanel, !window.SlotSettings.lockKiller);
+        setHidden(elCustomPerksPanel, !window.SlotSettings.customPerksEnabled);
+
+        // 特殊卡：卡片停用時，不能勾
+        if (elEnableSpecial) {
+          const cardsOff = (window.SlotSettings.cardsEnabled === false);
+          elEnableSpecial.disabled = cardsOff;
+          if (cardsOff) {
+            elEnableSpecial.checked = false;
+            window.SlotSettings.specialCardsEnabled = false;
+          }
+        }
+
+        if (elKillerSelect) elKillerSelect.value = window.SlotSettings.lockKillerKey || '';
+
+        if (window.SlotSettings.customPerksEnabled) ensureAllowedPerksDefault();
+        renderPerkGrid(elPerkSearch ? elPerkSearch.value : '');
+      }
+
+      // Init once data available
+      populateKillerSelect();
+      syncUIFromSettings();
+
+      // Events
+      if (elLockKiller) {
+        elLockKiller.addEventListener('change', () => {
+          window.SlotSettings.lockKiller = !!elLockKiller.checked;
+          if (window.SlotSettings.lockKiller) {
+            // 預設：若目前拉霸已抽到殺手，就以它為預設
+            if (!window.SlotSettings.lockKillerKey) {
+              if (window.slotState && window.slotState.killerKey) window.SlotSettings.lockKillerKey = window.slotState.killerKey;
+            }
+          }
+          save();
+          syncUIFromSettings();
+        });
+      }
+
+      if (elKillerSelect) {
+        elKillerSelect.addEventListener('change', () => {
+          window.SlotSettings.lockKillerKey = elKillerSelect.value || '';
+          save();
+          // 若拉霸已經開始抽了，切殺手會造成配件池不一致 → 直接 reset
+          if (window.resetSlotState && window.slotState) {
+            const started = !!(window.slotState.killerKey || (window.slotState.addons && window.slotState.addons.length) || (window.slotState.perks && window.slotState.perks.length));
+            if (started) window.resetSlotState();
+          }
+        });
+      }
+
+      if (elCustomPerks) {
+        elCustomPerks.addEventListener('change', () => {
+          window.SlotSettings.customPerksEnabled = !!elCustomPerks.checked;
+          if (window.SlotSettings.customPerksEnabled) ensureAllowedPerksDefault();
+          save();
+          syncUIFromSettings();
+        });
+      }
+
+      if (elPerkSearch) {
+        elPerkSearch.addEventListener('input', () => {
+          renderPerkGrid(elPerkSearch.value);
+        });
+      }
+
+      if (elDisableCards) {
+        elDisableCards.addEventListener('change', () => {
+          window.SlotSettings.cardsEnabled = !elDisableCards.checked;
+          // 卡片停用時順便關掉特殊卡
+          if (window.SlotSettings.cardsEnabled === false) window.SlotSettings.specialCardsEnabled = false;
+          save();
+          syncUIFromSettings();
+
+          // 立刻把畫面上的卡片收起來
+          const cardContainer = document.getElementById('cardContainer');
+          if (cardContainer) {
+            cardContainer.innerHTML = '';
+            cardContainer.classList.remove('card-visible');
+            if (window.SlotSettings.cardsEnabled === false) {
+              cardContainer.classList.add('hidden');
+            } else {
+              cardContainer.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      if (elEnableSpecial) {
+        elEnableSpecial.addEventListener('change', () => {
+          window.SlotSettings.specialCardsEnabled = !!elEnableSpecial.checked;
+          save();
+          syncUIFromSettings();
+        });
+      }
+    })();
+
+
+
     let currentMode = 'points';
     let currentKillerKey = null;
 
@@ -1188,6 +2015,9 @@
       animTimeout: null,
       afterFull: false,
     };
+    // 讓設定系統/卡片系統可讀取拉霸狀態
+    window.slotState = slotState;
+
 
     // ==========================
     // 初始化殺手下拉 + 搜尋
@@ -1234,7 +2064,8 @@
       if (!currentKillerKey || !window.KILLERS) return { limit: 0, usedAddons: 0, usedPerks: 0 };
 
       const killer = KILLERS[currentKillerKey] || {};
-      const limit = Number(killer.limit ?? 0);
+      const baseLimit = Number(killer.limit ?? 0);
+      const limit = (window.DICE_TOTAL_OVERRIDE != null) ? Number(window.DICE_TOTAL_OVERRIDE) : baseLimit;
 
       let usedAddons = 0;
       for (const name of selectedAddons) {
@@ -1445,7 +2276,12 @@
         if (term) {
           const zh = (addon.zh || '').toLowerCase();
           const aliases = (addon.aliases || []).join(' ').toLowerCase();
-          const combined = `${name.toLowerCase()} ${zh} ${aliases}`;
+          let killerPart = '';
+        if (perk.killer && window.KILLERS && window.KILLERS[perk.killer]) {
+          const k = window.KILLERS[perk.killer];
+          killerPart = `${perk.killer} ${(k.zh||'')} ${(k.aliases||[]).join(' ')}`.toLowerCase();
+        }
+        const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerPart}`;
           if (!combined.includes(term)) continue;
         }
         result.push([name, addon]);
@@ -1572,23 +2408,14 @@
         if (term) {
           const zh = (perk.zh || '').toLowerCase();
           const aliases = (perk.aliases || []).join(' ').toLowerCase();
-
-          // 允許用「殺手名稱/中文/代稱」搜尋技能（包含 General/通用）
-          const killerKey = (perk.killer || '').toString();
-          let killerCombined = '';
-          if (!killerKey || killerKey.toLowerCase() === 'general') {
-            killerCombined = 'general 通用 通用技能';
-          } else {
-            const k = (window.KILLERS && window.KILLERS[killerKey]) ? window.KILLERS[killerKey] : null;
-            const kZh = (k && k.zh) ? String(k.zh).toLowerCase() : '';
-            const kAliases = (k && Array.isArray(k.aliases)) ? k.aliases.join(' ').toLowerCase() : '';
-            killerCombined = `${killerKey.toLowerCase()} ${kZh} ${kAliases}`;
-          }
-
-          const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerCombined}`;
+          let killerPart = '';
+        if (perk.killer && window.KILLERS && window.KILLERS[perk.killer]) {
+          const k = window.KILLERS[perk.killer];
+          killerPart = `${perk.killer} ${(k.zh||'')} ${(k.aliases||[]).join(' ')}`.toLowerCase();
+        }
+        const combined = `${name.toLowerCase()} ${zh} ${aliases} ${killerPart}`;
           if (!combined.includes(term)) continue;
         }
-
         result.push([name, perk]);
       }
 
@@ -1823,6 +2650,9 @@
       renderSlotBoard();
     }
 
+    // 讓卡片系統/設定系統可呼叫 reset
+    window.resetSlotState = resetSlotState;
+
     function getRandomItem(arr) {
       if (!arr.length) return null;
       const idx = Math.floor(Math.random() * arr.length);
@@ -1842,9 +2672,14 @@
       const step = filledCount;
 
       if (step === 0) {
-        const killerKeys = Object.keys(KILLERS || {});
-        if (!killerKeys.length) return;
-        slotState.killerKey = getRandomItem(killerKeys);
+        const settings = window.SlotSettings || {};
+        if (settings.lockKiller && settings.lockKillerKey) {
+          slotState.killerKey = settings.lockKillerKey;
+        } else {
+          const killerKeys = Object.keys(KILLERS || {});
+          if (!killerKeys.length) return;
+          slotState.killerKey = getRandomItem(killerKeys);
+        }
 
       } else if (step === 1 || step === 2) {
         const pool = Object.entries(ADDONS || {})
@@ -1860,11 +2695,20 @@
         if (chosen) slotState.addons.push(chosen);
 
       } else {
+        const settings = window.SlotSettings || {};
         const used = new Set(slotState.perks);
+
+        // 自選技能池：只允許勾選的技能
+        let allowedSet = null;
+        if (settings.customPerksEnabled && Array.isArray(settings.allowedPerks)) {
+          allowedSet = new Set(settings.allowedPerks);
+        }
+
         const pool = Object.entries(PERKS || {})
           .filter(([perkName, perk]) => {
             if (used.has(perkName)) return false;
             if (!perk || typeof perk !== 'object') return false;
+            if (allowedSet && !allowedSet.has(perkName)) return false;
             return true;
           })
           .map(([name]) => name);
@@ -1901,9 +2745,12 @@
                   const changedIndices = [];
 
                   // 殺手格：index 0
-                  if (typeof updatedState.killerKey !== 'undefined' &&
-                    updatedState.killerKey !== prevState.killerKey) {
-                    changedIndices.push(0);
+                  {
+                    const settings = window.SlotSettings || {};
+                    const effectiveKillerKey = (settings.lockKiller && settings.lockKillerKey) ? settings.lockKillerKey : updatedState.killerKey;
+                    if (typeof effectiveKillerKey !== 'undefined' && effectiveKillerKey !== prevState.killerKey) {
+                      changedIndices.push(0);
+                    }
                   }
 
                   // 配件格：index 1,2
@@ -1933,8 +2780,14 @@
 
                   if (!hasChanged) {
                     // 沒東西變化就正常套用
+                    const settings = window.SlotSettings || {};
                     if (typeof updatedState.killerKey !== 'undefined') {
-                      slotState.killerKey = updatedState.killerKey;
+                      // 自選殺手開啟時：卡片造成的換殺手效果不影響
+                      if (settings.lockKiller && settings.lockKillerKey) {
+                        slotState.killerKey = settings.lockKillerKey;
+                      } else {
+                        slotState.killerKey = updatedState.killerKey;
+                      }
                     }
                     if (Array.isArray(updatedState.addons)) {
                       slotState.addons = [...updatedState.addons];
@@ -2010,6 +2863,10 @@
       pointsModeEl.classList.remove('hidden');
       slotModeEl.classList.add('hidden');
 
+      // 配分模式：隱藏右下角拉霸設定鍵
+      if (slotSettingsBtn) slotSettingsBtn.classList.add('hidden');
+      closeSlotSettings();
+
       // 切到配分模式時，隱藏拉霸卡片區域（但不清除內容）
       const cardContainer = document.getElementById('cardContainer');
       if (cardContainer) {
@@ -2025,9 +2882,15 @@
       pointsModeEl.classList.add('hidden');
       slotModeEl.classList.remove('hidden');
 
-      // 切回拉霸模式，如果之前有卡片，讓卡片容器重新顯示
+      // 拉霸模式：顯示右下角拉霸設定鍵
+      if (slotSettingsBtn) slotSettingsBtn.classList.remove('hidden');
+
+      // 切回拉霸模式，先關閉設定視窗（避免殘留）
+      closeSlotSettings();
+
+      // 切回拉霸模式：讓卡片容器可被顯示（即使目前還沒有卡片）
       const cardContainer = document.getElementById('cardContainer');
-      if (cardContainer && cardContainer.children.length > 0) {
+      if (cardContainer) {
         cardContainer.classList.remove('hidden');
       }
     });
@@ -2324,6 +3187,263 @@
       return FORTUNE_POOL[Math.floor(Math.random() * FORTUNE_POOL.length)];
     };
   </script>
+  <!-- Dice Assets -->
+  <!-- Dice (Fake 3D) -->
+  <!-- Dice (Fake 3D) -->
+  <div id="diceFlying" aria-hidden="true">
+    <div class="dice-cube" id="diceCube">
+      <div class="dice-face face-front"></div>
+      <div class="dice-face face-back"></div>
+      <div class="dice-face face-right"></div>
+      <div class="dice-face face-left"></div>
+      <div class="dice-face face-top"></div>
+      <div class="dice-face face-bottom"></div>
+    </div>
+  </div>
+  </div>
+  <div id="diceModal">
+    <div class="box">
+      <h3>🎲 骰子結果</h3>
+      <div id="diceResult" style="font-size:28px;font-weight:800;margin:8px 0;">--</div>
+      <button id="diceOk" type="button">確定</button>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      if (window.__DICE_TWO_SLOT_PATCH__) return;
+      window.__DICE_TWO_SLOT_PATCH__ = true;
+
+      const DICE_ICON_HTML = '<img src="./images/other/骰子.png" alt="dice" class="dice-icon">';
+
+      const leftBtn = document.getElementById('diceLeftBtn');   // red slot
+      const rightBtn = document.getElementById('diceRightBtn'); // yellow slot
+      const dice = document.getElementById('diceFlying');
+      const cube = document.getElementById('diceCube');
+      const modal = document.getElementById('diceModal');
+      const out = document.getElementById('diceResult');
+      const ok = document.getElementById('diceOk');
+      const clearBuildBtn = document.getElementById('clearBuildBtn');
+
+      if (!leftBtn || !rightBtn || !dice || !modal || !out || !ok) return;
+
+      function inPointsMode() {
+        const points = document.getElementById('pointsMode');
+        return points && !points.classList.contains('hidden');
+      }
+
+      function syncVisibility() {
+        const show = inPointsMode();
+        rightBtn.style.display = show ? 'flex' : 'none';
+        // left is controlled by state; default hidden when entering points mode
+        if (!show) leftBtn.style.display = 'none';
+      }
+
+      function randomEntry() {
+        const sides = ['top', 'left', 'right'];
+        return sides[Math.floor(Math.random() * sides.length)];
+      }
+
+      function setPreRollUI() {
+        // initial: hide left, show right as dice
+        leftBtn.style.display = 'none';
+
+        rightBtn.classList.remove('dice-number');
+        rightBtn.innerHTML = DICE_ICON_HTML;
+        rightBtn.title = '擲骰(10~23)';
+        rightBtn.onclick = rollDice;
+      }
+
+      function setPostRollUI(value) {
+        // after roll: left shows dice for reroll
+        leftBtn.style.display = 'flex';
+        leftBtn.innerHTML = DICE_ICON_HTML;
+        leftBtn.title = '再次擲骰(10~23)';
+        leftBtn.onclick = rollDice;
+
+        // right shows number; clicking number resets (clear build + clear override + back to initial)
+        rightBtn.classList.add('dice-number');
+        rightBtn.textContent = String(value);
+        rightBtn.title = '點擊重製（清空目前配置）';
+        rightBtn.onclick = () => {
+          if (clearBuildBtn) clearBuildBtn.click();
+          window.DICE_TOTAL_OVERRIDE = null;
+          setPreRollUI();
+          if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+        };
+      }
+
+
+      /* ===== slow-stop JS controller (startRollController) ===== */
+      function startRollController(diceEl) {
+        let rafId = null;
+        let lastT = performance.now();
+        const rot = { x: 0, y: 0, z: 0 };
+        // initial velocities (reduced)
+        const vel = { x: 520, y: 720, z: 420 };
+        let mode = "rolling";
+        let target = { x: 0, y: 0, z: 0 };
+
+        function norm(a) { a %= 360; return a < 0 ? a + 360 : a; }
+        function setTransform() { diceEl.style.transform = `translateZ(-32px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg)`; }
+
+        function tick(t) {
+          const dt = Math.min(0.05, (t - lastT) / 1000);
+          lastT = t;
+
+          if (mode === "rolling") {
+            rot.x += vel.x * dt;
+            rot.y += vel.y * dt;
+            rot.z += vel.z * dt;
+          } else {
+            const dampingPerSec = 0.10;
+            const damp = Math.pow(1 - dampingPerSec, dt * 60);
+            vel.x *= damp; vel.y *= damp; vel.z *= damp;
+
+            const spring = 9;
+            rot.x += (target.x - rot.x) * Math.min(1, spring * dt);
+            rot.y += (target.y - rot.y) * Math.min(1, spring * dt);
+            rot.z += (target.z - rot.z) * Math.min(1, spring * dt);
+
+            rot.x += vel.x * dt * 0.15;
+            rot.y += vel.y * dt * 0.15;
+            rot.z += vel.z * dt * 0.15;
+
+            const speed = Math.max(Math.abs(vel.x), Math.abs(vel.y), Math.abs(vel.z));
+            const diff = Math.max(Math.abs(target.x - rot.x), Math.abs(target.y - rot.y), Math.abs(target.z - rot.z));
+
+            if (speed < 6 && diff < 1) {
+              rot.x = target.x; rot.y = target.y; rot.z = target.z;
+              setTransform();
+              cancelAnimationFrame(rafId);
+              rafId = null;
+              return;
+            }
+          }
+
+          rot.x = norm(rot.x); rot.y = norm(rot.y); rot.z = norm(rot.z);
+          setTransform();
+          rafId = requestAnimationFrame(tick);
+        }
+
+        rafId = requestAnimationFrame(tick);
+
+        return {
+          stopTo(finalRot) {
+            target = { ...finalRot };
+            mode = "stopping";
+          },
+          cancel() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        };
+      }
+      /* ===== end controller ===== */
+
+      function rollDice() {
+        if (!inPointsMode()) return;
+
+        // 這個骰子其實是「配分總點數」(7~25)，所以外觀滾動只是視覺效果
+        const value = Math.floor(Math.random() * (25 - 7 + 1)) + 7;
+
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        const cx = w / 2 - 32;
+        const cy = h / 2 - 32;
+
+        // ✅ 從螢幕外「滾進來」(依 side 決定入口方向)
+        const side = randomEntry(); // 'top' | 'left' | 'right'
+        const off = 140;            // 螢幕外距離（越大越像從外面來）
+        const randY = () => Math.max(20, Math.min(h - 84, Math.random() * (h - 64)));
+        const randX = () => Math.max(20, Math.min(w - 84, Math.random() * (w - 64)));
+
+        let fx = cx, fy = cy;
+        if (side === 'left') { fx = -off; fy = randY(); }
+        if (side === 'right') { fx = w + off; fy = randY(); }
+        if (side === 'top') { fx = randX(); fy = -off; }
+
+        // ✅ 讓 rolling 動畫每次都能重新觸發（強制 reflow）
+        dice.classList.remove('rolling');
+        cube.style.transition = 'none';
+        cube.style.transform = 'translateZ(-32px)';
+        void dice.offsetWidth; // force reflow
+
+        dice.style.display = 'block';
+
+        // 父層只負責「位移」；旋轉交給 cube（3D）
+        dice.style.transform = `translate(${fx}px,${fy}px)`;
+
+        // 開始滾動: start JS rolling controller (instead of CSS infinite animation)
+        // ensure any previous roller is cancelled
+        if (window._diceRoller && window._diceRoller.cancel) window._diceRoller.cancel();
+        // start controller on the cube element
+        window._diceRoller = startRollController(cube);
+
+        // animate parent translate to center
+        requestAnimationFrame(() => {
+          dice.style.transform = `translate(${cx}px,${cy}px)`;
+        });
+
+        // 到中心後，請 roller 慢慢停到一個 90 度倍數的姿勢
+        dice.addEventListener('transitionend', function handler(e) {
+          if (e.propertyName !== 'transform') return;
+
+          dice.removeEventListener('transitionend', handler);
+
+          // 原本使用 CSS infinite 轉動的做法已改為 JS controller
+          // 計算要停到的 90 度倍數角度
+          const snap = () => (Math.floor(Math.random() * 4) * 90);
+          const rx = snap(), ry = snap(), rz = snap();
+
+          // 告訴 roller 開始慢慢停到目標角度
+          if (window._diceRoller && typeof window._diceRoller.stopTo === 'function') {
+            window._diceRoller.stopTo({ x: rx, y: ry, z: rz });
+          } else {
+            // fallback: apply immediate transform
+            cube.style.transition = 'transform 220ms ease-out';
+            cube.style.transform = `translateZ(-32px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+          }
+
+          // 記錄結果 + 顯示 modal (modal can appear while cube is slowing to stop)
+          window.DICE_TOTAL_OVERRIDE = value;
+          if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+
+          out.textContent = value;
+          modal.style.display = 'flex';
+        }, { once: true });
+      }
+
+      ok.addEventListener('click', () => {
+        modal.style.display = 'none';
+        dice.style.display = 'none';
+        const v = window.DICE_TOTAL_OVERRIDE;
+        if (v != null) setPostRollUI(Number(v));
+      });
+
+      const tabPoints = document.getElementById('tabPoints');
+      const tabSlot = document.getElementById('tabSlot');
+      if (tabPoints) tabPoints.addEventListener('click', () => { syncVisibility(); if (inPointsMode()) { window.DICE_TOTAL_OVERRIDE != null ? setPostRollUI(Number(window.DICE_TOTAL_OVERRIDE)) : setPreRollUI(); } });
+      if (tabSlot) tabSlot.addEventListener('click', syncVisibility);
+
+      // initial
+      syncVisibility();
+      if (inPointsMode()) {
+        if (window.DICE_TOTAL_OVERRIDE != null) setPostRollUI(Number(window.DICE_TOTAL_OVERRIDE));
+        else setPreRollUI();
+      }
+    })();
+  </script>
+
 
 </body>
 

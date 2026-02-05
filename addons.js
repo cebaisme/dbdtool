@@ -6026,4 +6026,152 @@ window.ADDONS = {
     img: "./images/addons/shreddedgown.png",
     killer: "The Krasue",
   },
+  
+  
+
+
+  // 亨利
+
+
+
+  "Bead Maze": {
+    zh: "串珠迷宮",
+    score: 2,
+    aliases: ["活", "3秒", "白配"],
+    img: "./images/addons/beadmaze.png",
+    killer: "The First",
+  },
+  "Orderly ID": {
+    zh: "勤務員證",
+    score: 3,
+    aliases: ["瞄準距離增加2公尺", "瞄準距離增加2米", "白配"],
+    img: "./images/addons/orderlyid.png",
+    killer: "The First",
+  },
+  "Shattered Wrist Rocket": {
+    zh: "破碎的腕帶火箭",
+    score: 3,
+    aliases: ["地下道", "地底門", "破壞", "發電機", "木板", "板子", "白配"],
+    img: "./images/addons/shatteredwristrocket.png",
+    killer: "The First",
+  },
+  "Stained Glass Mural": {
+    zh: "彩繪玻璃壁畫",
+    score: 3,
+    aliases: ["破壞", "木板", "板子", "牆壁", "冷卻", "12秒", "白配"],
+    img: "./images/addons/stainedglassmural.png",
+    killer: "The First",
+  },
+  "Bloody Roller Skate": {
+    zh: "血腥溜冰鞋",
+    score: 3,
+    aliases: ["地下道", "地底門", "敏捷", "加速", "20%", "2秒", "綠配"],
+    img: "./images/addons/bloodyrollerskate.png",
+    killer: "The First",
+  },
+  "Clock Hands": {
+    zh: "時鐘指針",
+    score: 3,
+    aliases: ["遲鈍", "12秒", "綠配"],
+    img: "./images/addons/clockhands.png",
+    killer: "The First",
+  },
+  "Gutted Supercom": {
+    zh: "被掏空的對講機",
+    score: 3,
+    aliases: ["氣場", "1.5秒", "綠配"],
+    img: "./images/addons/guttedsupercom.png",
+    killer: "The First",
+  },
+  "Mid-Century Radio": {
+    zh: "中世紀收音機",
+    score: 3,
+    aliases: ["32公尺", "32米", "氣場", "綠配"],
+    img: "./images/addons/midcenturyradio.png",
+    killer: "The First",
+  },
+  "Smashed Cassette Deck": {
+    zh: "被砸壞的卡帶播放機",
+    score: 5,
+    aliases: ["開場感染", "減少1台", "綠配"],
+    img: "./images/addons/smashedcassette.png",
+    killer: "The First",
+  },
+  "Electrode Cap": {
+    zh: "電極帽",
+    score: 2,
+    aliases: ["26公尺", "26米", "氣場", "6秒", "第二階段", "藍配"],
+    img: "./images/addons/electrodecap.png",
+    killer: "The First",
+  },
+  "Forged Death Certificate": {
+    zh: "偽造的死亡證明",
+    score: 2,
+    aliases: ["恐懼範圍減少", "12公尺", "12米", "藍配"],
+    img: "./images/addons/forgeddeathcertificate.png",
+    killer: "The First",
+  },
+  "Neck Tendril": {
+    zh: "頸部觸手",
+    score: 4,
+    aliases: ["重傷", "斷骨", "出血", "流血", "70秒", "藍配"],
+    img: "./images/addons/necktendril.png",
+    killer: "The First",
+  },
+  "Rabbit Remains": {
+    zh: "兔子殘骸",
+    score: 4,
+    aliases: ["疲憊", "疲勞", "20秒", "藍配"],
+    img: "./images/addons/rabbitremains.png",
+    killer: "The First",
+  },
+  "Victor's Razor Blade": {
+    zh: "維克多的剃刀",
+    score: 4,
+    aliases: ["不治", "20秒", "藍配"],
+    img: "./images/addons/victorsrazorblade.png",
+    killer: "The First",
+  },
+  "Black Widow Spider": {
+    zh: "黑寡婦蜘蛛",
+    score: 5,
+    aliases: ["36公尺", "36米", "尖叫", "大叫", "3秒", "紫配"],
+    img: "./images/addons/blackwidowspider.png",
+    killer: "The First",
+  },
+  "Broken Skateboard": {
+    zh: "破損的滑板",
+    score: 1,
+    aliases: ["跨越速度", "60秒", "30%", "紫配"],
+    img: "./images/addons/brokenskateboard.png",
+    killer: "The First",
+  },
+  "Electroshock Collar": {
+    zh: "電擊項圈",
+    score: 3,
+    aliases: ["32公尺", "32米", "封鎖", "12秒", "紫配"],
+    img: "./images/addons/electroshockcollar.png",
+    killer: "The First",
+  },
+  "Pizza Goggles": {
+    zh: "披薩護目鏡",
+    score: 0,
+    aliases: ["減少90%", "冷卻縮短20秒", "紫配"],
+    img: "./images/addons/pizzagoggles.png",
+    killer: "The First",
+  },
+  "Chess Piece": {
+    zh: "棋子",
+    score: 4,
+    aliases: ["兩次", "攻擊半徑減少50%", "冷卻時間增加15秒", "紅配"],
+    img: "./images/addons/chesspiece.png",
+    killer: "The First",
+  },
+  "Iridescent Soteria Chip": {
+    zh: "螢紅索泰里亞晶片",
+    score: 5,
+    aliases: ["虹彩索泰里亞晶片", "隱形", "隱身", "氣場", "12公尺", "12米", "紅配"],
+    img: "./images/addons/iridescentsoteriachip.png",
+    killer: "The First",
+  },
 };

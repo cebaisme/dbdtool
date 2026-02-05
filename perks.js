@@ -247,7 +247,7 @@ zh: "嗜血兇獸",
 "Hex: Huntress Lullaby": {
 zh: "厄咒:獵手搖籃曲",
     score: 1,
-    aliases: ["hex: huntress lullaby", "搖籃曲", "5層代幣", "技能檢驗", "QTE", "qte", "6%"],
+    aliases: ["hex: huntress lullaby", "厄咒", "搖籃曲", "5層代幣", "技能檢驗", "QTE", "qte", "6%"],
     killer: "The Huntress",
     img: "./images/perks/hexhuntresslullaby.png"
   },
@@ -281,42 +281,42 @@ zh: "擊倒出局",
   },
 "Blood Warden": {
 zh: "血腥獄長",
-    score: 5,
+    score: 4,
     aliases: ["blood warden", "封門", "終局"],
     killer: "The Nightmare",
     img: "./images/perks/bloodwarden.png"
   },
 "Fire Up": {
 zh: "怒火中燒",
-    score: 5,
+    score: 4,
     aliases: ["fire up", "賽亞人", "發電機", "破壞速度", "跨越速度", "互動速度"],
     killer: "The Nightmare",
     img: "./images/perks/fireup.png"
   },
 "Remember Me": {
 zh: "勿忘我",
-    score: 5,
+    score: 3,
     aliases: ["rememer me", "記憶猶新", "開關", "血祭品", "終局"],
     killer: "The Nightmare",
     img: "./images/perks/rememberme.png"
   },
 "Make Your Choice": {
 zh: "做出你的選擇",
-    score: 5,
+    score: 3,
     aliases: ["make your choice", "天平", "天秤"],
     killer: "The Pig",
     img: "./images/perks/makeyourchoice.png"
   },
 "Scourge Hook: Hangman's Trick": {
 zh: "禍害之鉤:行刑者的技巧",
-    score: 5,
+    score: 1,
     aliases: ["scourge hook: hangman's trick", "禍害之鉤", "行刑者的技巧", "天災鉤子:劊子手的把戲", "處刑人的妙計", "天災鉤"],
     killer: "The Pig",
     img: "./images/perks/scourgehookhangmanstrick.png"
   },
 "Surveillance": {
 zh: "了如指掌",
-    score: 5,
+    score: 3,
     aliases: ["surveillance", "發電機"],
     killer: "The Pig",
     img: "./images/perks/surveillance.png"
@@ -330,14 +330,14 @@ zh: "花言巧語",
   },
 "Coulrophobia": {
 zh: "小丑恐懼症",
-    score: 5,
+    score: 3,
     aliases: ["coulrophobia", "小丑恐", "哈奇恐懼症", "治療", "補血", "QTE"],
     killer: "The Clown",
     img: "./images/perks/coulrophobia.png"
   },
 "Pop Goes the Weasel": {
 zh: "心驚肉跳",
-    score: 5,
+    score: 4,
     aliases: ["pop goes the wease", "小丑腳", "POP", "pop"],
     killer: "The Clown",
     img: "./images/perks/popgoestheweasel.png"
@@ -520,14 +520,14 @@ zh: "龍爪",
 "Hex: Blood Favour": {
 zh: "厄咒:鮮血之禮",
     score: 3,
-    aliases: ["hex: blood favour", "厄咒:鮮血恩惠", "封板", "木板"],
+    aliases: ["hex: blood favour", "厄咒:鮮血恩惠", "厄咒", "封板", "木板"],
     killer: "The Blight",
     img: "./images/perks/hexbloodfavour.png"
   },
 "Hex: Undying": {
 zh: "厄咒:不死",
     score: 3,
-    aliases: ["hex: undying", "必死"],
+    aliases: ["hex: undying", "厄咒", "必死"],
     killer: "The Blight",
     img: "./images/perks/hexundying.png"
   },
@@ -604,14 +604,14 @@ zh: "死鎖",
 "Hex: Plaything": {
 zh: "厄咒:玩物",
     score: 4,
-    aliases: ["hex: plaything", "厄咒:命運眷顧", "Hex: Fortune's Fool", "遲鈍"],
+    aliases: ["hex: plaything", "厄咒:命運眷顧", "厄咒", "Hex: Fortune's Fool", "遲鈍"],
     killer: "The Cenobite",
     img: "./images/perks/hexplaything.png"
   },
 "Scourge Hook: Gift of Pain": {
 zh: "禍害之鉤:苦痛贈禮",
     score: 3,
-    aliases: ["禍害之鉤:哭泣傷口", "天災鉤子:痛苦禮物", "天災鉤", "豬頭鉤", "天災鉤", "Scourge Hook: Weeping Wounds", "出血", "流血", "重傷", "斷骨", "90秒"],
+    aliases: ["禍害之鉤:哭泣傷口", "天災鉤子:痛苦禮物", "天災鉤", "豬頭鉤", "Scourge Hook: Weeping Wounds", "出血", "流血", "重傷", "斷骨", "90秒"],
     killer: "The Cenobite",
     img: "./images/perks/scourgehookgiftofpain.png"
   },
@@ -625,7 +625,7 @@ zh: "陰森擁抱",
 "Hex: Pentimento": {
 zh: "厄咒:修飾痕",
     score: 3,
-    aliases: ["厄咒:餘痕", "維修", "修理", "治療", "補血", "20%", "3%"],
+    aliases: ["厄咒:餘痕", "厄咒", "維修", "修理", "治療", "補血", "20%", "3%"],
     killer: "The Artist",
     img: "./images/perks/hexpentimento.png"
   },
@@ -653,7 +653,7 @@ zh: "虐之鋸",
 "Scourge Hook: Floods of Rage": {
 zh: "禍害之鉤:怒之潮",
     score: 4,
-    aliases: ["天災鉤子:狂怒之潮", "貞子鉤", "氣場", "7秒"],
+    aliases: ["天災鉤子:狂怒之潮", "天災鉤", "貞子鉤", "氣場", "7秒"],
     killer: "The Onryo",
     img: "./images/perks/scourgehookfloodsofrage.png"
   },
@@ -884,7 +884,7 @@ zh: "絕不饒恕",
 "Scourge Hook: Jagged Compass": {
 zh: "禍害之鉤:鋸齒指南針",
     score: 2,
-    aliases: ["天災鉤子:鋸齒羅盤", "天災鉤", "指南針", "發電機"],
+    aliases: ["天災鉤子:鋸齒羅盤", "天災鉤", "指南針", "狗鉤", "發電機"],
     killer: "The Houndmaster",
     img: "./images/perks/scourgehookjaggedcompass.png"
   },
@@ -950,28 +950,26 @@ zh: "遊蕩之眼",
     aliases: ["受傷", "氣場", "5秒", "冷卻30秒"],
     killer: "The Krasue",
     img: "./images/perks/wanderingeye.png"
-  }
-/*
+  },
 "Hex: Hive Mind": {
 zh: "厄咒:蜂巢心智",
-    score: 1,
-    aliases: ["修理進度", "10%"],
+    score: 3,
+    aliases: ["厄咒", "修理進度", "10%"],
     killer: "The First",
-    img: "./images/perks/wanderingeye.png"
-  }
+    img: "./images/perks/hivemind.png"
+  },
 "Secret Project": {
 zh: "秘密計畫",
-    score: 1,
+    score: 4,
     aliases: ["隱形", "隱身", "圖騰", "封鎖", "阻擋", "30"],
     killer: "The First",
-    img: "./images/perks/wanderingeye.png"
-  }
+    img: "./images/perks/secretproject.png"
+  },
 "Turn Back the Clock": {
 zh: "逆轉時光",
-    score: 1,
+    score: 4,
     aliases: ["60秒", "技能按鍵1", "20公尺", "20米", "10%"],
     killer: "The First",
-    img: "./images/perks/wanderingeye.png"
-  }
-  */
+    img: "./images/perks/turnbacktheclock.png"
+  },
 };
