@@ -341,47 +341,47 @@
         }
       }
     },
-  
-// 31. 普通卡：竟敢無視（指定技能 -> 厄咒技能）
-{
-  id: 'card31',
-  zh: '竟敢無視',
-  target: 'perk',
-  colorType: 'perk',
-  summary: '將指定欄位的技能變為隨機厄咒技能。',
-  effect: { type: 'card31_replace_curse', data: {} }
-},
 
-// 32. 普通卡：怨者上鉤（指定技能 -> 天災鉤技能）
-{
-  id: 'card32',
-  zh: '怨者上鉤',
-  target: 'perk',
-  colorType: 'perk',
-  summary: '將指定欄位的技能變為隨機天災技能。',
-  effect: { type: 'card32_replace_scourge', data: {} }
-},
+    // 31. 普通卡：竟敢無視（指定技能 -> 厄咒技能）
+    {
+      id: 'card31',
+      zh: '竟敢無視',
+      target: 'perk',
+      colorType: 'perk',
+      summary: '將指定欄位的技能變為隨機厄咒技能。',
+      effect: { type: 'card31_replace_curse', data: {} }
+    },
 
-// 33. 特殊卡：老威集合（殺手 -> aliases 含「威」；技能 -> 該殺手技能）
-{
-  id: 'card33',
-  zh: '老威集合',
-  target: 'any',
-  colorType: 'all-colored',
-  summary: '所有威家人集合一起獵殺人類吧',
-  effect: { type: 'card33_will_family', data: {} }
-},
+    // 32. 普通卡：怨者上鉤（指定技能 -> 天災鉤技能）
+    {
+      id: 'card32',
+      zh: '怨者上鉤',
+      target: 'perk',
+      colorType: 'perk',
+      summary: '將指定欄位的技能變為隨機天災技能。',
+      effect: { type: 'card32_replace_scourge', data: {} }
+    },
 
-// 34. 普通卡：願望清單（5 隻殺手自選 1 隻，指定技能變成該殺手的隨機專屬技能）
-{
-  id: 'card34',
-  zh: '願望清單',
-  target: 'perk',
-  colorType: 'perk',
-  summary: '隨機選出 5 位殺手，讓你自選 1 位，將指定欄位變成該殺手的隨機一個技能。',
-  effect: { type: 'card34_wishlist', data: {} }
-},
-];
+    // 33. 特殊卡：老威集合（殺手 -> aliases 含「威」；技能 -> 該殺手技能）
+    {
+      id: 'card33',
+      zh: '老威集合',
+      target: 'any',
+      colorType: 'all-colored',
+      summary: '所有威家人集合一起獵殺人類吧',
+      effect: { type: 'card33_will_family', data: {} }
+    },
+
+    // 34. 普通卡：願望清單（5 隻殺手自選 1 隻，指定技能變成該殺手的隨機專屬技能）
+    {
+      id: 'card34',
+      zh: '願望清單',
+      target: 'perk',
+      colorType: 'perk',
+      summary: '隨機選出 5 位殺手，讓你自選 1 位，將指定欄位變成該殺手的隨機一個技能。',
+      effect: { type: 'card34_wishlist', data: {} }
+    },
+  ];
 
   // ==========================
   // 2. 共用工具
@@ -1268,18 +1268,18 @@
       case 'card30_watch_ad':
         doCard30WatchAd(card);
         return;
-case 'card31_replace_curse':
-  ok = doCard31ReplaceCurse(slotIndex);
-  break;
-case 'card32_replace_scourge':
-  ok = doCard32ReplaceScourge(slotIndex);
-  break;
-case 'card33_will_family':
-  ok = doCard33WillFamily();
-  break;
-case 'card34_wishlist':
-  doCard34Wishlist(card, slotIndex);
-  return;
+      case 'card31_replace_curse':
+        ok = doCard31ReplaceCurse(slotIndex);
+        break;
+      case 'card32_replace_scourge':
+        ok = doCard32ReplaceScourge(slotIndex);
+        break;
+      case 'card33_will_family':
+        ok = doCard33WillFamily();
+        break;
+      case 'card34_wishlist':
+        doCard34Wishlist(card, slotIndex);
+        return;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -2508,188 +2508,188 @@ case 'card34_wishlist':
   }
 
 
-// ==========================
-// 10.x 新增卡片：31 / 32 / 33
-// ==========================
-function getPerkKeysByAlias(aliasText) {
-  return Object.entries(window.PERKS || {})
-    .filter(([_, p]) => p && Array.isArray(p.aliases) && p.aliases.includes(aliasText))
-    .map(([name]) => name);
-}
+  // ==========================
+  // 10.x 新增卡片：31 / 32 / 33
+  // ==========================
+  function getPerkKeysByAlias(aliasText) {
+    return Object.entries(window.PERKS || {})
+      .filter(([_, p]) => p && Array.isArray(p.aliases) && p.aliases.includes(aliasText))
+      .map(([name]) => name);
+  }
 
-function doCard31ReplaceCurse(slotIndex) {
-  if (slotIndex < 3 || slotIndex > 6) return false;
-  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
+  function doCard31ReplaceCurse(slotIndex) {
+    if (slotIndex < 3 || slotIndex > 6) return false;
+    if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
 
-  const idx = slotIndex - 3;
-  const poolAll = getPerkKeysByAlias('厄咒');
-  if (!poolAll.length) return false;
+    const idx = slotIndex - 3;
+    const poolAll = getPerkKeysByAlias('厄咒');
+    if (!poolAll.length) return false;
 
-  const used = new Set(currentState.perks);
-  used.delete(currentState.perks[idx]);
+    const used = new Set(currentState.perks);
+    used.delete(currentState.perks[idx]);
 
-  let pool = poolAll.filter(p => !used.has(p));
-  if (!pool.length) pool = poolAll;
+    let pool = poolAll.filter(p => !used.has(p));
+    if (!pool.length) pool = poolAll;
 
-  const picked = getRandomItem(pool);
-  if (!picked) return false;
+    const picked = getRandomItem(pool);
+    if (!picked) return false;
 
-  currentState.perks[idx] = picked;
-  return true;
-}
+    currentState.perks[idx] = picked;
+    return true;
+  }
 
-function doCard32ReplaceScourge(slotIndex) {
-  if (slotIndex < 3 || slotIndex > 6) return false;
-  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
+  function doCard32ReplaceScourge(slotIndex) {
+    if (slotIndex < 3 || slotIndex > 6) return false;
+    if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
 
-  const idx = slotIndex - 3;
-  const poolAll = getPerkKeysByAlias('天災鉤');
-  if (!poolAll.length) return false;
+    const idx = slotIndex - 3;
+    const poolAll = getPerkKeysByAlias('天災鉤');
+    if (!poolAll.length) return false;
 
-  const used = new Set(currentState.perks);
-  used.delete(currentState.perks[idx]);
+    const used = new Set(currentState.perks);
+    used.delete(currentState.perks[idx]);
 
-  let pool = poolAll.filter(p => !used.has(p));
-  if (!pool.length) pool = poolAll;
+    let pool = poolAll.filter(p => !used.has(p));
+    if (!pool.length) pool = poolAll;
 
-  const picked = getRandomItem(pool);
-  if (!picked) return false;
+    const picked = getRandomItem(pool);
+    if (!picked) return false;
 
-  currentState.perks[idx] = picked;
-  return true;
-}
+    currentState.perks[idx] = picked;
+    return true;
+  }
 
-function doCard33WillFamily() {
-  if (!currentState) return false;
+  function doCard33WillFamily() {
+    if (!currentState) return false;
 
-  // 1) 找出 aliases 內含「威」的殺手
-  const killerKeys = Object.keys(window.KILLERS || {});
-  const willKillers = killerKeys.filter(k => {
-    const kk = window.KILLERS && window.KILLERS[k];
-    const aliases = kk && Array.isArray(kk.aliases) ? kk.aliases : [];
-    return aliases.includes('威');
-  });
-  if (!willKillers.length) return false;
+    // 1) 找出 aliases 內含「威」的殺手
+    const killerKeys = Object.keys(window.KILLERS || {});
+    const willKillers = killerKeys.filter(k => {
+      const kk = window.KILLERS && window.KILLERS[k];
+      const aliases = kk && Array.isArray(kk.aliases) ? kk.aliases : [];
+      return aliases.includes('威');
+    });
+    if (!willKillers.length) return false;
 
-  // 2) 從候選中挑一個「至少有 2 個配件」的殺手（避免必定失敗）
-  let pickedKiller = null;
-  for (let i = 0; i < 50; i++) {
-    const candidate = getRandomItem(willKillers);
-    const addonPool = getAddonNamesForKiller(candidate);
-    if (addonPool && addonPool.length >= 2) {
-      pickedKiller = candidate;
-      break;
+    // 2) 從候選中挑一個「至少有 2 個配件」的殺手（避免必定失敗）
+    let pickedKiller = null;
+    for (let i = 0; i < 50; i++) {
+      const candidate = getRandomItem(willKillers);
+      const addonPool = getAddonNamesForKiller(candidate);
+      if (addonPool && addonPool.length >= 2) {
+        pickedKiller = candidate;
+        break;
+      }
     }
-  }
-  if (!pickedKiller) return false;
+    if (!pickedKiller) return false;
 
-  // 3) 技能：從「所有威家殺手」的技能池抽 4 個（不重複）
-  //    （DBD 每個殺手通常只有 3 個專屬技能，所以這樣才能湊滿 4 格）
-  const willPerkPool = Object.entries(window.PERKS || {})
-    .filter(([_, p]) => p && willKillers.includes(p.killer))
-    .map(([name]) => name);
+    // 3) 技能：從「所有威家殺手」的技能池抽 4 個（不重複）
+    //    （DBD 每個殺手通常只有 3 個專屬技能，所以這樣才能湊滿 4 格）
+    const willPerkPool = Object.entries(window.PERKS || {})
+      .filter(([_, p]) => p && willKillers.includes(p.killer))
+      .map(([name]) => name);
 
-  const pickedPerks = [];
-  const used = new Set();
+    const pickedPerks = [];
+    const used = new Set();
 
-  // 先從威家技能池抽
-  const shuffledWill = shuffle(Array.from(new Set(willPerkPool)));
-  for (const name of shuffledWill) {
-    if (pickedPerks.length >= 4) break;
-    if (used.has(name)) continue;
-    used.add(name);
-    pickedPerks.push(name);
-  }
-
-  // 不足 4 個：用通用技能補滿（保底不碎卡）
-  if (pickedPerks.length < 4) {
-    const allPerks = Object.keys(window.PERKS || {});
-    const shuffledAll = shuffle(allPerks);
-    for (const name of shuffledAll) {
+    // 先從威家技能池抽
+    const shuffledWill = shuffle(Array.from(new Set(willPerkPool)));
+    for (const name of shuffledWill) {
       if (pickedPerks.length >= 4) break;
       if (used.has(name)) continue;
       used.add(name);
       pickedPerks.push(name);
     }
-  }
 
-  if (pickedPerks.length < 4) return false;
-
-  // 4) 配件：改成新殺手的任意兩配
-  const addonPool = getAddonNamesForKiller(pickedKiller);
-  if (!addonPool || addonPool.length < 2) return false;
-  const newAddons = shuffle(addonPool).slice(0, 2);
-
-  currentState.killerKey = pickedKiller;
-  currentState.perks = pickedPerks;
-  currentState.addons = newAddons;
-  return true;
-}
-
-
-function doCard34Wishlist(card, slotIndex) {
-  const isPerk = slotIndex >= 3 && slotIndex <= 6;
-  if (!isPerk) {
-    showInvalidCardPopup(card);
-    return;
-  }
-  if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
-    showInvalidCardPopup(card);
-    return;
-  }
-
-  const perkIdx = slotIndex - 3;
-
-  // 從所有殺手中找出「至少有 1 個專屬技能」的殺手
-  const killerKeys = Object.keys(window.KILLERS || {});
-  const killersWithPerks = killerKeys.filter(k => {
-    for (const p of Object.values(window.PERKS || {})) {
-      if (p && p.killer === k) return true;
-    }
-    return false;
-  });
-
-  if (killersWithPerks.length < 1) {
-    showInvalidCardPopup(card);
-    return;
-  }
-
-  // 隨機抽出 5 位殺手（不足就用全部）
-  const candidates = shuffle(killersWithPerks).slice(0, Math.min(5, killersWithPerks.length));
-
-  showChoiceOverlay({
-    type: 'killer',
-    candidates,
-    title: '願望清單：從 5 位殺手中選 1 位',
-    onPick: (killerKey) => {
-      // 把指定技能欄位換成該殺手的隨機 1 個專屬技能
-      const poolAll = Object.entries(window.PERKS || {})
-        .filter(([_, p]) => p && p.killer === killerKey)
-        .map(([name]) => name);
-
-      if (!poolAll.length) {
-        showInvalidCardPopup(card);
-        return;
+    // 不足 4 個：用通用技能補滿（保底不碎卡）
+    if (pickedPerks.length < 4) {
+      const allPerks = Object.keys(window.PERKS || {});
+      const shuffledAll = shuffle(allPerks);
+      for (const name of shuffledAll) {
+        if (pickedPerks.length >= 4) break;
+        if (used.has(name)) continue;
+        used.add(name);
+        pickedPerks.push(name);
       }
-
-      const currentPerks = currentState.perks.slice();
-      const used = new Set(currentPerks);
-      used.delete(currentPerks[perkIdx]);
-
-      let pool = poolAll.filter(p => !used.has(p));
-      if (!pool.length) pool = poolAll;
-
-      const picked = getRandomItem(pool);
-      if (!picked) {
-        showInvalidCardPopup(card);
-        return;
-      }
-
-      currentState.perks[perkIdx] = picked;
-      finishCardPhase();
     }
-  });
-}
+
+    if (pickedPerks.length < 4) return false;
+
+    // 4) 配件：改成新殺手的任意兩配
+    const addonPool = getAddonNamesForKiller(pickedKiller);
+    if (!addonPool || addonPool.length < 2) return false;
+    const newAddons = shuffle(addonPool).slice(0, 2);
+
+    currentState.killerKey = pickedKiller;
+    currentState.perks = pickedPerks;
+    currentState.addons = newAddons;
+    return true;
+  }
+
+
+  function doCard34Wishlist(card, slotIndex) {
+    const isPerk = slotIndex >= 3 && slotIndex <= 6;
+    if (!isPerk) {
+      showInvalidCardPopup(card);
+      return;
+    }
+    if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    const perkIdx = slotIndex - 3;
+
+    // 從所有殺手中找出「至少有 1 個專屬技能」的殺手
+    const killerKeys = Object.keys(window.KILLERS || {});
+    const killersWithPerks = killerKeys.filter(k => {
+      for (const p of Object.values(window.PERKS || {})) {
+        if (p && p.killer === k) return true;
+      }
+      return false;
+    });
+
+    if (killersWithPerks.length < 1) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    // 隨機抽出 5 位殺手（不足就用全部）
+    const candidates = shuffle(killersWithPerks).slice(0, Math.min(5, killersWithPerks.length));
+
+    showChoiceOverlay({
+      type: 'killer',
+      candidates,
+      title: '願望清單：從 5 位殺手中選 1 位',
+      onPick: (killerKey) => {
+        // 把指定技能欄位換成該殺手的隨機 1 個專屬技能
+        const poolAll = Object.entries(window.PERKS || {})
+          .filter(([_, p]) => p && p.killer === killerKey)
+          .map(([name]) => name);
+
+        if (!poolAll.length) {
+          showInvalidCardPopup(card);
+          return;
+        }
+
+        const currentPerks = currentState.perks.slice();
+        const used = new Set(currentPerks);
+        used.delete(currentPerks[perkIdx]);
+
+        let pool = poolAll.filter(p => !used.has(p));
+        if (!pool.length) pool = poolAll;
+
+        const picked = getRandomItem(pool);
+        if (!picked) {
+          showInvalidCardPopup(card);
+          return;
+        }
+
+        currentState.perks[perkIdx] = picked;
+        finishCardPhase();
+      }
+    });
+  }
 
   // ==========================
   // 12. 對外介面

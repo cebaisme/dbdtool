@@ -613,7 +613,7 @@ window.ADDONS = {
     zh: "俗氣的耳環",
     score: 4,
     aliases: ["跟蹤時的移動速度增加20%", "白配"],
-    img: "./images/addons/tackyearrings.png", 
+    img: "./images/addons/tackyearrings.png",
     killer: "The Shape",
   },
   "Dead Rabbit": {
@@ -1944,7 +1944,7 @@ window.ADDONS = {
   "Defaced Smiley Pin": {
     zh: "塗鴉笑臉飾針",
     score: 3,
-    aliases: ["重傷",  "斷骨", "60秒", "綠配"],
+    aliases: ["重傷", "斷骨", "60秒", "綠配"],
     img: "./images/addons/defacedsmileypin.png",
     killer: "The Legion",
   },
@@ -2800,7 +2800,7 @@ window.ADDONS = {
   "Black Strap": {
     zh: "黑色掛帶",
     score: 4,
-    aliases: ["距離增加25%","寬度減少25%", "白配"],
+    aliases: ["距離增加25%", "寬度減少25%", "白配"],
     img: "./images/addons/blackstrap.png",
     killer: "The Executioner",
   },
@@ -2821,7 +2821,7 @@ window.ADDONS = {
   "Lead Ring": {
     zh: "鉛環",
     score: 1,
-    aliases: ["距離減少25%","寬度增加25%", "白配"],
+    aliases: ["距離減少25%", "寬度增加25%", "白配"],
     img: "./images/addons/leadring.png",
     killer: "The Executioner",
   },
@@ -2849,14 +2849,14 @@ window.ADDONS = {
   "Spearhead": {
     zh: "槍尖",
     score: 2,
-    aliases: ["牢籠" ,"氣場", "8秒", "綠配"],
+    aliases: ["牢籠", "氣場", "8秒", "綠配"],
     img: "./images/addons/spearhead.png",
     killer: "The Executioner",
   },
   "Wax Doll": {
     zh: "蠟製娃娃",
     score: 3,
-    aliases: ["距離增加5%","綠配"],
+    aliases: ["距離增加5%", "綠配"],
     img: "./images/addons/waxdoll.png",
     killer: "The Executioner",
   },
@@ -3900,7 +3900,7 @@ window.ADDONS = {
   "Mother's Comb": {
     zh: "母親的梳子",
     score: 4,
-    aliases: ["黃色氣場","關機的電視", "藍配"],
+    aliases: ["黃色氣場", "關機的電視", "藍配"],
     img: "./images/addons/motherscomb.png",
     killer: "The Onryo",
   },
@@ -3935,7 +3935,7 @@ window.ADDONS = {
   "Tape Editing Deck": {
     zh: "錄影剪輯設備",
     score: 2,
-    aliases: ["最遠","氣場", "6秒", "紫配"],
+    aliases: ["最遠", "氣場", "6秒", "紫配"],
     img: "./images/addons/tapeeditingdeck.png",
     killer: "The Onryo",
   },
@@ -3963,7 +3963,7 @@ window.ADDONS = {
   "Remote Control": {
     zh: "遙控器",
     score: 5,
-    aliases: ["開機電視","12公尺", "12米", "氣場","7秒", "紅配"],
+    aliases: ["開機電視", "12公尺", "12米", "氣場", "7秒", "紅配"],
     img: "./images/addons/remotecontrol.png",
     killer: "The Onryo",
   },
@@ -6026,8 +6026,8 @@ window.ADDONS = {
     img: "./images/addons/shreddedgown.png",
     killer: "The Krasue",
   },
-  
-  
+
+
 
 
   // 亨利
