@@ -831,7 +831,7 @@
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
     if (specialEnabled) {
-      const p = 1; // 0.75%
+      const p = 0.0075; // 0.75%
       const availableSpecials = specials.filter(c => !excludeIds.includes(c.id));
       if (availableSpecials.length && Math.random() < p) {
         return getRandomItem(availableSpecials);
