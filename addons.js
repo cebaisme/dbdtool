@@ -6155,7 +6155,7 @@ window.ADDONS = {
   },
   "Pizza Goggles": {
     zh: "披薩護目鏡",
-    score: 0,
+    score: 1,
     aliases: ["減少90%", "冷卻縮短20秒", "迷因配件", "紫配"],
     img: "./images/addons/pizzagoggles.png",
     killer: "The First",
