@@ -960,7 +960,7 @@ zh: "厄咒:蜂巢心智",
   },
 "Secret Project": {
 zh: "秘密計畫",
-    score: 4,
+    score: 3,
     aliases: ["隱形", "隱身", "圖騰", "封鎖", "阻擋", "30"],
     killer: "The First",
     img: "./images/perks/secretproject.png"
