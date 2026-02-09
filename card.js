@@ -825,13 +825,13 @@
 
     excludeIds = excludeIds || [];
 
-    // 特殊卡：總機率 1%
+    // 特殊卡：總機率 5%
     const specialIds = ['card1', 'card28', 'card30', 'card33'];
     const specials = CARDS.filter(c => specialIds.includes(c.id));
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
     if (specialEnabled) {
-      const p = 0.01; // 1%
+      const p = 0.05; // 5%
       const availableSpecials = specials.filter(c => !excludeIds.includes(c.id));
       if (availableSpecials.length && Math.random() < p) {
         return getRandomItem(availableSpecials);
