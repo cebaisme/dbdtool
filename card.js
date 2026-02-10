@@ -404,15 +404,14 @@
       effect: { type: 'card36_equal_score', data: {} }
     },
 
-
-    // 37. 特殊卡：哼啊阿阿（配件/技能分數依序變為 1 1 4 5 1 4）
+    // 37. 普通卡：殺手皇后（直接炸掉上一階段讓玩家重新拉拉霸）
     {
       id: 'card37',
-      zh: '哼啊阿阿',
+      zh: '殺手皇后',
       target: 'any',
-      colorType: 'all-neutral-dark',
-      summary: '為這麼臭的卡有存在的必要嗎?',
-      effect: { type: 'card37_set_sequence_scores', data: { seq: [1, 1, 4, 5, 1, 4] } }
+      colorType: 'killer-queen',
+      summary: `「殺手皇后，第三爆彈，敗者食塵」`,
+      effect: { type: 'card37_restart_slot', data: {} }
     },
 
   ];
@@ -660,6 +659,11 @@
       }
       .slot-card.color-perk-slot {
         background: linear-gradient(135deg, #5caf4eff, #2a5a21ff);
+      }
+
+      /* 敗者食塵 */
+      .slot-card.color-killer-queen {
+        background: linear-gradient(135deg, #F4CFE0 0%, #E8AFC8 45%, #D889B3 100%);
       }
 
       .slot-cell.card-drop-ok {
@@ -920,7 +924,7 @@
     excludeIds = excludeIds || [];
 
     // 特殊卡：目前支援 card1 / card28（總機率 5%）
-    const specialIds = ['card1', 'card28', 'card30', 'card33', 'card37'];
+    const specialIds = ['card1', 'card28', 'card30', 'card33'];
     const specials = CARDS.filter(c => specialIds.includes(c.id));
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
@@ -1307,8 +1311,6 @@
         const slotIndex = idx;
         if (!isCardAllowedOnSlot(card, slotIndex)) {
           clearDropHighlights();
-          // 不能使用在該欄位：視為使用失敗，跳出提示並消耗此卡
-          showInvalidCardPopup(card);
           return;
         }
         applyCardOnSlot(card, slotIndex);
@@ -1432,6 +1434,9 @@
       case 'card36_equal_score':
         ok = doCard36EqualScore();
         break;
+      case 'card37_restart_slot':
+        ok = doCard37RestartSlot(card);
+        break;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -1444,18 +1449,14 @@
       case 'keep_selected_reroll_others':
         ok = doKeepSelectedRerollOthers(slotIndex);
         break;
-      case 'card37_set_sequence_scores':
-        ok = doCard37SetSequenceScores(card, card.effect && card.effect.data);
-        break;
-
-      default:
+default:
         console.warn('未知卡片效果:', type);
         ok = false;
         break;
     }
 
     if (!ok) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -1804,12 +1805,12 @@
   // 35 號卡：做出選擇（A：技能 4-5 / 配件 1-2；B：技能 0-1 / 配件 4-5）
   function doCard35MakeChoice(card) {
     if (!currentState) {
-      showInvalidCardPopup(card);
+      
       return;
     }
     const killerKey = currentState.killerKey;
     if (!killerKey) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -1836,11 +1837,11 @@
 
         // 需要：4 個技能 + 2 個配件（盡量不重複）
         if (!perkPool || perkPool.length < 4) {
-          showInvalidCardPopup(card);
+          
           return;
         }
         if (!addonPool || addonPool.length < 2) {
-          showInvalidCardPopup(card);
+          
           return;
         }
 
@@ -1851,7 +1852,7 @@
           if (newPerks.length === 4) break;
         }
         if (newPerks.length !== 4) {
-          showInvalidCardPopup(card);
+          
           return;
         }
 
@@ -1862,7 +1863,7 @@
           if (newAddons.length === 2) break;
         }
         if (newAddons.length !== 2) {
-          showInvalidCardPopup(card);
+          
           return;
         }
 
@@ -1879,7 +1880,26 @@
 
 
   // 36 號卡：一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
-  function doCard36EqualScore() {
+  
+  // 37. 殺手皇后：敗者食塵（直接回到拉霸階段）
+  function doCard37RestartSlot(card) {
+    isActive = false;
+    currentCards = [];
+    currentState = null;
+
+    const container = document.getElementById('cardContainer');
+    if (container) {
+      container.innerHTML = '';
+      container.classList.remove('card-visible');
+    }
+
+    if (typeof window.resetSlotState === 'function') {
+      window.resetSlotState();
+    }
+    return true;
+  }
+
+function doCard36EqualScore() {
     if (!currentState) return false;
     const killerKey = currentState.killerKey;
     if (!killerKey) return false;
@@ -2033,7 +2053,7 @@
     const isPerkSlot = slotIndex >= 3 && slotIndex <= 6;
 
     if (!isAddonSlot && !isPerkSlot) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2042,7 +2062,7 @@
     if (isAddonSlot) {
       const killerKey = currentState.killerKey;
       if (!killerKey) {
-        showInvalidCardPopup(card);
+        
         return;
       }
       const originalAddons = currentState.addons.slice();
@@ -2053,7 +2073,7 @@
         name => !originalAddons.includes(name)
       );
       if (!basePool.length) {
-        showInvalidCardPopup(card);
+        
         return;
       }
 
@@ -2085,7 +2105,7 @@
       // 全部技能池除去當前四個技能
       const basePool = getAllPerksExcept(originalPerks);
       if (!basePool.length) {
-        showInvalidCardPopup(card);
+        
         return;
       }
 
@@ -2117,19 +2137,19 @@
   function doReplaceSkillByCurrentKiller3Pick(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      showInvalidCardPopup(card);
+      
       return;
     }
     const idx = slotIndex - 3;
     const killerKey = currentState && currentState.killerKey;
     if (!killerKey) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
     const candidates = collectPerkCandidatesForKiller(killerKey);
     if (!candidates.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2140,7 +2160,7 @@
   function doReplaceSkillByRandomKiller3Pick(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      showInvalidCardPopup(card);
+      
       return;
     }
     const idx = slotIndex - 3;
@@ -2153,13 +2173,13 @@
 
     // 若沒有 killerKey（理論上不會發生）→ 直接當作無效卡
     if (!killerKey) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
     const candidates = collectPerkCandidatesForKiller(killerKey);
     if (!candidates.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2192,7 +2212,7 @@
 
     const unique = Array.from(new Set(allCandidates));
     if (!unique.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2438,7 +2458,7 @@
 
     const perkSetsZh = Array.isArray(data.perkSetsZh) ? data.perkSetsZh : [];
     if (!perkSetsZh.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2453,7 +2473,7 @@
 
     // 強制清單如果因為名稱對不上而變空 → 當作無效卡
     if (!forced.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2473,11 +2493,11 @@
     if (currentState && currentState.killerKey) {
       const okAddons = doReplaceAddonsByColor(['藍配', '藍配']);
       if (!okAddons) {
-        showInvalidCardPopup(card);
+        
         return;
       }
     } else {
-      showInvalidCardPopup(card);
+      
       return;
     }
     // ✅ 全螢幕圖片（GIF 可以；就是一張 <img>）
@@ -2522,7 +2542,7 @@
     if (lockedKiller) {
       const ok = applyWithKiller(lockedKiller);
       if (!ok) {
-        showInvalidCardPopup(card);
+        
         return;
       }
       finishCardPhase();
@@ -2532,13 +2552,13 @@
     // 玩家自選：先抽 5 位殺手讓他選
     const killerKeys = Object.keys(window.KILLERS || {});
     if (!killerKeys.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
     const candidates = shuffle(Array.from(new Set(killerKeys))).slice(0, 5);
     if (candidates.length < 1) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2546,7 +2566,7 @@
     if (candidates.length === 1) {
       const ok = applyWithKiller(candidates[0]);
       if (!ok) {
-        showInvalidCardPopup(card);
+        
         return;
       }
       finishCardPhase();
@@ -2561,7 +2581,7 @@
         data.killerKey = picked; // 記錄一下（方便未來除錯/顯示）
         const ok = applyWithKiller(picked);
         if (!ok) {
-          showInvalidCardPopup(card);
+          
           return;
         }
         finishCardPhase();
@@ -2583,13 +2603,13 @@
     const unlockDelayMs = (typeof data.unlockDelayMs === 'number' && data.unlockDelayMs >= 0) ? data.unlockDelayMs : 1000;
 
     if (!images.length) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
     const killerKey = currentState.killerKey;
     if (!killerKey) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2605,7 +2625,7 @@
         // onClose：玩家自選 4 次（每次 5 選 1）的 4–5 分技能，然後套用獎勵
         const perk45PoolAll = getPerkNamesByScores([4, 5]);
         if (!perk45PoolAll || perk45PoolAll.length < 4) {
-          showInvalidCardPopup(card);
+          
           finishCardPhase();
           return;
         }
@@ -2616,7 +2636,7 @@
           const remain = perk45PoolAll.filter(p => !picked.includes(p));
           const candidates = shuffle(remain).slice(0, 5); // 每次抽 5 個給玩家選
           if (!candidates.length) {
-            showInvalidCardPopup(card);
+            
             finishCardPhase();
             return;
           }
@@ -2647,7 +2667,7 @@
               if (addonPoolNoDup.length >= 2) addonPool = addonPoolNoDup;
 
               if (!addonPool || addonPool.length < 2) {
-                showInvalidCardPopup(card);
+                
                 finishCardPhase();
                 return;
               }
@@ -2771,9 +2791,6 @@
     if (typeof applyCallback === 'function') {
       const finalState = cloneState(currentState);
       applyCallback(finalState);
-      if (window.lockSlotLever) {
-        window.lockSlotLever(500);
-      }
     }
   }
 
@@ -2900,11 +2917,11 @@
   function doCard34Wishlist(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      showInvalidCardPopup(card);
+      
       return;
     }
     if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2920,7 +2937,7 @@
     });
 
     if (killersWithPerks.length < 1) {
-      showInvalidCardPopup(card);
+      
       return;
     }
 
@@ -2938,7 +2955,7 @@
           .map(([name]) => name);
 
         if (!poolAll.length) {
-          showInvalidCardPopup(card);
+          
           return;
         }
 
@@ -2951,7 +2968,7 @@
 
         const picked = getRandomItem(pool);
         if (!picked) {
-          showInvalidCardPopup(card);
+          
           return;
         }
 
@@ -2971,14 +2988,11 @@
   // 37. 特殊卡：哼啊阿阿（分數序列：1 1 4 5 1 4）
   // 依序套用到：配件1、配件2、技能1、技能2、技能3、技能4
   // ==========================
-  function doCard37SetSequenceScores(card, data) {
-    if (!currentState) {
-      showInvalidCardPopup(card);
-      return false;
-    }
+  // 注意：這段原本被貼成「游離程式碼」，會導致整個 card.js 語法錯誤（Unexpected token '}'）。
+  // 為了不影響既有主流程，將它包成函式，並且不主動呼叫（等你日後要加新卡再接到 switch 即可）。
+  function doCardHumAaa(data) {
     const killerKey = currentState.killerKey;
     if (!killerKey) {
-      showInvalidCardPopup(card);
       return false;
     }
 
@@ -2995,23 +3009,22 @@
     // Addons
     const usedAddons = new Set();
     const addon1 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[0]]), usedAddons);
-    if (!addon1) { showInvalidCardPopup(card); return false; }
+    if (!addon1) {  return false; }
     const addon2 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[1]]), usedAddons);
-    if (!addon2) { showInvalidCardPopup(card); return false; }
+    if (!addon2) {  return false; }
 
     // Perks
     const usedPerks = new Set();
     const perks = [];
     for (let i = 2; i < 6; i++) {
       const perk = pickUnique(getPerkNamesByScores([seq[i]]), usedPerks);
-      if (!perk) { showInvalidCardPopup(card); return false; }
+      if (!perk) {  return false; }
       perks.push(perk);
     }
 
     currentState.addons = [addon1, addon2];
     currentState.perks = perks;
 
-    applyCurrentState();
     return true;
   }
 
