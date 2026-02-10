@@ -1449,14 +1449,14 @@
       case 'keep_selected_reroll_others':
         ok = doKeepSelectedRerollOthers(slotIndex);
         break;
-default:
+      default:
         console.warn('未知卡片效果:', type);
         ok = false;
         break;
     }
 
     if (!ok) {
-      
+
       return;
     }
 
@@ -1805,12 +1805,12 @@ default:
   // 35 號卡：做出選擇（A：技能 4-5 / 配件 1-2；B：技能 0-1 / 配件 4-5）
   function doCard35MakeChoice(card) {
     if (!currentState) {
-      
+
       return;
     }
     const killerKey = currentState.killerKey;
     if (!killerKey) {
-      
+
       return;
     }
 
@@ -1837,11 +1837,11 @@ default:
 
         // 需要：4 個技能 + 2 個配件（盡量不重複）
         if (!perkPool || perkPool.length < 4) {
-          
+
           return;
         }
         if (!addonPool || addonPool.length < 2) {
-          
+
           return;
         }
 
@@ -1852,7 +1852,7 @@ default:
           if (newPerks.length === 4) break;
         }
         if (newPerks.length !== 4) {
-          
+
           return;
         }
 
@@ -1863,7 +1863,7 @@ default:
           if (newAddons.length === 2) break;
         }
         if (newAddons.length !== 2) {
-          
+
           return;
         }
 
@@ -1880,7 +1880,7 @@ default:
 
 
   // 36 號卡：一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
-  
+
   // 37. 殺手皇后：敗者食塵（直接回到拉霸階段）
   function doCard37RestartSlot(card) {
     isActive = false;
@@ -1899,7 +1899,7 @@ default:
     return true;
   }
 
-function doCard36EqualScore() {
+  function doCard36EqualScore() {
     if (!currentState) return false;
     const killerKey = currentState.killerKey;
     if (!killerKey) return false;
@@ -2053,7 +2053,7 @@ function doCard36EqualScore() {
     const isPerkSlot = slotIndex >= 3 && slotIndex <= 6;
 
     if (!isAddonSlot && !isPerkSlot) {
-      
+
       return;
     }
 
@@ -2062,7 +2062,7 @@ function doCard36EqualScore() {
     if (isAddonSlot) {
       const killerKey = currentState.killerKey;
       if (!killerKey) {
-        
+
         return;
       }
       const originalAddons = currentState.addons.slice();
@@ -2073,7 +2073,7 @@ function doCard36EqualScore() {
         name => !originalAddons.includes(name)
       );
       if (!basePool.length) {
-        
+
         return;
       }
 
@@ -2105,7 +2105,7 @@ function doCard36EqualScore() {
       // 全部技能池除去當前四個技能
       const basePool = getAllPerksExcept(originalPerks);
       if (!basePool.length) {
-        
+
         return;
       }
 
@@ -2137,19 +2137,19 @@ function doCard36EqualScore() {
   function doReplaceSkillByCurrentKiller3Pick(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      
+
       return;
     }
     const idx = slotIndex - 3;
     const killerKey = currentState && currentState.killerKey;
     if (!killerKey) {
-      
+
       return;
     }
 
     const candidates = collectPerkCandidatesForKiller(killerKey);
     if (!candidates.length) {
-      
+
       return;
     }
 
@@ -2160,7 +2160,7 @@ function doCard36EqualScore() {
   function doReplaceSkillByRandomKiller3Pick(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      
+
       return;
     }
     const idx = slotIndex - 3;
@@ -2173,13 +2173,13 @@ function doCard36EqualScore() {
 
     // 若沒有 killerKey（理論上不會發生）→ 直接當作無效卡
     if (!killerKey) {
-      
+
       return;
     }
 
     const candidates = collectPerkCandidatesForKiller(killerKey);
     if (!candidates.length) {
-      
+
       return;
     }
 
@@ -2212,7 +2212,7 @@ function doCard36EqualScore() {
 
     const unique = Array.from(new Set(allCandidates));
     if (!unique.length) {
-      
+
       return;
     }
 
@@ -2458,7 +2458,7 @@ function doCard36EqualScore() {
 
     const perkSetsZh = Array.isArray(data.perkSetsZh) ? data.perkSetsZh : [];
     if (!perkSetsZh.length) {
-      
+
       return;
     }
 
@@ -2473,7 +2473,7 @@ function doCard36EqualScore() {
 
     // 強制清單如果因為名稱對不上而變空 → 當作無效卡
     if (!forced.length) {
-      
+
       return;
     }
 
@@ -2493,11 +2493,11 @@ function doCard36EqualScore() {
     if (currentState && currentState.killerKey) {
       const okAddons = doReplaceAddonsByColor(['藍配', '藍配']);
       if (!okAddons) {
-        
+
         return;
       }
     } else {
-      
+
       return;
     }
     // ✅ 全螢幕圖片（GIF 可以；就是一張 <img>）
@@ -2542,7 +2542,7 @@ function doCard36EqualScore() {
     if (lockedKiller) {
       const ok = applyWithKiller(lockedKiller);
       if (!ok) {
-        
+
         return;
       }
       finishCardPhase();
@@ -2552,13 +2552,13 @@ function doCard36EqualScore() {
     // 玩家自選：先抽 5 位殺手讓他選
     const killerKeys = Object.keys(window.KILLERS || {});
     if (!killerKeys.length) {
-      
+
       return;
     }
 
     const candidates = shuffle(Array.from(new Set(killerKeys))).slice(0, 5);
     if (candidates.length < 1) {
-      
+
       return;
     }
 
@@ -2566,7 +2566,7 @@ function doCard36EqualScore() {
     if (candidates.length === 1) {
       const ok = applyWithKiller(candidates[0]);
       if (!ok) {
-        
+
         return;
       }
       finishCardPhase();
@@ -2581,7 +2581,7 @@ function doCard36EqualScore() {
         data.killerKey = picked; // 記錄一下（方便未來除錯/顯示）
         const ok = applyWithKiller(picked);
         if (!ok) {
-          
+
           return;
         }
         finishCardPhase();
@@ -2603,13 +2603,13 @@ function doCard36EqualScore() {
     const unlockDelayMs = (typeof data.unlockDelayMs === 'number' && data.unlockDelayMs >= 0) ? data.unlockDelayMs : 1000;
 
     if (!images.length) {
-      
+
       return;
     }
 
     const killerKey = currentState.killerKey;
     if (!killerKey) {
-      
+
       return;
     }
 
@@ -2625,7 +2625,7 @@ function doCard36EqualScore() {
         // onClose：玩家自選 4 次（每次 5 選 1）的 4–5 分技能，然後套用獎勵
         const perk45PoolAll = getPerkNamesByScores([4, 5]);
         if (!perk45PoolAll || perk45PoolAll.length < 4) {
-          
+
           finishCardPhase();
           return;
         }
@@ -2636,7 +2636,7 @@ function doCard36EqualScore() {
           const remain = perk45PoolAll.filter(p => !picked.includes(p));
           const candidates = shuffle(remain).slice(0, 5); // 每次抽 5 個給玩家選
           if (!candidates.length) {
-            
+
             finishCardPhase();
             return;
           }
@@ -2667,7 +2667,7 @@ function doCard36EqualScore() {
               if (addonPoolNoDup.length >= 2) addonPool = addonPoolNoDup;
 
               if (!addonPool || addonPool.length < 2) {
-                
+
                 finishCardPhase();
                 return;
               }
@@ -2791,6 +2791,9 @@ function doCard36EqualScore() {
     if (typeof applyCallback === 'function') {
       const finalState = cloneState(currentState);
       applyCallback(finalState);
+      if (window.lockSlotLever) {
+        window.lockSlotLever(500);
+      }
     }
   }
 
@@ -2917,11 +2920,11 @@ function doCard36EqualScore() {
   function doCard34Wishlist(card, slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) {
-      
+
       return;
     }
     if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
-      
+
       return;
     }
 
@@ -2937,7 +2940,7 @@ function doCard36EqualScore() {
     });
 
     if (killersWithPerks.length < 1) {
-      
+
       return;
     }
 
@@ -2955,7 +2958,7 @@ function doCard36EqualScore() {
           .map(([name]) => name);
 
         if (!poolAll.length) {
-          
+
           return;
         }
 
@@ -2968,7 +2971,7 @@ function doCard36EqualScore() {
 
         const picked = getRandomItem(pool);
         if (!picked) {
-          
+
           return;
         }
 
@@ -3009,16 +3012,16 @@ function doCard36EqualScore() {
     // Addons
     const usedAddons = new Set();
     const addon1 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[0]]), usedAddons);
-    if (!addon1) {  return false; }
+    if (!addon1) { return false; }
     const addon2 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[1]]), usedAddons);
-    if (!addon2) {  return false; }
+    if (!addon2) { return false; }
 
     // Perks
     const usedPerks = new Set();
     const perks = [];
     for (let i = 2; i < 6; i++) {
       const perk = pickUnique(getPerkNamesByScores([seq[i]]), usedPerks);
-      if (!perk) {  return false; }
+      if (!perk) { return false; }
       perks.push(perk);
     }
 
