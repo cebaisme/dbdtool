@@ -11,6 +11,8 @@
   // ==========================
   const CARDS = [
 
+
+
     // 1. 特殊卡（The Wraith + 固定配件 + 技能重抽）
     {
       id: 'card1',
@@ -381,6 +383,38 @@
       summary: '隨機選出 5 位殺手，讓你自選 1 位，將指定欄位變成該殺手的隨機一個技能。',
       effect: { type: 'card34_wishlist', data: {} }
     },
+
+    // 35. 做出選擇（A：技能4-5 / 配件1-2；B：技能0-1 / 配件4-5）
+    {
+      id: 'card35',
+      zh: '做出選擇',
+      target: 'any',
+      colorType: 'all-neutral-dark',
+      summary: 'I want to play a game.',
+      effect: { type: 'card35_make_choice', data: {} }
+    },
+
+    // 36. 一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
+    {
+      id: 'card36',
+      zh: '一視同仁',
+      target: 'any',
+      colorType: 'all-neutral',
+      summary: '所有技能與配件會被設為同一個隨機分數（1–5）。',
+      effect: { type: 'card36_equal_score', data: {} }
+    },
+
+
+    // 37. 特殊卡：哼啊阿阿（配件/技能分數依序變為 1 1 4 5 1 4）
+    {
+      id: 'card37',
+      zh: '哼啊阿阿',
+      target: 'any',
+      colorType: 'all-neutral-dark',
+      summary: '為這麼臭的卡有存在的必要嗎?',
+      effect: { type: 'card37_set_sequence_scores', data: { seq: [1, 1, 4, 5, 1, 4] } }
+    },
+
   ];
 
   // ==========================
@@ -705,6 +739,66 @@
         opacity: 0.7;
       }
 
+      /* 兩選一彈窗（卡35） */
+      #cardBinaryChoiceOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .card-binary-panel {
+        background: #1b1b1b;
+        border-radius: 10px;
+        padding: 16px 18px;
+        max-width: 520px;
+        width: 92%;
+        color: #f5f5f5;
+        box-shadow: 0 18px 36px rgba(0,0,0,0.7);
+      }
+      .card-binary-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        white-space: pre-line;
+      }
+      .card-binary-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .card-binary-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #2a2a2a;
+        color: #f5f5f5;
+        cursor: pointer;
+        text-align: left;
+        transition: transform 0.12s ease-out, background 0.12s ease-out;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+      }
+      .card-binary-btn:hover {
+        background: #3a3a3a;
+        transform: translateY(-1px);
+      }
+      .card-binary-btn:active {
+        transform: translateY(0);
+      }
+      .card-binary-btn .card-binary-label {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .card-binary-btn .card-binary-desc {
+        font-size: 12px;
+        opacity: 0.85;
+        line-height: 1.35;
+        white-space: pre-line;
+      }
+
       
 
 /* 觀看廣告（卡30）過場：全螢幕輪播，不可跳過 */
@@ -803,7 +897,7 @@
   }
 
   // ==========================
-  // 4. 卡片抽選（含特殊卡 0.75%）
+  // 4. 卡片抽選（含特殊卡 5%）
   // ==========================
   function drawOneCardWeighted(excludeIds) {
     // 盡量容錯：就算 index 的 SlotSettings 腳本壞掉，也能從 localStorage 抓到設定
@@ -825,8 +919,8 @@
 
     excludeIds = excludeIds || [];
 
-    // 特殊卡：總機率 5%
-    const specialIds = ['card1', 'card28', 'card30', 'card33'];
+    // 特殊卡：目前支援 card1 / card28（總機率 5%）
+    const specialIds = ['card1', 'card28', 'card30', 'card33', 'card37'];
     const specials = CARDS.filter(c => specialIds.includes(c.id));
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
@@ -944,6 +1038,56 @@
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
   }
+
+
+  // ==========================
+  // 6.1 兩選一彈窗（卡35）
+  // ==========================
+  function showBinaryChoiceOverlay(options) {
+    const overlay = document.createElement('div');
+    overlay.id = 'cardBinaryChoiceOverlay';
+
+    const panel = document.createElement('div');
+    panel.className = 'card-binary-panel';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'card-binary-title';
+    titleEl.textContent = options.title || '做出選擇：';
+
+    const actions = document.createElement('div');
+    actions.className = 'card-binary-actions';
+
+    const items = options.items || [];
+    items.forEach((it) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'card-binary-btn';
+
+      const label = document.createElement('div');
+      label.className = 'card-binary-label';
+      label.textContent = it.label || '';
+
+      const desc = document.createElement('div');
+      desc.className = 'card-binary-desc';
+      desc.textContent = it.desc || '';
+
+      btn.appendChild(label);
+      btn.appendChild(desc);
+
+      btn.addEventListener('click', () => {
+        if (overlay.parentNode) document.body.removeChild(overlay);
+        if (typeof options.onPick === 'function') options.onPick(it.key);
+      });
+
+      actions.appendChild(btn);
+    });
+
+    panel.appendChild(titleEl);
+    panel.appendChild(actions);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+  }
+
 
   // ==========================
   // 6.5 無效卡片彈窗（卡片消失，三張都失敗則 reset）
@@ -1163,6 +1307,8 @@
         const slotIndex = idx;
         if (!isCardAllowedOnSlot(card, slotIndex)) {
           clearDropHighlights();
+          // 不能使用在該欄位：視為使用失敗，跳出提示並消耗此卡
+          showInvalidCardPopup(card);
           return;
         }
         applyCardOnSlot(card, slotIndex);
@@ -1280,6 +1426,12 @@
       case 'card34_wishlist':
         doCard34Wishlist(card, slotIndex);
         return;
+      case 'card35_make_choice':
+        doCard35MakeChoice(card);
+        return;
+      case 'card36_equal_score':
+        ok = doCard36EqualScore();
+        break;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -1292,6 +1444,10 @@
       case 'keep_selected_reroll_others':
         ok = doKeepSelectedRerollOthers(slotIndex);
         break;
+      case 'card37_set_sequence_scores':
+        ok = doCard37SetSequenceScores(card, card.effect && card.effect.data);
+        break;
+
       default:
         console.warn('未知卡片效果:', type);
         ok = false;
@@ -1644,6 +1800,117 @@
     return true;
   }
 
+
+  // 35 號卡：做出選擇（A：技能 4-5 / 配件 1-2；B：技能 0-1 / 配件 4-5）
+  function doCard35MakeChoice(card) {
+    if (!currentState) {
+      showInvalidCardPopup(card);
+      return;
+    }
+    const killerKey = currentState.killerKey;
+    if (!killerKey) {
+      showInvalidCardPopup(card);
+      return;
+    }
+
+    showBinaryChoiceOverlay({
+      title: `Make your choice.`,
+      items: [
+        {
+          key: 'A',
+          label: 'A ',
+          desc: `技能：全部 4–5 分\n配件：全部 1–2 分`
+        },
+        {
+          key: 'B',
+          label: 'B ',
+          desc: `技能：全部 0–1 分\n配件：全部 4–5 分`
+        }
+      ],
+      onPick: (key) => {
+        const wantPerkScores = (key === 'A') ? [4, 5] : [0, 1];
+        const wantAddonScores = (key === 'A') ? [1, 2] : [4, 5];
+
+        const perkPool = getPerkNamesByScores(wantPerkScores);
+        const addonPool = getAddonNamesByScoresForKiller(killerKey, wantAddonScores);
+
+        // 需要：4 個技能 + 2 個配件（盡量不重複）
+        if (!perkPool || perkPool.length < 4) {
+          showInvalidCardPopup(card);
+          return;
+        }
+        if (!addonPool || addonPool.length < 2) {
+          showInvalidCardPopup(card);
+          return;
+        }
+
+        const newPerks = [];
+        const perkCandidates = shuffle(perkPool);
+        for (const p of perkCandidates) {
+          if (!newPerks.includes(p)) newPerks.push(p);
+          if (newPerks.length === 4) break;
+        }
+        if (newPerks.length !== 4) {
+          showInvalidCardPopup(card);
+          return;
+        }
+
+        const newAddons = [];
+        const addonCandidates = shuffle(addonPool);
+        for (const a of addonCandidates) {
+          if (!newAddons.includes(a)) newAddons.push(a);
+          if (newAddons.length === 2) break;
+        }
+        if (newAddons.length !== 2) {
+          showInvalidCardPopup(card);
+          return;
+        }
+
+        currentState.perks = newPerks;
+        currentState.addons = newAddons;
+
+        finishCardPhase();
+      }
+    });
+  }
+
+
+
+
+
+  // 36 號卡：一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
+  function doCard36EqualScore() {
+    if (!currentState) return false;
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+
+    const score = Math.floor(Math.random() * 5) + 1; // 1~5
+
+    const perkPool = getPerkNamesByScores([score]);
+    const addonPool = getAddonNamesByScoresForKiller(killerKey, [score]);
+
+    // 需要：4 技能 + 2 配件（盡量不重複）
+    if (!perkPool || perkPool.length < 4) return false;
+    if (!addonPool || addonPool.length < 2) return false;
+
+    const newPerks = [];
+    for (const p of shuffle(perkPool)) {
+      if (!newPerks.includes(p)) newPerks.push(p);
+      if (newPerks.length === 4) break;
+    }
+    if (newPerks.length !== 4) return false;
+
+    const newAddons = [];
+    for (const a of shuffle(addonPool)) {
+      if (!newAddons.includes(a)) newAddons.push(a);
+      if (newAddons.length === 2) break;
+    }
+    if (newAddons.length !== 2) return false;
+
+    currentState.perks = newPerks;
+    currentState.addons = newAddons;
+    return true;
+  }
 
   // 24 號卡：保持每格分數不變，但全部重抽同分數的技能或配件
   function doRerollSameScoreAll() {
@@ -2504,6 +2771,9 @@
     if (typeof applyCallback === 'function') {
       const finalState = cloneState(currentState);
       applyCallback(finalState);
+      if (window.lockSlotLever) {
+        window.lockSlotLever(500);
+      }
     }
   }
 
@@ -2697,4 +2967,52 @@
   window.CardSystem = {
     startCardPhase
   };
+  // ==========================
+  // 37. 特殊卡：哼啊阿阿（分數序列：1 1 4 5 1 4）
+  // 依序套用到：配件1、配件2、技能1、技能2、技能3、技能4
+  // ==========================
+  function doCard37SetSequenceScores(card, data) {
+    if (!currentState) {
+      showInvalidCardPopup(card);
+      return false;
+    }
+    const killerKey = currentState.killerKey;
+    if (!killerKey) {
+      showInvalidCardPopup(card);
+      return false;
+    }
+
+    const seq = (data && Array.isArray(data.seq) && data.seq.length === 6) ? data.seq : [1, 1, 4, 5, 1, 4];
+
+    function pickUnique(pool, usedSet) {
+      const candidates = (pool || []).filter(x => !usedSet.has(x));
+      if (candidates.length < 1) return null;
+      const picked = shuffle(candidates)[0];
+      usedSet.add(picked);
+      return picked;
+    }
+
+    // Addons
+    const usedAddons = new Set();
+    const addon1 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[0]]), usedAddons);
+    if (!addon1) { showInvalidCardPopup(card); return false; }
+    const addon2 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[1]]), usedAddons);
+    if (!addon2) { showInvalidCardPopup(card); return false; }
+
+    // Perks
+    const usedPerks = new Set();
+    const perks = [];
+    for (let i = 2; i < 6; i++) {
+      const perk = pickUnique(getPerkNamesByScores([seq[i]]), usedPerks);
+      if (!perk) { showInvalidCardPopup(card); return false; }
+      perks.push(perk);
+    }
+
+    currentState.addons = [addon1, addon2];
+    currentState.perks = perks;
+
+    applyCurrentState();
+    return true;
+  }
+
 })();

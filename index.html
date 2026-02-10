@@ -1095,7 +1095,6 @@
     /* === Slot Settings (Slot mode only) === */
     .slot-settings-btn {
       position: fixed;
-      /* ✅ 貼在整個畫面右下角 */
       right: 24px;
       bottom: 24px;
       width: 56px;
@@ -1104,17 +1103,22 @@
       cursor: pointer;
       display: grid;
       place-items: center;
-      background: rgba(0, 0, 0, 0.65);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.55);
+      border: none;
+      outline: none;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
       z-index: 9999;
+
+      /* ⭐ 拉霸設定鍵放大 1.5 倍 */
+      transform: scale(1.5);
+      transform-origin: bottom right;
     }
 
     .slot-settings-btn:hover {
-      transform: scale(1.06);
+      transform: scale(1.6);
       border-color: rgba(122, 167, 255, 0.8);
     }
+
 
     .slot-settings-icon {
       width: 30px;
@@ -2652,6 +2656,34 @@
 
     // 讓卡片系統/設定系統可呼叫 reset
     window.resetSlotState = resetSlotState;
+    // 讓卡片系統在「套用完卡片」的瞬間鎖拉桿一小段時間（避免連點）
+    // card.js 會呼叫 window.lockSlotLever(500)
+    window.lockSlotLever = function (ms) {
+      const dur = (typeof ms === 'number' && ms >= 0) ? ms : 500;
+      try {
+        if (typeof slotState === 'undefined') return;
+
+        const now = Date.now();
+        slotState.lockedUntil = now + dur;
+        slotState.locked = true;
+
+        if (slotState.leverLockTimeout) {
+          clearTimeout(slotState.leverLockTimeout);
+          slotState.leverLockTimeout = null;
+        }
+
+        slotState.leverLockTimeout = setTimeout(() => {
+          // 只解除「自己的鎖」，避免把其他流程的鎖提前解掉
+          if (typeof slotState !== 'undefined' && typeof slotState.lockedUntil === 'number') {
+            if (Date.now() >= slotState.lockedUntil) {
+              slotState.locked = false;
+            }
+          }
+          if (slotState) slotState.leverLockTimeout = null;
+        }, dur);
+      } catch (e) { }
+    };
+
 
     function getRandomItem(arr) {
       if (!arr.length) return null;
