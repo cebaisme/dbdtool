@@ -2987,48 +2987,6 @@
   window.CardSystem = {
     startCardPhase
   };
-  // ==========================
-  // 37. 特殊卡：哼啊阿阿（分數序列：1 1 4 5 1 4）
-  // 依序套用到：配件1、配件2、技能1、技能2、技能3、技能4
-  // ==========================
-  // 注意：這段原本被貼成「游離程式碼」，會導致整個 card.js 語法錯誤（Unexpected token '}'）。
-  // 為了不影響既有主流程，將它包成函式，並且不主動呼叫（等你日後要加新卡再接到 switch 即可）。
-  function doCardHumAaa(data) {
-    const killerKey = currentState.killerKey;
-    if (!killerKey) {
-      return false;
-    }
 
-    const seq = (data && Array.isArray(data.seq) && data.seq.length === 6) ? data.seq : [1, 1, 4, 5, 1, 4];
-
-    function pickUnique(pool, usedSet) {
-      const candidates = (pool || []).filter(x => !usedSet.has(x));
-      if (candidates.length < 1) return null;
-      const picked = shuffle(candidates)[0];
-      usedSet.add(picked);
-      return picked;
-    }
-
-    // Addons
-    const usedAddons = new Set();
-    const addon1 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[0]]), usedAddons);
-    if (!addon1) { return false; }
-    const addon2 = pickUnique(getAddonNamesByScoresForKiller(killerKey, [seq[1]]), usedAddons);
-    if (!addon2) { return false; }
-
-    // Perks
-    const usedPerks = new Set();
-    const perks = [];
-    for (let i = 2; i < 6; i++) {
-      const perk = pickUnique(getPerkNamesByScores([seq[i]]), usedPerks);
-      if (!perk) { return false; }
-      perks.push(perk);
-    }
-
-    currentState.addons = [addon1, addon2];
-    currentState.perks = perks;
-
-    return true;
-  }
 
 })();
