@@ -2749,7 +2749,7 @@
         let imgSrc = killer.img;
 
         if (killerKeyLower === 'wraith' || killerKeyLower === 'the wraith') {
-          useEasterEgg = Math.random() < 0.33;
+          useEasterEgg = Math.random() < 0.2;
           if (useEasterEgg) {
             imgSrc = killer.img.replace(/wraith\.png$/i, 'wraith easter egg.png');
             useNoFrame = true;
@@ -4300,6 +4300,634 @@
         if (window.DICE_TOTAL_OVERRIDE != null) setPostRollUI(Number(window.DICE_TOTAL_OVERRIDE));
         else setPreRollUI();
       }
+    })();
+  </script>
+
+
+
+  <style>
+    #polyDiceOverlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 2500;
+      perspective: 1200px;
+    }
+    #polyDiceFlight {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 180px;
+      height: 180px;
+      margin-left: -90px;
+      margin-top: -90px;
+      will-change: transform;
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.45));
+      transition: transform 820ms cubic-bezier(.2,.9,.2,1);
+    }
+    #polyDiceCanvasWrap {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+    #polyDiceCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: transparent;
+    }
+    #polyDiceResultModal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.58);
+      z-index: 2600;
+    }
+    #polyDiceResultModal .box {
+      min-width: 260px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(12,15,25,0.98), rgba(20,25,38,0.98));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.75);
+      text-align: center;
+    }
+    #polyDiceResultModal h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+    #polyDiceResultValue {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: 0.04em;
+    }
+  </style>
+
+  <div id="polyDiceOverlay" aria-hidden="true">
+    <div id="polyDiceFlight">
+      <div id="polyDiceCanvasWrap">
+        <canvas id="polyDiceCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="polyDiceResultModal" aria-hidden="true">
+    <div class="box">
+      <h3 id="polyDiceResultTitle">🎲 骰子結果</h3>
+      <div id="polyDiceResultValue">--</div>
+      <button id="polyDiceOk" type="button">確定</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      if (window.__REAL_POLY_DICE_PATCH__) return;
+      window.__REAL_POLY_DICE_PATCH__ = true;
+
+      const overlay = document.getElementById('polyDiceOverlay');
+      const flight = document.getElementById('polyDiceFlight');
+      const canvas = document.getElementById('polyDiceCanvas');
+      const modal = document.getElementById('polyDiceResultModal');
+      const modalTitle = document.getElementById('polyDiceResultTitle');
+      const modalValue = document.getElementById('polyDiceResultValue');
+      const modalOk = document.getElementById('polyDiceOk');
+
+      if (!overlay || !flight || !canvas) return;
+
+      const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+      if (!ctx) return;
+
+      const DPR_LIMIT = 2;
+      let activeFaces = 6;
+      let currentResult = null;
+      let currentResultEl = null;
+      let animRaf = 0;
+      let startTs = 0;
+      let stopTs = 0;
+      let rolling = false;
+      let revealed = false;
+
+      let sizePx = 300;
+      let canvasW = 300;
+      let canvasH = 300;
+
+      let poly = null;
+      let rot = { x: 0.42, y: -0.58, z: 0.2 };
+      let spin = { x: 0.18, y: 0.22, z: 0.12 };
+      let targetRot = { x: 0, y: 0, z: 0 };
+
+      const diceStyles = {
+        4:  { fill: '#7fa4ff', edge: '#eef4ff', glow: 'rgba(127,164,255,.36)', radius: 80, shadowScale: 1.05 },
+        6:  { fill: '#77a0ff', edge: '#eef4ff', glow: 'rgba(119,160,255,.36)', radius: 78, shadowScale: 1.00 },
+        8:  { fill: '#7aa8ff', edge: '#eef4ff', glow: 'rgba(122,168,255,.36)', radius: 82, shadowScale: 1.05 },
+        12: { fill: '#c99a3a', edge: '#ffefb8', glow: 'rgba(201,154,58,.34)', radius: 86, shadowScale: 1.10 },
+        20: { fill: '#84adff', edge: '#f1f6ff', glow: 'rgba(132,173,255,.34)', radius: 90, shadowScale: 1.12 }
+      };
+
+      function clamp(v, a, b) {
+        return Math.max(a, Math.min(b, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function easeOutBack(t) {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      }
+
+      function vec(x, y, z) {
+        return { x, y, z };
+      }
+
+      function add(a, b) {
+        return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z };
+      }
+
+      function sub(a, b) {
+        return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+      }
+
+      function mul(a, s) {
+        return { x: a.x * s, y: a.y * s, z: a.z * s };
+      }
+
+      function dot(a, b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+      }
+
+      function cross(a, b) {
+        return {
+          x: a.y * b.z - a.z * b.y,
+          y: a.z * b.x - a.x * b.z,
+          z: a.x * b.y - a.y * b.x
+        };
+      }
+
+      function length(a) {
+        return Math.hypot(a.x, a.y, a.z);
+      }
+
+      function normalize(a) {
+        const len = length(a) || 1;
+        return { x: a.x / len, y: a.y / len, z: a.z / len };
+      }
+
+      function centroid(points) {
+        let c = vec(0, 0, 0);
+        points.forEach((p) => { c = add(c, p); });
+        return mul(c, 1 / points.length);
+      }
+
+      function hexToRgb(hex) {
+        const v = parseInt(String(hex).replace('#', ''), 16);
+        return { r: (v >> 16) & 255, g: (v >> 8) & 255, b: v & 255 };
+      }
+
+      function shadeColor(hex, amt) {
+        const rgb = hexToRgb(hex);
+        return `rgb(${clamp(Math.round(rgb.r * amt), 0, 255)}, ${clamp(Math.round(rgb.g * amt), 0, 255)}, ${clamp(Math.round(rgb.b * amt), 0, 255)})`;
+      }
+
+      function rotatePoint(p, e) {
+        let x = p.x;
+        let y = p.y;
+        let z = p.z;
+
+        let cy = Math.cos(e.x), sy = Math.sin(e.x);
+        let ny = y * cy - z * sy;
+        let nz = y * sy + z * cy;
+        y = ny; z = nz;
+
+        let cx = Math.cos(e.y), sx = Math.sin(e.y);
+        let nx = x * cx + z * sx;
+        nz = -x * sx + z * cx;
+        x = nx; z = nz;
+
+        let cz = Math.cos(e.z), sz = Math.sin(e.z);
+        nx = x * cz - y * sz;
+        ny = x * sz + y * cz;
+        x = nx; y = ny;
+
+        return { x, y, z };
+      }
+
+      function projectPoint(p) {
+        const cameraDist = 320;
+        const scale = cameraDist / (cameraDist - p.z);
+        return {
+          x: p.x * scale,
+          y: p.y * scale,
+          z: p.z,
+          scale
+        };
+      }
+
+      function resizeRenderer() {
+        const size = flight.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, DPR_LIMIT);
+        canvasW = Math.max(240, Math.round(size.width));
+        canvasH = Math.max(240, Math.round(size.height));
+        canvas.width = Math.round(canvasW * dpr);
+        canvas.height = Math.round(canvasH * dpr);
+        canvas.style.width = canvasW + 'px';
+        canvas.style.height = canvasH + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        sizePx = Math.min(canvasW, canvasH);
+      }
+
+      function makeIcosa() {
+        const t = (1 + Math.sqrt(5)) / 2;
+        const raw = [
+          [-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0],
+          [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t],
+          [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]
+        ].map(([x, y, z]) => normalize(vec(x, y, z)));
+
+        const faces = [
+          [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
+          [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+          [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
+          [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]
+        ];
+        return { vertices: raw, faces };
+      }
+
+      function makeDodecaFromIcosa() {
+        const ico = makeIcosa();
+        const centers = ico.faces.map((face) => normalize(centroid(face.map((i) => ico.vertices[i]))));
+        const faceIndicesByVertex = ico.vertices.map(() => []);
+
+        ico.faces.forEach((face, faceIndex) => {
+          face.forEach((vertexIndex) => faceIndicesByVertex[vertexIndex].push(faceIndex));
+        });
+
+        const faces = faceIndicesByVertex.map((adj, vertexIndex) => {
+          const axis = normalize(ico.vertices[vertexIndex]);
+          const helper = Math.abs(axis.z) < 0.9 ? vec(0, 0, 1) : vec(0, 1, 0);
+          const u = normalize(cross(helper, axis));
+          const v = normalize(cross(axis, u));
+          const ordered = adj.slice().sort((a, b) => {
+            const pa = centers[a];
+            const pb = centers[b];
+            const da = sub(pa, axis);
+            const db = sub(pb, axis);
+            const aa = Math.atan2(dot(da, v), dot(da, u));
+            const ab = Math.atan2(dot(db, v), dot(db, u));
+            return aa - ab;
+          });
+
+          const pts = ordered.map((idx) => centers[idx]);
+          const n = normalize(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0])));
+          if (dot(n, axis) < 0) ordered.reverse();
+          return ordered;
+        });
+
+        return { vertices: centers, faces };
+      }
+
+      const POLY_CACHE = {};
+      function getPolyData(faces) {
+        if (POLY_CACHE[faces]) return POLY_CACHE[faces];
+
+        let data;
+        if (faces === 4) {
+          const s = 1 / Math.sqrt(3);
+          data = {
+            vertices: [
+              vec(s, s, s), vec(-s, -s, s), vec(-s, s, -s), vec(s, -s, -s)
+            ],
+            faces: [
+              [0, 1, 2], [0, 3, 1], [0, 2, 3], [1, 3, 2]
+            ]
+          };
+        } else if (faces === 6) {
+          data = {
+            vertices: [
+              vec(-1, -1, -1), vec(1, -1, -1), vec(1, 1, -1), vec(-1, 1, -1),
+              vec(-1, -1, 1), vec(1, -1, 1), vec(1, 1, 1), vec(-1, 1, 1)
+            ].map(normalize),
+            faces: [
+              [4, 5, 6, 7], [1, 0, 3, 2], [0, 4, 7, 3],
+              [5, 1, 2, 6], [3, 7, 6, 2], [0, 1, 5, 4]
+            ]
+          };
+        } else if (faces === 8) {
+          data = {
+            vertices: [
+              vec(1, 0, 0), vec(-1, 0, 0), vec(0, 1, 0),
+              vec(0, -1, 0), vec(0, 0, 1), vec(0, 0, -1)
+            ],
+            faces: [
+              [0, 2, 4], [2, 1, 4], [1, 3, 4], [3, 0, 4],
+              [2, 0, 5], [1, 2, 5], [3, 1, 5], [0, 3, 5]
+            ]
+          };
+        } else if (faces === 12) {
+          data = makeDodecaFromIcosa();
+        } else {
+          data = makeIcosa();
+        }
+
+        POLY_CACHE[faces] = data;
+        return data;
+      }
+
+      function buildMesh(faces) {
+        activeFaces = faces;
+        poly = getPolyData(faces);
+        const defaults = {
+          4: { x: -0.55, y: 0.6, z: -0.15 },
+          6: { x: 0.42, y: -0.58, z: 0.2 },
+          8: { x: -0.35, y: 0.32, z: -0.18 },
+          12: { x: 0.22, y: 0.64, z: -0.08 },
+          20: { x: 0.2, y: 0.8, z: -0.05 }
+        };
+        rot = Object.assign({}, defaults[faces] || defaults[6]);
+      }
+
+      function orientationForResult(faces, value) {
+        const spread = (Math.PI * 2) / faces;
+        if (faces === 4) {
+          return { x: -0.95 + value * 0.17, y: 0.35 + spread * value, z: 0.18 + value * 0.11 };
+        }
+        if (faces === 6) {
+          const map = [
+            { x: 0, y: 0, z: 0 },
+            { x: 0, y: Math.PI / 2, z: 0 },
+            { x: 0, y: Math.PI, z: 0 },
+            { x: 0, y: -Math.PI / 2, z: 0 },
+            { x: -Math.PI / 2, y: 0, z: 0 },
+            { x: Math.PI / 2, y: 0, z: 0 }
+          ];
+          return map[(value - 1) % map.length];
+        }
+        if (faces === 8) {
+          return { x: -0.85 + value * 0.08, y: spread * value * 0.9, z: 0.12 + value * 0.04 };
+        }
+        if (faces === 12) {
+          return { x: 0.34 + value * 0.03, y: spread * value * 0.8, z: 0.08 + value * 0.02 };
+        }
+        return { x: 0.26 + value * 0.025, y: spread * value * 0.75, z: 0.06 + value * 0.018 };
+      }
+
+      function randomEntryTransform() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const side = ['left', 'right', 'top'][Math.floor(Math.random() * 3)];
+        const off = 240;
+        const centerX = w / 2 - 90;
+        const centerY = h / 2 - 90;
+        const randY = Math.max(40, Math.min(h - 220, Math.random() * (h - 200)));
+        const randX = Math.max(40, Math.min(w - 220, Math.random() * (w - 200)));
+        let x = centerX;
+        let y = centerY;
+        if (side === 'left') { x = -off; y = randY; }
+        if (side === 'right') { x = w + off; y = randY; }
+        if (side === 'top') { x = randX; y = -off; }
+        return {
+          from: `translate(${x - centerX}px, ${y - centerY}px) scale(0.66)`,
+          to: 'translate(0px, 0px) scale(1)'
+        };
+      }
+
+      function drawShadow(style, bob) {
+        const y = canvasH * 0.63;
+        const rx = style.radius * style.shadowScale * (1 + bob * 0.02);
+        const ry = style.radius * 0.34 * (1 + bob * 0.01);
+        ctx.save();
+        ctx.translate(canvasW / 2, y);
+        const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, rx);
+        grad.addColorStop(0, 'rgba(0,0,0,.18)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawPoly(ts) {
+        if (!poly) return;
+        const style = diceStyles[activeFaces] || diceStyles[6];
+        const light = normalize(vec(-0.4, -0.8, 1.1));
+        const scale = style.radius * (1 + (rolling ? Math.sin(ts / 100) * 0.018 : 0));
+        const bob = rolling ? Math.sin(ts / 130) * 4 : 0;
+
+        ctx.clearRect(0, 0, canvasW, canvasH);
+        drawShadow(style, bob);
+
+        const rotated = poly.vertices.map((v) => {
+          const r = rotatePoint(v, rot);
+          const scaled = mul(r, scale);
+          const shifted = { x: scaled.x, y: scaled.y - 10 - bob, z: scaled.z };
+          const p = projectPoint(shifted);
+          return {
+            x: canvasW / 2 + p.x,
+            y: canvasH / 2 + p.y,
+            z: p.z,
+            raw: shifted
+          };
+        });
+
+        const facesToDraw = poly.faces.map((face, index) => {
+          const pts = face.map((i) => rotated[i]);
+          const rawPts = face.map((i) => rotated[i].raw);
+          const c = centroid(rawPts);
+          const n = normalize(cross(sub(rawPts[1], rawPts[0]), sub(rawPts[2], rawPts[0])));
+          const facing = dot(n, vec(0, 0, 1));
+          const avgZ = pts.reduce((s, p) => s + p.z, 0) / pts.length;
+          const area = pts.reduce((acc, p, i) => {
+            const q = pts[(i + 1) % pts.length];
+            return acc + (p.x * q.y - q.x * p.y);
+          }, 0) * 0.5;
+          return { index, pts, facing, avgZ, area };
+        }).filter((f) => Math.abs(f.area) > 1);
+
+        facesToDraw.sort((a, b) => a.avgZ - b.avgZ);
+
+        ctx.save();
+        ctx.shadowBlur = 22;
+        ctx.shadowColor = style.glow;
+        facesToDraw.forEach((face) => {
+          const visible = face.area < 0;
+          if (!visible) return;
+
+          const intensity = clamp(0.42 + Math.max(0, face.facing) * 0.7, 0.3, 1.15);
+          ctx.beginPath();
+          face.pts.forEach((p, i) => {
+            if (i === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+          });
+          ctx.closePath();
+          ctx.fillStyle = shadeColor(style.fill, intensity);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.lineWidth = activeFaces === 12 ? 2.2 : 2.4;
+          ctx.strokeStyle = style.edge;
+          ctx.stroke();
+          ctx.shadowBlur = 22;
+          ctx.shadowColor = style.glow;
+        });
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,.06)';
+        ctx.beginPath();
+        ctx.ellipse(canvasW / 2 - style.radius * 0.18, canvasH / 2 - style.radius * 0.24, style.radius * 0.34, style.radius * 0.16, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function renderFrame(ts) {
+        if (!rolling) {
+          drawPoly(ts);
+          return;
+        }
+
+        const elapsed = ts - startTs;
+        if (!stopTs && elapsed > 780) stopTs = ts;
+
+        if (!stopTs) {
+          rot.x += spin.x;
+          rot.y += spin.y;
+          rot.z += spin.z;
+        } else {
+          const t = clamp((ts - stopTs) / 900, 0, 1);
+          const eased = easeOutCubic(t);
+          rot.x = lerp(rot.x, targetRot.x, 0.08 + eased * 0.16);
+          rot.y = lerp(rot.y, targetRot.y, 0.08 + eased * 0.16);
+          rot.z = lerp(rot.z, targetRot.z, 0.08 + eased * 0.16);
+          spin.x *= 0.958;
+          spin.y *= 0.958;
+          spin.z *= 0.958;
+          rot.x += spin.x * (1 - eased * 0.7);
+          rot.y += spin.y * (1 - eased * 0.7);
+          rot.z += spin.z * (1 - eased * 0.7);
+
+          const nearEnough =
+            Math.abs(rot.x - targetRot.x) < 0.02 &&
+            Math.abs(rot.y - targetRot.y) < 0.02 &&
+            Math.abs(rot.z - targetRot.z) < 0.02;
+
+          if (t >= 1 && nearEnough) {
+            rot = Object.assign({}, targetRot);
+            rolling = false;
+          }
+        }
+
+        drawPoly(ts);
+        animRaf = requestAnimationFrame(renderFrame);
+      }
+
+      function startRenderLoop() {
+        cancelAnimationFrame(animRaf);
+        animRaf = requestAnimationFrame(renderFrame);
+      }
+
+      function showResult() {
+        if (revealed || !currentResultEl) return;
+        revealed = true;
+        if (typeof setMiniDiceResult === 'function') {
+          setMiniDiceResult(currentResultEl, currentResult);
+        } else {
+          currentResultEl.textContent = String(currentResult);
+          currentResultEl.classList.remove('is-empty');
+        }
+        modalTitle.textContent = `🎲 D${activeFaces} 骰子結果`;
+        modalValue.textContent = String(currentResult);
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function rollPolyDie(faces, resultElement) {
+        currentResultEl = resultElement;
+        currentResult = Math.floor(Math.random() * faces) + 1;
+        revealed = false;
+        buildMesh(faces);
+        resizeRenderer();
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden', 'false');
+        canvas.style.opacity = '1';
+        modal.style.display = 'none';
+
+        const entry = randomEntryTransform();
+        flight.style.transition = 'none';
+        flight.style.transform = entry.from;
+        void flight.offsetWidth;
+        flight.style.transition = 'transform 820ms cubic-bezier(.2,.9,.2,1)';
+
+        startTs = performance.now();
+        stopTs = 0;
+        rolling = true;
+        spin = {
+          x: 0.18 + Math.random() * 0.08,
+          y: 0.22 + Math.random() * 0.08,
+          z: 0.12 + Math.random() * 0.06
+        };
+        targetRot = orientationForResult(faces, currentResult);
+        startRenderLoop();
+
+        requestAnimationFrame(() => {
+          flight.style.transform = entry.to;
+        });
+
+        const onEnd = (e) => {
+          if (e.propertyName !== 'transform') return;
+          flight.removeEventListener('transitionend', onEnd);
+          setTimeout(showResult, 920);
+        };
+        flight.addEventListener('transitionend', onEnd);
+      }
+
+      modalOk.addEventListener('click', () => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+        cancelAnimationFrame(animRaf);
+        rolling = false;
+      });
+
+      window.addEventListener('resize', () => {
+        resizeRenderer();
+        drawPoly(performance.now());
+      });
+
+      const defs = [
+        ['floatingD4Btn', 'floatingD4Result', 4],
+        ['floatingD6Btn', 'floatingD6Result', 6],
+        ['floatingD8Btn', 'floatingD8Result', 8],
+        ['floatingD12Btn', 'floatingD12Result', 12],
+        ['floatingD20Btn', 'floatingD20Result', 20]
+      ];
+
+      defs.forEach(([btnId, resultId, faces]) => {
+        const btn = document.getElementById(btnId);
+        const resultEl = document.getElementById(resultId);
+        if (!btn || !resultEl) return;
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          rollPolyDie(faces, resultEl);
+        }, true);
+      });
+
+      resizeRenderer();
+      buildMesh(20);
+      drawPoly(performance.now());
     })();
   </script>
 
