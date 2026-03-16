@@ -509,6 +509,356 @@
       color: #fff;
     }
 
+    .build-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .build-card-shell {
+      position: relative;
+      border-radius: 24px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(5, 8, 18, 0.98), rgba(12, 18, 34, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .build-card-shell::before,
+    .build-card-shell::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .build-card-shell::before {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .build-id-card {
+      position: relative;
+      width: min(100%, 440px);
+      margin: 6px auto 0;
+      padding: 18px 18px 20px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #020304 0%, #04070d 42%, #020304 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 18px 34px rgba(0, 0, 0, 0.55);
+    }
+
+    .build-id-card::before,
+    .build-id-card::after {
+      content: "";
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      opacity: 0.95;
+    }
+
+    .build-id-card::before {
+      left: 12px;
+      top: 12px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .build-id-card::after {
+      right: 12px;
+      top: 12px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .build-id-card-bottom-corner,
+    .build-id-card-bottom-corner.right {
+      position: absolute;
+      bottom: 12px;
+      width: 26px;
+      height: 26px;
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .build-id-card-bottom-corner {
+      left: 12px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .build-id-card-bottom-corner.right {
+      right: 12px;
+      left: auto;
+      border-left: none;
+      border-top: none;
+    }
+
+    .id-card-notch {
+      width: 76px;
+      height: 10px;
+      border-radius: 999px;
+      margin: 0 auto 18px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
+    }
+
+    .id-killer-portrait {
+      width: 190px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(180deg, #e7ebf3, #d2d9e8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #263149;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .id-killer-portrait.no-frame {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .id-killer-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    }
+
+
+    .id-killer-nameplate {
+      margin: 18px auto 0;
+      width: min(100%, 220px);
+      min-height: 50px;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2px;
+      text-align: center;
+      padding: 6px 12px;
+    }
+
+    .id-killer-nameplate #killerName {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.05;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .id-killer-nameplate #killerZh {
+      font-size: 12px;
+      color: #ffffff;
+      opacity: 0.85;
+      line-height: 1.2;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+
+    .id-addon-row,
+    .id-perk-row {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 18px;
+      flex-wrap: nowrap;
+    }
+
+    .id-perk-row {
+      gap: 12px;
+      margin-top: 24px;
+      padding-bottom: 8px;
+    }
+
+    .id-addon-slot,
+    .id-perk-slot {
+      position: relative;
+      border-radius: 12px;
+      background: transparent;
+      border: none;
+      overflow: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+    }
+
+    .id-addon-slot {
+      width: 96px;
+      height: 96px;
+    }
+
+    .id-perk-slot {
+      width: 74px;
+      height: 74px;
+    }
+
+    .id-addon-slot img,
+    .id-perk-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .id-slot-placeholder {
+      color: #1c2330;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .build-summary.id-summary {
+      display: none;
+    }
+
+    .build-card-header-min {
+      margin-bottom: 8px;
+    }
+
+    .build-clear-mini {
+      padding: 4px 10px;
+      font-size: 12px;
+      line-height: 1.2;
+      min-height: 28px;
+      border-radius: 999px;
+      color: #d7dcef;
+    }
+
+    .points-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .points-box {
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .points-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .points-value.sub {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .points-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .utility-panel {
+      margin-top: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+    }
+
+    .utility-toggle {
+      width: 100%;
+      border: none;
+      border-radius: 0;
+      padding: 12px 14px;
+      background: transparent;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .utility-toggle:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .utility-toggle-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .utility-toggle .utility-arrow {
+      transition: transform 0.2s ease;
+      color: var(--muted);
+    }
+
+    .utility-panel.open .utility-arrow {
+      transform: rotate(180deg);
+    }
+
+    .utility-content {
+      display: none;
+      padding: 0 14px 14px;
+    }
+
+    .utility-panel.open .utility-content {
+      display: block;
+    }
+
+    .utility-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .points-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .build-id-card {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .id-addon-row {
+        gap: 12px;
+      }
+
+      .id-perk-row {
+        gap: 8px;
+      }
+
+      .id-perk-slot {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
     /* === 拉霸模式 === */
 
     .slot-section {
@@ -1326,6 +1676,207 @@
     .slot-settings-toggle input:disabled+span {
       opacity: 0.6;
     }
+
+    .id-addon-slot:empty,
+    .id-perk-slot:empty {
+      display: none;
+    }
+
+    /* Plastic badge style */
+    .id-card-shell {
+      position: relative;
+      width: min(100%, 390px);
+      margin: 24px auto 10px;
+      padding: 20px 16px 18px;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, #0b0d12 0%, #020307 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -12px 22px rgba(0, 0, 0, 0.6);
+      transform: rotate(-4deg);
+    }
+
+    /* plastic shine */
+    .id-card-shell::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 22px;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05) 22%, rgba(255, 255, 255, 0) 45%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* lanyard hole */
+    .id-card-shell::before {
+      content: "";
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 14px;
+      border-radius: 8px;
+      background: #d8dbe2;
+      box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+
+    .build-id-card {
+      transform-origin: 50% 8%;
+    }
+
+
+    .id-killer-portrait.no-frame {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+
+    .id-killer-portrait.no-frame img {
+      filter: none !important;
+    }
+
+
+    /* === Floating toolbox (proxy to existing utility tools) === */
+    .floating-toolbox-btn {
+      position: fixed;
+      right: 26px;
+      bottom: 26px;
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(0, 0, 0, 0.58);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      cursor: pointer;
+      z-index: 10020;
+    }
+
+    .floating-toolbox-btn:hover {
+      transform: scale(1.04);
+    }
+
+    .floating-toolbox-btn img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .floating-toolbox-fallback {
+      font-size: 28px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .floating-toolbox-panel {
+      position: fixed;
+      right: 26px;
+      bottom: 96px;
+      top: auto;
+      transform: none;
+
+      width: 92px;
+      max-height: calc(100vh - 120px);
+
+      border-radius: 18px;
+      padding: 10px 6px 12px;
+
+      background: rgba(6, 8, 14, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
+
+      display: none;
+      flex-direction: column;
+      align-items: center;
+
+      gap: 12px;
+      z-index: 10019;
+      overflow-y: auto;
+    }
+
+    .floating-toolbox-panel.open {
+      display: flex;
+    }
+
+    .floating-tool-item {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .floating-tool-trigger {
+      width: 54px;
+      height: 54px;
+      border: none;
+      background: transparent;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: none !important;
+    }
+
+    .floating-tool-trigger img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .floating-tool-result {
+      width: 68px;
+      min-height: 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+      overflow: hidden;
+      padding: 4px;
+    }
+
+    .floating-tool-result.is-empty {
+      visibility: hidden;
+    }
+
+    .floating-tool-result img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Keep original tools alive for JS, but hide the old UI */
+    #utilityPanel {
+      display: none !important;
+    }
+
+
+    .floating-toolbox-btn.mode-hidden,
+    .floating-toolbox-panel.mode-hidden {
+      display: none !important;
+    }
   </style>
 </head>
 
@@ -1439,99 +1990,80 @@
 
         <!-- 右側：目前配置 -->
         <div>
-          <div class="card">
-            <div class="card-header">
-              <div>
+          <div class="build-stack">
+            <div class="card build-card-shell">
+              <div class="card-header build-card-header-min">
                 <div class="card-title">目前配置</div>
-                <div class="card-sub">顯示當前殺手、配件與技能（右側技能為 4 格圖示）</div>
+                <button id="clearBuildBtn" type="button" class="outline build-clear-mini" title="清空目前配置">清空</button>
               </div>
-              <button id="clearBuildBtn" type="button" class="outline">清空目前配置</button>
-            </div>
 
-            <!-- 殺手 + 配件 版面 -->
-            <div class="build-main-layout">
-              <div class="kill-avatar-wrap">
-                <div class="killer-box">
-                  <div id="killerAvatar" class="killer-avatar">
-                    尚未選擇
-                  </div>
-                  <div>
-                    <div id="killerName" class="killer-name-main">—</div>
-                    <div id="killerZh" class="killer-name-sub">請先選擇殺手</div>
-                  </div>
+              <div class="build-id-card" id="buildIdCard">
+                <div class="id-card-notch"></div>
+                <div id="killerAvatar" class="id-killer-portrait">殺手圖</div>
+
+                <div class="id-killer-nameplate">
+                  <div id="killerName">殺手名</div>
+                  <div id="killerZh">請先選擇殺手</div>
                 </div>
-              </div>
-              <div>
-                <div class="label">已選配件</div>
-                <div id="selectedAddons" class="selected-grid"></div>
-              </div>
-            </div>
 
-            <!-- 技能 4 格圖示 -->
-            <div class="mt-8">
-              <div class="label">技能欄位</div>
-              <div class="skills-row" id="selectedPerkIcons">
-                <!-- 4 個 slot 會動態填 -->
+                <div class="id-addon-row" id="selectedAddons"></div>
+                <div class="id-perk-row" id="selectedPerkIcons"></div>
+
+                <div class="build-summary id-summary" id="buildSummary"></div>
+                <span class="build-id-card-bottom-corner"></span>
+                <span class="build-id-card-bottom-corner right"></span>
               </div>
             </div>
 
-            <!-- 總結文字 -->
-            <div id="buildSummary" class="build-summary mt-8"></div>
-
-            <!-- 目前分數卡片 -->
-            <!-- ⭐ 獨立的目前配分卡片 -->
-            <div id="currentPointsCard" class="card mt-8">
+            <div id="currentPointsCard" class="card">
               <div class="card-title" style="font-size:15px; font-weight:600;">目前配分</div>
-              <div style="font-size:12px; color:#a6a9c0; margin-top:2px;">
-                A = B - ( C + D )
+              <div style="font-size:12px; color:#a6a9c0; margin-top:2px;">A = B - ( C + D )</div>
+
+              <div class="points-grid">
+                <div class="points-box">
+                  <div id="cp_A" class="points-value">—</div>
+                  <div class="points-label">剩餘分數</div>
+                </div>
+                <div class="points-box">
+                  <div id="cp_B" class="points-value sub">—</div>
+                  <div class="points-label">殺手上限</div>
+                </div>
+                <div class="points-box">
+                  <div id="cp_C" class="points-value sub">—</div>
+                  <div class="points-label">配件總分</div>
+                </div>
+                <div class="points-box">
+                  <div id="cp_D" class="points-value sub">—</div>
+                  <div class="points-label">技能總分</div>
+                </div>
               </div>
 
-              <!-- 四個大數字 -->
-              <div style="display:flex; gap:32px; margin-top:10px; align-items:flex-end;">
-                <div style="text-align:center;">
-                  <div id="cp_A" style="font-size:28px; font-weight:700;">—</div>
-                  <div style="font-size:12px; color:#a6a9c0;">剩餘分數</div>
-                </div>
+              <div id="utilityPanel" class="utility-panel">
+                <button id="utilityToggle" type="button" class="utility-toggle" aria-expanded="false">
+                  <span class="utility-toggle-text">🎲 工具箱</span>
+                  <span class="utility-arrow">▾</span>
+                </button>
+                <div id="utilityContent" class="utility-content">
+                  <div class="utility-actions">
+                    <button id="diceLeftBtn" type="button" title="清空目前配置"
+                      style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;"><img
+                        src="./images/other/骰子.png" alt="dice" class="dice-icon"></button>
+                    <button id="diceRightBtn" type="button" title="擲骰(7~25)"
+                      style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;">
+                      <img src="./images/other/骰子.png" alt="dice" class="dice-icon">
+                    </button>
 
-                <div style="text-align:center;">
-                  <div id="cp_B" style="font-size:22px; font-weight:600;">—</div>
-                  <div style="font-size:12px; color:#a6a9c0;">殺手上限</div>
-                </div>
-
-                <div style="text-align:center;">
-                  <div id="cp_C" style="font-size:22px; font-weight:600;">—</div>
-                  <div style="font-size:12px; color:#a6a9c0;">配件總分</div>
-                </div>
-
-                <div style="text-align:center;">
-                  <div id="cp_D" style="font-size:22px; font-weight:600;">—</div>
-                  <div style="font-size:12px; color:#a6a9c0;">技能總分</div>
+                    <img id="fortuneTubeBtn" src="./images/other/籤筒.png" alt="抽神籤"
+                      style="width:56px; height:56px; cursor:pointer; filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));">
+                    <div id="fortuneResultIcon"
+                      style="width:56px; height:56px; border-radius:12px; border:1px solid rgba(255,255,255,0.25); background:#111320; display:none; cursor:pointer; overflow:hidden;">
+                      <img id="fortuneResultPerkImg" src="" alt="幸運技能"
+                        style="width:100%; height:100%; object-fit:contain;">
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- 幸運神籤：配分模式底部 -->
-            <div id="fortuneRow"
-              style="margin-top:16px; display:flex; align-items:center; gap:16px; justify-content:flex-end;">
-              <!-- Dice Controls -->
-              <button id="diceLeftBtn" type="button" title="清空目前配置"
-                style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;"><img
-                  src="./images/other/骰子.png" alt="dice" class="dice-icon"></button>
-              <button id="diceRightBtn" type="button" title="擲骰(7~25)"
-                style="width:56px;height:56px;cursor:pointer;background:transparent;border:none;box-shadow:none;outline:none;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img src="./images/other/骰子.png" alt="dice" class="dice-icon">
-              </button>
-
-
-              <img id="fortuneTubeBtn" src="./images/other/籤筒.png" alt="抽神籤"
-                style="width:56px; height:56px; cursor:pointer; filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));">
-              <div id="fortuneResultIcon"
-                style="width:56px; height:56px; border-radius:12px; border:1px solid rgba(255,255,255,0.25); background:#111320; display:none; cursor:pointer; overflow:hidden;">
-                <img id="fortuneResultPerkImg" src="" alt="幸運技能" style="width:100%; height:100%; object-fit:contain;">
-              </div>
-            </div>
-
-
           </div>
         </div>
       </div>
@@ -1640,6 +2172,68 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <button id="floatingToolboxBtn" class="floating-toolbox-btn" type="button" title="工具箱">
+    <img src="./images/other/工具箱.png" alt="toolbox"
+      onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+    <span class="floating-toolbox-fallback">☰</span>
+  </button>
+
+  <div id="floatingToolboxPanel" class="floating-toolbox-panel" aria-hidden="true">
+    <div class="floating-tool-item">
+      <button id="floatingDiceBtn" class="floating-tool-trigger" type="button" title="原本骰子">
+        <img src="./images/other/骰子.png" alt="dice">
+      </button>
+      <div id="floatingDiceResult" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingD4Btn" class="floating-tool-trigger" type="button" title="4面骰">
+        <img src="./images/other/d4.png" alt="d4">
+      </button>
+      <div id="floatingD4Result" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingD6Btn" class="floating-tool-trigger" type="button" title="6面骰">
+        <img src="./images/other/d6.png" alt="d6">
+      </button>
+      <div id="floatingD6Result" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingD8Btn" class="floating-tool-trigger" type="button" title="8面骰">
+        <img src="./images/other/d8.png" alt="d8">
+      </button>
+      <div id="floatingD8Result" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingD12Btn" class="floating-tool-trigger" type="button" title="12面骰">
+        <img src="./images/other/d12.png" alt="d12">
+      </button>
+      <div id="floatingD12Result" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingD20Btn" class="floating-tool-trigger" type="button" title="20面骰">
+        <img src="./images/other/d20.png" alt="d20">
+      </button>
+      <div id="floatingD20Result" class="floating-tool-result is-empty">—</div>
+    </div>
+
+    <div class="floating-tool-item">
+      <button id="floatingFortuneBtn" class="floating-tool-trigger" type="button" title="抽神籤">
+        <img src="./images/other/籤筒.png" alt="fortune">
+      </button>
+      <div id="floatingFortuneResult" class="floating-tool-result is-empty">
+        <img id="floatingFortuneImg" src="" alt="fortune result">
       </div>
     </div>
   </div>
@@ -2006,6 +2600,7 @@
     // 配分模式選中的配件 / 技能
     let selectedAddons = []; // array of addon name
     let selectedPerks = [];  // array of perk name
+    let buildWasComplete = false;
 
     // 殺手原始列表（用於搜尋）
     let allKillerEntries = [];
@@ -2128,62 +2723,95 @@
     // ==========================
     function renderKillerInfo() {
       if (!currentKillerKey || !window.KILLERS) {
-        killerAvatarEl.innerHTML = '尚未選擇';
-        killerNameEl.textContent = '—';
+        killerAvatarEl.innerHTML = '殺手圖';
+        killerAvatarEl.classList.remove('no-frame');
+        killerNameEl.textContent = '殺手名';
         killerZhEl.textContent = '請先選擇殺手';
         return;
       }
+
       const killer = KILLERS[currentKillerKey];
+      const killerKeyLower = String(currentKillerKey || '').toLowerCase();
+      const killerZhLower = String(killer?.zh || '').toLowerCase();
+
+      let isUnknown = false;
+      if (killerKeyLower === 'unknown' || killerKeyLower === 'the unknown' || killerZhLower === '神秘人') {
+        isUnknown = true;
+      }
+
       killerAvatarEl.innerHTML = '';
-      if (killer.img) {
+
+      let useNoFrame = isUnknown;
+      let useEasterEgg = false;
+
+      if (killer && killer.img) {
         const img = document.createElement('img');
-        img.src = killer.img;
+        let imgSrc = killer.img;
+
+        if (killerKeyLower === 'wraith' || killerKeyLower === 'the wraith') {
+          useEasterEgg = Math.random() < 0.2;
+          if (useEasterEgg) {
+            imgSrc = killer.img.replace(/wraith\.png$/i, 'wraith easter egg.png');
+            useNoFrame = true;
+            setTimeout(() => {
+              if (typeof swingBadge === 'function') swingBadge();
+            }, 30);
+          }
+        }
+
+        killerAvatarEl.classList.toggle('no-frame', useNoFrame);
+
+        img.src = imgSrc;
         img.alt = currentKillerKey;
         killerAvatarEl.appendChild(img);
       } else {
-        killerAvatarEl.textContent = 'No Img';
+        killerAvatarEl.classList.toggle('no-frame', useNoFrame);
+        killerAvatarEl.textContent = '殺手圖';
       }
-      killerNameEl.textContent = currentKillerKey;
-      killerZhEl.textContent = killer.zh || '（無中文名稱）';
+
+      killerNameEl.textContent = killer.zh || currentKillerKey;
+      killerZhEl.textContent = currentKillerKey;
     }
 
     function renderSelectedAddons() {
       selectedAddonsEl.innerHTML = '';
-      if (!selectedAddons.length) {
-        const span = document.createElement('span');
-        span.style.color = 'var(--muted)';
-        span.textContent = '尚未選擇配件';
-        selectedAddonsEl.appendChild(span);
-        return;
-      }
-      for (const name of selectedAddons) {
-        const addon = ADDONS?.[name];
-        if (!addon) continue;
 
-        const pill = document.createElement('div');
-        pill.className = 'selected-pill';
+      for (let i = 0; i < 2; i++) {
+        const name = selectedAddons[i];
+        const slot = document.createElement('div');
+        slot.className = 'id-addon-slot';
 
-        if (addon.img) {
-          const img = document.createElement('img');
-          img.src = addon.img;
-          img.alt = name;
-          pill.appendChild(img);
+        if (!name) {
+          const span = document.createElement('span');
+          span.className = 'id-slot-placeholder';
+          span.textContent = '配件';
+          slot.appendChild(span);
+        } else {
+          const addon = ADDONS?.[name];
+          if (addon && addon.img) {
+            const img = document.createElement('img');
+            img.src = addon.img;
+            img.alt = name;
+            img.title = `${name}${addon.zh ? ' / ' + addon.zh : ''}（${addon.score ?? 0} 分）
+點擊移除`;
+            img.onclick = () => {
+              selectedAddons = selectedAddons.filter((_, idx) => idx !== i);
+              renderSelectedAddons();
+              renderSelectedPerkIcons();
+              updatePointsDisplay();
+              maybeSwingCompletedBuild();
+              renderAddonList();
+            };
+            slot.appendChild(img);
+          } else {
+            const span = document.createElement('span');
+            span.className = 'id-slot-placeholder';
+            span.textContent = '配件';
+            slot.appendChild(span);
+          }
         }
 
-        const remove = document.createElement('span');
-        remove.className = 'pill-remove';
-        remove.textContent = '×';
-        remove.title = '移除此配件';
-        remove.onclick = () => {
-          selectedAddons = selectedAddons.filter(n => n !== name);
-          renderSelectedAddons();
-          renderSelectedPerkIcons();
-          updatePointsDisplay();
-          renderAddonList();
-        };
-        pill.appendChild(remove);
-
-        selectedAddonsEl.appendChild(pill);
+        selectedAddonsEl.appendChild(slot);
       }
     }
 
@@ -2191,72 +2819,47 @@
       selectedPerkIconsEl.innerHTML = '';
       for (let i = 0; i < 4; i++) {
         const slot = document.createElement('div');
-        slot.className = 'skill-slot';
+        slot.className = 'id-perk-slot';
 
         const perkName = selectedPerks[i];
         if (!perkName) {
           const span = document.createElement('span');
-          span.className = 'placeholder';
-          span.textContent = '空';
+          span.className = 'id-slot-placeholder';
+          span.textContent = '技能';
           slot.appendChild(span);
         } else {
           const perk = PERKS?.[perkName];
-          slot.classList.add('filled');
           if (perk && perk.img) {
             const img = document.createElement('img');
             img.src = perk.img;
             img.alt = perkName;
             const zh = perk.zh || '';
             const score = perk.score ?? 0;
-            img.title = `${perkName}${zh ? ' / ' + zh : ''}（${score} 分）\n點擊移除`;
+            img.title = `${perkName}${zh ? ' / ' + zh : ''}（${score} 分）
+點擊移除`;
             img.onclick = () => {
-              selectedPerks = selectedPerks.filter(n => n !== perkName);
+              selectedPerks = selectedPerks.filter((_, idx) => idx !== i);
               renderSelectedPerkIcons();
               renderSelectedAddons();
               updatePointsDisplay();
+              maybeSwingCompletedBuild();
               renderPerkList();
             };
             slot.appendChild(img);
           } else {
             const span = document.createElement('span');
-            span.className = 'placeholder';
-            span.textContent = perkName;
+            span.className = 'id-slot-placeholder';
+            span.textContent = '技能';
             slot.appendChild(span);
           }
+
         }
         selectedPerkIconsEl.appendChild(slot);
       }
 
-      const { limit, usedAddons, usedPerks } = computePoints();
-      if (!currentKillerKey) {
+      if (buildSummaryEl) {
         buildSummaryEl.textContent = '';
-        return;
       }
-      const totalUsed = usedAddons + usedPerks;
-      const remaining = limit - totalUsed;
-      // ======== 新增：取得配件中文＋英文 ========
-      const addonNames = selectedAddons
-        .map(a => {
-          const data = ADDONS[a];
-          const zh = data?.zh ? ` / ${data.zh}` : "";
-          return `${a}${zh}`;
-        })
-        .join("、");
-
-      // ======== 新增：取得技能中文＋英文 ========
-      const perkNames = selectedPerks
-        .map(p => {
-          const data = PERKS[p];
-          const zh = data?.zh ? ` / ${data.zh}` : "";
-          return `${p}${zh}`;
-        })
-        .join("、");
-
-      buildSummaryEl.innerHTML =
-        `殺手：<strong>${currentKillerKey}</strong><br>` +
-        `配件（${selectedAddons.length} 個 / ${usedAddons} 分）：<strong>${addonNames || "—"}</strong><br>` +
-        `技能（${selectedPerks.length} 個 / ${usedPerks} 分）：<strong>${perkNames || "—"}</strong><br>` +
-        `剩餘：<strong>${remaining}</strong>`;
     }
 
 
@@ -2391,6 +2994,7 @@
           renderSelectedAddons();
           renderSelectedPerkIcons();
           updatePointsDisplay();
+          maybeSwingCompletedBuild();
           renderAddonList();
         };
 
@@ -2512,6 +3116,7 @@
           renderSelectedPerkIcons();
           renderSelectedAddons();
           updatePointsDisplay();
+          maybeSwingCompletedBuild();
           renderPerkList();
         };
 
@@ -2572,7 +3177,12 @@
       if (slotState.killerKey && KILLERS[slotState.killerKey]) {
         const killer = KILLERS[slotState.killerKey];
         const img = document.createElement('img');
-        img.src = killer.img || '';
+        let slotKillerImg = killer.img || '';
+
+        // 拉霸模式殺手圖改用 images/killers2/
+        slotKillerImg = slotKillerImg.replace('images/killers/', 'images/killers2/');
+
+        img.src = slotKillerImg;
         img.alt = slotState.killerKey;
         img.title = killer.zh ? `${slotState.killerKey} / ${killer.zh}` : slotState.killerKey;
         killerIcon.appendChild(img);
@@ -2894,6 +3504,7 @@
       tabSlot.classList.remove('active');
       pointsModeEl.classList.remove('hidden');
       slotModeEl.classList.add('hidden');
+      if (typeof updateFloatingToolboxVisibility === 'function') updateFloatingToolboxVisibility();
 
       // 配分模式：隱藏右下角拉霸設定鍵
       if (slotSettingsBtn) slotSettingsBtn.classList.add('hidden');
@@ -2913,6 +3524,7 @@
       tabPoints.classList.remove('active');
       pointsModeEl.classList.add('hidden');
       slotModeEl.classList.remove('hidden');
+      if (typeof updateFloatingToolboxVisibility === 'function') updateFloatingToolboxVisibility();
 
       // 拉霸模式：顯示右下角拉霸設定鍵
       if (slotSettingsBtn) slotSettingsBtn.classList.remove('hidden');
@@ -2942,9 +3554,55 @@
       renderSelectedAddons();
       renderSelectedPerkIcons();
       updatePointsDisplay();
+      maybeSwingCompletedBuild();
       renderAddonList();
       renderPerkList();
     });
+
+
+    function isBuildComplete() {
+      return Boolean(currentKillerKey) && selectedAddons.length === 2 && selectedPerks.length === 4;
+    }
+
+    function swingBadge() {
+      const card = document.getElementById('buildIdCard');
+      if (!card || !card.animate) return;
+
+      card.getAnimations().forEach(anim => anim.cancel());
+
+      card.animate(
+        [
+          { transform: 'rotate(0deg)', offset: 0 },
+          { transform: 'rotate(5.2deg)', offset: 0.14 },
+          { transform: 'rotate(-4.2deg)', offset: 0.29 },
+          { transform: 'rotate(3.1deg)', offset: 0.44 },
+          { transform: 'rotate(-2.2deg)', offset: 0.58 },
+          { transform: 'rotate(1.4deg)', offset: 0.72 },
+          { transform: 'rotate(-0.8deg)', offset: 0.84 },
+          { transform: 'rotate(0.35deg)', offset: 0.93 },
+          { transform: 'rotate(0deg)', offset: 1 }
+        ],
+        {
+          duration: 1850,
+          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          iterations: 1
+        }
+      );
+    }
+
+    function maybeSwingCompletedBuild() {
+      const complete = isBuildComplete();
+      if (complete && !buildWasComplete) {
+        swingBadge();
+      }
+      buildWasComplete = complete;
+    }
+
+    document.addEventListener('click', (e) => {
+      const card = e.target.closest('#buildIdCard');
+      if (card) swingBadge();
+    });
+
 
     // 配件搜尋 / 分數過濾
     addonSearchInput.addEventListener('input', renderAddonList);
@@ -2961,9 +3619,20 @@
       renderSelectedAddons();
       renderSelectedPerkIcons();
       updatePointsDisplay();
+      maybeSwingCompletedBuild();
       renderAddonList();
       renderPerkList();
     });
+
+    const utilityPanelEl = document.getElementById('utilityPanel');
+    const utilityToggleEl = document.getElementById('utilityToggle');
+    if (utilityPanelEl && utilityToggleEl) {
+      utilityToggleEl.addEventListener('click', () => {
+        const willOpen = !utilityPanelEl.classList.contains('open');
+        utilityPanelEl.classList.toggle('open', willOpen);
+        utilityToggleEl.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+    }
 
     // 拉霸：抽一格（隱藏按鈕）
     slotBtn.addEventListener('click', () => {
@@ -3004,12 +3673,170 @@
       });
     }
 
+
+
+    // ==========================
+    // 浮動工具箱（代理舊工具，確保骰子原功能不壞）
+    // ==========================
+    const floatingToolboxBtn = document.getElementById('floatingToolboxBtn');
+    const floatingToolboxPanel = document.getElementById('floatingToolboxPanel');
+    const floatingDiceBtn = document.getElementById('floatingDiceBtn');
+    const floatingDiceResult = document.getElementById('floatingDiceResult');
+    const floatingFortuneBtn = document.getElementById('floatingFortuneBtn');
+    const floatingFortuneResult = document.getElementById('floatingFortuneResult');
+    const floatingFortuneImg = document.getElementById('floatingFortuneImg');
+
+    const extraDiceDefs = [
+      ['floatingD4Btn', 'floatingD4Result', 4],
+      ['floatingD6Btn', 'floatingD6Result', 6],
+      ['floatingD8Btn', 'floatingD8Result', 8],
+      ['floatingD12Btn', 'floatingD12Result', 12],
+      ['floatingD20Btn', 'floatingD20Result', 20],
+    ];
+
+    function updateFloatingToolboxVisibility() {
+      const inPoints = pointsModeEl && !pointsModeEl.classList.contains('hidden');
+      if (floatingToolboxBtn) floatingToolboxBtn.classList.toggle('mode-hidden', !inPoints);
+      if (floatingToolboxPanel) {
+        floatingToolboxPanel.classList.toggle('mode-hidden', !inPoints);
+        if (!inPoints) {
+          floatingToolboxPanel.classList.remove('open');
+          floatingToolboxPanel.setAttribute('aria-hidden', 'true');
+        }
+      }
+    }
+
+    if (floatingToolboxBtn && floatingToolboxPanel) {
+      floatingToolboxBtn.addEventListener('click', () => {
+        const willOpen = !floatingToolboxPanel.classList.contains('open');
+        floatingToolboxPanel.classList.toggle('open', willOpen);
+        floatingToolboxPanel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+      });
+    }
+
+    function setMiniDiceResult(el, value) {
+      if (!el) return;
+      el.textContent = String(value);
+      el.classList.remove('is-empty');
+
+      // 點擊數字可重置
+      el.onclick = () => {
+        el.textContent = '—';
+        el.classList.add('is-empty');
+        el.onclick = null;
+      };
+    }
+
+    function rollMiniDice(faces, resultId) {
+      const value = Math.floor(Math.random() * faces) + 1;
+      setMiniDiceResult(document.getElementById(resultId), value);
+    }
+
+    extraDiceDefs.forEach(([btnId, resultId, faces]) => {
+      const btn = document.getElementById(btnId);
+      if (btn) btn.addEventListener('click', () => rollMiniDice(faces, resultId));
+    });
+
+    function syncFloatingDiceResult() {
+      const sourceBtn = document.getElementById('diceRightBtn');
+      if (!sourceBtn || !floatingDiceResult) return;
+
+      const isNumber = sourceBtn.classList.contains('dice-number');
+      const text = (sourceBtn.textContent || '').trim();
+
+      if (isNumber && text && /^\d+$/.test(text)) {
+        floatingDiceResult.textContent = text;
+        floatingDiceResult.classList.remove('is-empty');
+        // 點數字重置
+        floatingDiceResult.onclick = () => {
+          floatingDiceResult.textContent = '—';
+          floatingDiceResult.classList.add('is-empty');
+          const sourceBtn = document.getElementById('diceRightBtn');
+          if (sourceBtn) sourceBtn.click();
+        };
+      } else {
+        floatingDiceResult.textContent = '—';
+        floatingDiceResult.classList.add('is-empty');
+      }
+    }
+
+    function syncFloatingFortuneResult() {
+      const sourceIcon = document.getElementById('fortuneResultIcon');
+      const sourceImg = document.getElementById('fortuneResultPerkImg');
+      if (!sourceIcon || !sourceImg || !floatingFortuneResult || !floatingFortuneImg) return;
+
+      const visible = sourceIcon.style.display !== 'none' && !!sourceImg.getAttribute('src');
+      if (visible) {
+        floatingFortuneImg.src = sourceImg.src;
+        floatingFortuneResult.classList.remove('is-empty');
+      } else {
+        floatingFortuneImg.removeAttribute('src');
+        floatingFortuneResult.classList.add('is-empty');
+      }
+    }
+
+
+    if (floatingDiceBtn) {
+      floatingDiceBtn.addEventListener('click', () => {
+        // 如果已有數字，點骰子也當作重置
+        if (!floatingDiceResult.classList.contains('is-empty')) {
+          floatingDiceResult.textContent = '—';
+          floatingDiceResult.classList.add('is-empty');
+          const sourceBtn = document.getElementById('diceRightBtn');
+          if (sourceBtn) sourceBtn.click(); // 觸發原本重置
+          return;
+        }
+
+        const sourceBtn = document.getElementById('diceRightBtn');
+        if (sourceBtn) sourceBtn.click();
+        setTimeout(syncFloatingDiceResult, 30);
+        setTimeout(syncFloatingDiceResult, 1200);
+      });
+    }
+
+
+    if (floatingFortuneBtn) {
+      floatingFortuneBtn.addEventListener('click', () => {
+        const sourceBtn = document.getElementById('fortuneTubeBtn');
+        if (sourceBtn) sourceBtn.click();
+        setTimeout(syncFloatingFortuneResult, 30);
+        setTimeout(syncFloatingFortuneResult, 150);
+      });
+    }
+
+    if (floatingFortuneResult) {
+      floatingFortuneResult.addEventListener('click', () => {
+        if (floatingFortuneResult.classList.contains('is-empty')) return;
+        const sourceIcon = document.getElementById('fortuneResultIcon');
+        if (sourceIcon) sourceIcon.click();
+      });
+    }
+
+    const diceRightBtnForMirror = document.getElementById('diceRightBtn');
+    if (diceRightBtnForMirror && window.MutationObserver) {
+      const diceObserver = new MutationObserver(syncFloatingDiceResult);
+      diceObserver.observe(diceRightBtnForMirror, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class'] });
+    }
+
+    const fortuneResultIconForMirror = document.getElementById('fortuneResultIcon');
+    const fortuneResultImgForMirror = document.getElementById('fortuneResultPerkImg');
+    if (fortuneResultIconForMirror && fortuneResultImgForMirror && window.MutationObserver) {
+      const fortuneObserver = new MutationObserver(syncFloatingFortuneResult);
+      fortuneObserver.observe(fortuneResultIconForMirror, { attributes: true, attributeFilter: ['style'] });
+      fortuneObserver.observe(fortuneResultImgForMirror, { attributes: true, attributeFilter: ['src'] });
+    }
+
+    syncFloatingDiceResult();
+    syncFloatingFortuneResult();
+    updateFloatingToolboxVisibility();
+
     // 初始化
     initKillerData();
     renderKillerInfo();
     renderSelectedAddons();
     renderSelectedPerkIcons();
     updatePointsDisplay();
+    maybeSwingCompletedBuild();
     renderAddonList();
     renderPerkList();
     initSlotBoard();
