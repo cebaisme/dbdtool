@@ -735,7 +735,7 @@ function normalizeCard39AnswerToken(value) {
   // 例：const FORCE_DRAW_CARD_IDS = [17];
   // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
   // ==========================
-  const FORCE_DRAW_CARD_IDS = [];
+  const FORCE_DRAW_CARD_IDS = [39];
 
   function normalizeForcedCardId(value) {
     if (value == null) return null;
@@ -3478,7 +3478,17 @@ function showCard39SlotPicker(onDone) {
     btn.innerHTML = `<div style="font-weight:800;margin-bottom:4px;">${meta.label}</div><div style="font-size:13px;color:#d7deef;line-height:1.4;">${meta.zh}</div><div style="font-size:12px;color:#8fa2ca;margin-top:8px;">目前分數：${typeof meta.score === 'number' ? meta.score : '?'}</div>`;
 
     btn.addEventListener('click', () => {
-      if (selected.includes(meta.slotIndex)) return;
+      if (selected.includes(meta.slotIndex)) {
+        const idx = selected.indexOf(meta.slotIndex);
+        if (idx !== -1) selected.splice(idx, 1);
+        btn.style.borderColor = 'rgba(255,255,255,0.1)';
+        btn.style.boxShadow = 'none';
+        btn.style.background = '#202633';
+        return;
+      }
+
+      if (selected.length >= 2) return;
+
       selected.push(meta.slotIndex);
       btn.style.borderColor = '#ffd36e';
       btn.style.boxShadow = '0 0 0 1px rgba(255,211,110,0.55)';
