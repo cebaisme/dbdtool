@@ -613,7 +613,7 @@ window.ADDONS = {
     zh: "俗氣的耳環",
     score: 4,
     aliases: ["跟蹤時的移動速度增加20%", "白配"],
-    img: "./images/addons/tackyearrings.png",
+    img: "./images/addons/tackyearrings.png", 
     killer: "The Shape",
   },
   "Dead Rabbit": {
@@ -1944,7 +1944,7 @@ window.ADDONS = {
   "Defaced Smiley Pin": {
     zh: "塗鴉笑臉飾針",
     score: 3,
-    aliases: ["重傷", "斷骨", "60秒", "綠配"],
+    aliases: ["重傷",  "斷骨", "60秒", "綠配"],
     img: "./images/addons/defacedsmileypin.png",
     killer: "The Legion",
   },
@@ -2800,7 +2800,7 @@ window.ADDONS = {
   "Black Strap": {
     zh: "黑色掛帶",
     score: 4,
-    aliases: ["距離增加25%", "寬度減少25%", "白配"],
+    aliases: ["距離增加25%","寬度減少25%", "白配"],
     img: "./images/addons/blackstrap.png",
     killer: "The Executioner",
   },
@@ -2821,7 +2821,7 @@ window.ADDONS = {
   "Lead Ring": {
     zh: "鉛環",
     score: 1,
-    aliases: ["距離減少25%", "寬度增加25%", "白配"],
+    aliases: ["距離減少25%","寬度增加25%", "白配"],
     img: "./images/addons/leadring.png",
     killer: "The Executioner",
   },
@@ -2849,14 +2849,14 @@ window.ADDONS = {
   "Spearhead": {
     zh: "槍尖",
     score: 2,
-    aliases: ["牢籠", "氣場", "8秒", "綠配"],
+    aliases: ["牢籠" ,"氣場", "8秒", "綠配"],
     img: "./images/addons/spearhead.png",
     killer: "The Executioner",
   },
   "Wax Doll": {
     zh: "蠟製娃娃",
     score: 3,
-    aliases: ["距離增加5%", "綠配"],
+    aliases: ["距離增加5%","綠配"],
     img: "./images/addons/waxdoll.png",
     killer: "The Executioner",
   },
@@ -3290,7 +3290,7 @@ window.ADDONS = {
   "On Target Single": {
     zh: "《正中紅心》單曲",
     score: 2,
-    aliases: ["衰退", "時間增加2秒", "綠配"],
+    aliases: ["衰退", "時間增加2秒", "藍配"],
     img: "./images/addons/ontargetsingle.png",
     killer: "The Trickster",
   },
@@ -3304,7 +3304,7 @@ window.ADDONS = {
   "Bloody Boa": {
     zh: "血腥毛圍巾",
     score: 3,
-    aliases: ["8個飛刀", "藍配"],
+    aliases: ["8個飛刀", "綠配"],
     img: "./images/addons/bloodyboa.png",
     killer: "The Trickster",
   },
@@ -3900,7 +3900,7 @@ window.ADDONS = {
   "Mother's Comb": {
     zh: "母親的梳子",
     score: 4,
-    aliases: ["黃色氣場", "關機的電視", "藍配"],
+    aliases: ["黃色氣場","關機的電視", "藍配"],
     img: "./images/addons/motherscomb.png",
     killer: "The Onryo",
   },
@@ -3935,7 +3935,7 @@ window.ADDONS = {
   "Tape Editing Deck": {
     zh: "錄影剪輯設備",
     score: 2,
-    aliases: ["最遠", "氣場", "6秒", "紫配"],
+    aliases: ["最遠","氣場", "6秒", "紫配"],
     img: "./images/addons/tapeeditingdeck.png",
     killer: "The Onryo",
   },
@@ -3963,7 +3963,7 @@ window.ADDONS = {
   "Remote Control": {
     zh: "遙控器",
     score: 5,
-    aliases: ["開機電視", "12公尺", "12米", "氣場", "7秒", "紅配"],
+    aliases: ["開機電視","12公尺", "12米", "氣場","7秒", "紅配"],
     img: "./images/addons/remotecontrol.png",
     killer: "The Onryo",
   },
@@ -6026,8 +6026,8 @@ window.ADDONS = {
     img: "./images/addons/shreddedgown.png",
     killer: "The Krasue",
   },
-
-
+  
+  
 
 
   // 亨利
@@ -6036,14 +6036,14 @@ window.ADDONS = {
 
   "Bead Maze": {
     zh: "串珠迷宮",
-    score: 2,
+    score: 4,
     aliases: ["活", "3秒", "白配"],
     img: "./images/addons/beadmaze.png",
     killer: "The First",
   },
   "Orderly ID": {
     zh: "勤務員證",
-    score: 3,
+    score: 2,
     aliases: ["瞄準距離增加2公尺", "瞄準距離增加2米", "白配"],
     img: "./images/addons/orderlyid.png",
     killer: "The First",
@@ -6057,28 +6057,28 @@ window.ADDONS = {
   },
   "Stained Glass Mural": {
     zh: "彩繪玻璃壁畫",
-    score: 3,
+    score: 2,
     aliases: ["破壞", "木板", "板子", "牆壁", "冷卻", "12秒", "白配"],
     img: "./images/addons/stainedglassmural.png",
     killer: "The First",
   },
   "Bloody Roller Skate": {
     zh: "血腥溜冰鞋",
-    score: 3,
+    score: 4,
     aliases: ["地下道", "地底門", "敏捷", "加速", "20%", "2秒", "綠配"],
     img: "./images/addons/bloodyrollerskate.png",
     killer: "The First",
   },
   "Clock Hands": {
     zh: "時鐘指針",
-    score: 3,
+    score: 2,
     aliases: ["遲鈍", "12秒", "綠配"],
     img: "./images/addons/clockhands.png",
     killer: "The First",
   },
   "Gutted Supercom": {
     zh: "被掏空的對講機",
-    score: 3,
+    score: 4,
     aliases: ["氣場", "1.5秒", "綠配"],
     img: "./images/addons/guttedsupercom.png",
     killer: "The First",
@@ -6092,14 +6092,14 @@ window.ADDONS = {
   },
   "Smashed Cassette Deck": {
     zh: "被砸壞的卡帶播放機",
-    score: 5,
+    score: 4,
     aliases: ["開場感染", "減少1台", "綠配"],
     img: "./images/addons/smashedcassette.png",
     killer: "The First",
   },
   "Electrode Cap": {
     zh: "電極帽",
-    score: 2,
+    score: 4,
     aliases: ["26公尺", "26米", "氣場", "6秒", "第二階段", "藍配"],
     img: "./images/addons/electrodecap.png",
     killer: "The First",
@@ -6120,35 +6120,35 @@ window.ADDONS = {
   },
   "Rabbit Remains": {
     zh: "兔子殘骸",
-    score: 4,
+    score: 5,
     aliases: ["疲憊", "疲勞", "20秒", "藍配"],
     img: "./images/addons/rabbitremains.png",
     killer: "The First",
   },
   "Victor's Razor Blade": {
     zh: "維克多的剃刀",
-    score: 4,
+    score: 2,
     aliases: ["不治", "20秒", "藍配"],
     img: "./images/addons/victorsrazorblade.png",
     killer: "The First",
   },
   "Black Widow Spider": {
     zh: "黑寡婦蜘蛛",
-    score: 5,
+    score: 3,
     aliases: ["36公尺", "36米", "尖叫", "大叫", "3秒", "紫配"],
     img: "./images/addons/blackwidowspider.png",
     killer: "The First",
   },
   "Broken Skateboard": {
     zh: "破損的滑板",
-    score: 1,
+    score: 2,
     aliases: ["跨越速度", "60秒", "30%", "紫配"],
     img: "./images/addons/brokenskateboard.png",
     killer: "The First",
   },
   "Electroshock Collar": {
     zh: "電擊項圈",
-    score: 3,
+    score: 2,
     aliases: ["32公尺", "32米", "封鎖", "12秒", "紫配"],
     img: "./images/addons/electroshockcollar.png",
     killer: "The First",
@@ -6156,20 +6156,20 @@ window.ADDONS = {
   "Pizza Goggles": {
     zh: "披薩護目鏡",
     score: 1,
-    aliases: ["減少90%", "冷卻縮短20秒", "迷因配件", "紫配"],
+    aliases: ["減少90%", "冷卻縮短20秒", "紫配"],
     img: "./images/addons/pizzagoggles.png",
     killer: "The First",
   },
   "Chess Piece": {
     zh: "棋子",
-    score: 4,
+    score: 3,
     aliases: ["兩次", "攻擊半徑減少50%", "冷卻時間增加15秒", "紅配"],
     img: "./images/addons/chesspiece.png",
     killer: "The First",
   },
   "Iridescent Soteria Chip": {
     zh: "螢紅索泰里亞晶片",
-    score: 5,
+    score: 4,
     aliases: ["虹彩索泰里亞晶片", "隱形", "隱身", "氣場", "12公尺", "12米", "紅配"],
     img: "./images/addons/iridescentsoteriachip.png",
     killer: "The First",

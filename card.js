@@ -29,54 +29,54 @@
       }
     },
 
-    // 2. 不包含殺手全部重抽
+    // 2. 5 個通用技能擇一
     {
       id: 'card02',
       zh: '起床重睡',
-      target: 'any',
-      colorType: 'all-neutral',
-      summary: '保留殺手，重抽配件與全部技能。',
-      effect: { type: 'reroll_all_except_killer', data: {} }
+      target: 'slot-perk',
+      colorType: 'perk-slot',
+      summary: '該技能欄位抽出 5 個通用技能，五選一替換。',
+      effect: { type: 'replace_skill_general_choice', data: { choices: 5 } }
     },
 
-    // 3. 配件全部重抽
+    // 3. 兩個配件總分為 7
     {
       id: 'card03',
       zh: '汰舊換新',
       target: 'addon',
       colorType: 'addon',
-      summary: '重抽兩個配件欄位。',
-      effect: { type: 'reroll_addons_all', data: {} }
+      summary: '系統會在後台自動重抽兩個配件，直到得到可用且總分為 7 的組合。',
+      effect: { type: 'card03_addons_sum_7', data: {} }
     },
 
-    // 4. 4 個技能全部重抽
+    // 4. 4 個技能不低於目前欄位分數
     {
       id: 'card04',
       zh: '空空遺忘',
       target: 'perk',
       colorType: 'perk',
-      summary: '重抽四個技能欄位。',
-      effect: { type: 'reroll_perks_all', data: {} }
+      summary: '重抽四個技能，且分數都不會低於被指定欄位的分數。',
+      effect: { type: 'card04_reroll_perks_not_lower_than_slot', data: {} }
     },
 
-    // 5. 4 技能隨機 3 重抽
+    // 5. 三個技能重抽，固定欄位至少 4 分
     {
       id: 'card05',
       zh: '重振旗鼓',
       target: 'perk',
       colorType: 'perk',
-      summary: '隨機三個技能重抽。',
-      effect: { type: 'reroll_random_perks', data: { count: 3 } }
+      summary: '重抽三個技能，其中卡片放置的欄位固定重抽成至少 4 分，其餘兩格照一般規則重抽。',
+      effect: { type: 'card05_reroll_three_with_fixed_high_slot', data: {} }
     },
 
-    // 6. 4 技能隨機 2 重抽
+    // 6. 兩次 3-5 分技能五選一，隨機丟進技能欄位
     {
       id: 'card06',
       zh: '盤點庫存',
       target: 'perk',
       colorType: 'perk',
-      summary: '隨機兩個技能重抽。',
-      effect: { type: 'reroll_random_perks', data: { count: 2 } }
+      summary: '進行兩次：每次抽出 5 個 3–5 分技能讓玩家選 1 個，並隨機替換到技能欄位。',
+      effect: { type: 'card06_double_choice_random_perk_slot', data: { rounds: 2, choices: 5, scores: [3, 4, 5] } }
     },
 
     // 7. 4 技能隨機 1 重抽
@@ -129,14 +129,14 @@
       effect: { type: 'replace_skill_by_current_killer_3pick', data: {} }
     },
 
-    // 12. 技能 -> 通用技能
+    // 12. 技能 -> 通用技能 5 選 1
     {
       id: 'card12',
       zh: '萌新入坑',
       target: 'slot-perk',
       colorType: 'perk-slot',
-      summary: '將此技能改成通用技能。',
-      effect: { type: 'replace_skill_general', data: {} }
+      summary: '該欄位抽出 5 個通用技能候選，五選一替換。',
+      effect: { type: 'replace_skill_general_choice', data: { choices: 5 } }
     },
 
     // 13. 配件 -> 一紅配一白配
@@ -169,34 +169,34 @@
       effect: { type: 'replace_addons_by_color', data: { colors: ['藍配', '藍配'] } }
     },
 
-    // 16. 技能平均分配後重抽（實作：重抽全部技能）
+    // 16. 六欄固定分數後 +1 分重抽（5 -> 0）
     {
       id: 'card16',
       zh: '全民普發',
-      target: 'perk',
-      colorType: 'perk',
-      summary: '將技能重新分配並重抽四個技能。',
-      effect: { type: 'reroll_perks_all', data: {} }
+      target: 'any',
+      colorType: 'all-neutral',
+      summary: '六個非殺手欄位會以原分數 +1 的分數重抽（5 分會變成 0 分）。',
+      effect: { type: 'card16_all_slots_plus_one_wrap', data: {} }
     },
 
-    // 17. 技能極端分配：兩格變 1 分，其餘變 3/4/5 分
+    // 17. 小遊戲：猜分數對決
     {
       id: 'card17',
       zh: '狂賭之冤',
       target: 'any',
       colorType: 'perk',
-      summary: '隨機兩個欄位變為 1 分，其餘欄位抽 3/4/5 分的技能或配件。',
-      effect: { type: 'card17_extreme_redistribute', data: {} }
+      summary: '選擇 0–5 的分數後與莊家 0–6 對決。莊家比較大則獲勝，較小則失敗，相同則平手。',
+      effect: { type: 'card17_score_duel_minigame', data: {} }
     },
 
-    // 18. 配件平均分配後重抽（實作：重抽兩個配件）
+    // 18. 兩個配件取平均後重抽
     {
       id: 'card18',
       zh: '一分為二',
       target: 'addon',
       colorType: 'addon',
-      summary: '將配件分配後重抽兩個配件。',
-      effect: { type: 'reroll_addons_all', data: {} }
+      summary: '兩個配件會變成相同分數的配件。',
+      effect: { type: 'card18_average_addons', data: {} }
     },
 
     // 19. 技能集中：指定欄位變 0 分，其餘技能 +1 分重抽
@@ -209,14 +209,14 @@
       effect: { type: 'card19_zero_and_plus_one', data: {} }
     },
 
-    // 20. 技能 + 配件總和平均（實作：技能+配件全部重抽）
+    // 20. 齊頭平等
     {
       id: 'card20',
       zh: '共產主義',
       target: 'any',
       colorType: 'all-neutral',
-      summary: '重新分配技能與配件並重抽全部欄位。',
-      effect: { type: 'reroll_all_addon_perk', data: {} }
+      summary: '六個非殺手欄位會盡量變成同一個分數後重抽。',
+      effect: { type: 'card20_equalize_all_scores', data: {} }
     },
 
     // 21. 什麼事都沒有
@@ -414,6 +414,27 @@
       effect: { type: 'card37_restart_slot', data: {} }
     },
 
+    // 38. 限時四選一：3 秒內不選就變成 0–2 分技能
+    {
+      id: 'card38',
+      zh: '生死時速',
+      target: 'slot-perk',
+      colorType: 'perk-slot',
+      summary: '該技能欄位先抽出 4 個 3–5 分技能四選一；3 秒內沒選則候選改成 0–2 分技能。',
+      effect: { type: 'card38_speed_choice', data: {} }
+    },
+
+    // 39. 快問快答：選兩格後答題，答對 +2，答錯/超時 -1
+    {
+      id: 'card39',
+      zh: '快問快答',
+      target: 'any',
+      colorType: 'all-neutral-dark',
+      summary: '選兩個非殺手欄位後進行快問快答；答對兩格各 +2，答錯或超時則各 -1。',
+      effect: { type: 'card39_quiz', data: {} }
+    },
+
+
   ];
 
   // ==========================
@@ -516,7 +537,14 @@
 
   function getKillerImg(key) {
     const k = window.KILLERS && window.KILLERS[key];
-    return (k && k.img) || '';
+    if (!k || !k.img) return '';
+
+    let img = k.img;
+
+    // 拉霸模式改用 killers2 資料夾
+    img = img.replace("images/killers/", "images/killers2/");
+
+    return img;
   }
 
   function getKillerScore(key) {
@@ -553,6 +581,362 @@
         scoreSet.has(a.score)
       )
       .map(([name]) => name);
+  }
+
+const CARD39_QUIZ_RAW = String.raw`題目
+dbd裡面 版權角色全部都可以用暗金細胞買
+答 否 註釋:比爾
+
+dbd是一個鮮少有bug的遊戲
+答 否 註釋:dead bug daylight
+
+若是攜帶風敏的「機械技術」在對上佛萊迪入夢的時候 發電機技能檢驗失敗沒有爆點能醒來嗎
+答 是 註釋:冷知識 醒來是因為炸機而不是巨大聲響或爆點 所以這樣就能在沒有爆點的情況下醒來
+
+對上地獄修士時 被鎖鏈綁的時候可以開門嗎
+答 是 註釋:遇到醫生瘋狂三時也可以 是個很重要的小知識
+
+深度傷口在解醫生瘋狂的時候 仍然會持續倒退
+答 否 註釋:黃條解瘋狂期間不會倒退
+
+幽靈殺手本名菲利浦
+答 是 註釋:全名Philip Ojomo
+
+最大的地圖是黑水沼澤蒼白玫瑰
+答 否 註釋:最大的地圖是阿札羅夫長眠處(資料來源wikigg)
+
+小丑斬殺男性倖存者時 是拿走右手小指
+答 否 註釋:是左手小指 女性倖存者是右手食指
+
+在陰屍路章節時 遊戲出現了不下百個bug 請問當時以下哪位殺手成功倖存沒有bug?
+A.醫生
+B.淤神
+C.未知惡物
+D.以上皆非
+答 以上皆非 註釋:醫生電可以打斷翻窗 淤神會導致伺服器崩潰 未知惡物的幻影會不見 這個版本沒有殺手倖存ヽ(ﾟ∀。)ﾉ
+
+據說每張地圖裡面都會藏有一個黃金工具箱 請問米德威治小學的黃金工具箱在哪裡
+A.圖書室
+B.化學室
+C.中庭花園
+D.二樓廁所
+答 化學室 註釋:在終局的時候會從肉塊中慢慢長出來
+
+下列何者不能從殺手外觀來判斷殺手能力現況
+A.追跡者
+B.好孩子娃娃
+C.鬼臉
+D.鬼武者
+答 鬼臉 註釋:追跡者可以透過手臂來看出現在階級 恰吉把刀反拿代表隱身 鬼武者開大的時候會噴紅煙
+
+邁爾斯攜帶「死兔子」配件 技能攜帶「恐懼釋放」和「監控與打擊」 在跟蹤模式下追逐倖存者 請問此時恐懼範圍約為多少公尺
+A.0
+B.18
+C.24
+D.36
+答 0 註釋:跟蹤模式下隱身
+
+若是我今天想要到陰屍路的專屬地圖 我在燒祭品的情況下機率為多少
+A.0%
+B.2.33%
+C.6.86%
+D.17.49%
+答 6.86% 註釋:祭品成功的情況下進到該圖是5% 沒成功的情況下是1/43 乘上80%大約是1.86% 所以是6.86% 跟部分遊戲抽卡出金的機率差不多喔
+
+網站作者名?
+A.ceba
+B.oeba
+C.eba
+D.cade
+答 A
+
+下列哪隻殺手沒有搖籃曲
+A.怨靈
+B.雙胞胎
+C.騙術師
+D.女獵人
+答 怨靈 註釋:怨靈的只是風聲音效 不是搖籃曲
+
+下列哪隻殺手設定上最年輕
+A.怨靈
+B.異形
+C.妖婆
+D.維克多
+答 異形 註釋:怨靈18-20歲 妖婆17-18歲 維克多推測在6-7歲時掛掉 異形才剛出生不到幾個小時
+
+以下殺手哪位沒有特殊斬殺
+A.原初者
+B.貞子
+C.劊子手
+D.騎士
+答 騎士 註釋:貞子迷咒7層可以特殊斬殺 三角頭二掛+折磨狀態可以特殊斬殺 原初者二掛+標記四層可以特殊斬殺`;
+
+function parseCard39QuizRaw(raw) {
+  const blocks = String(raw || '')
+    .replace(/^\uFEFF/, '')
+    .split(/\n\s*\n+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  return blocks.map(block => {
+    let lines = block.split(/\n+/).map(s => s.trim()).filter(Boolean);
+    if (!lines.length) return null;
+
+    // 第一段題庫前面會有一個標題「題目」，不要把它當成真正題目
+    if (lines[0] === '題目') {
+      lines = lines.slice(1);
+    }
+    if (!lines.length) return null;
+
+    const question = lines[0];
+    const options = [];
+    let answer = '';
+    let note = '';
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^[A-D]\./.test(line)) {
+        options.push({
+          label: line.slice(0, 1),
+          text: line.slice(2).trim()
+        });
+        continue;
+      }
+      if (line.startsWith('答 ')) {
+        const rest = line.slice(2).trim();
+        const parts = rest.split(/\s+註釋:/);
+        answer = (parts[0] || '').trim();
+        note = (parts[1] || '').trim();
+      }
+    }
+
+    if (!question) return null;
+    return { question, options, answer, note };
+  }).filter(Boolean);
+}
+
+const CARD39_QUIZ_DATA = Array.isArray(window.CARD39_QUIZ_DATA) && window.CARD39_QUIZ_DATA.length
+  ? window.CARD39_QUIZ_DATA
+  : parseCard39QuizRaw(CARD39_QUIZ_RAW);
+
+function normalizeCard39AnswerToken(value) {
+  return String(value || '')
+    .trim()
+    .replace(/[．。]/g, '.')
+    .replace(/^([A-D])\.$/, '$1')
+    .replace(/\s+/g, '')
+    .toUpperCase();
+}
+
+
+  // ==========================
+  // 2.x 測試用：強制抽中卡片
+  // 可填入：2、'2'、'02'、'card02' 皆可
+  // 例：const FORCE_DRAW_CARD_IDS = [17];
+  // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
+  // ==========================
+  const FORCE_DRAW_CARD_IDS = [];
+
+  function normalizeForcedCardId(value) {
+    if (value == null) return null;
+    const raw = String(value).trim();
+    if (!raw) return null;
+    if (/^card\d+$/i.test(raw)) {
+      const digits = raw.replace(/^card/i, '');
+      return 'card' + digits.padStart(2, '0');
+    }
+    if (/^\d+$/.test(raw)) {
+      return 'card' + raw.padStart(2, '0');
+    }
+    return null;
+  }
+
+  function getForcedCards(extraExcludeIds) {
+    const exclude = new Set(extraExcludeIds || []);
+    const result = [];
+    const used = new Set();
+
+    (FORCE_DRAW_CARD_IDS || []).forEach((value) => {
+      const id = normalizeForcedCardId(value);
+      if (!id || used.has(id) || exclude.has(id)) return;
+      const found = CARDS.find(c => c.id === id);
+      if (!found) return;
+      used.add(id);
+      result.push(found);
+    });
+
+    return result.slice(0, 3);
+  }
+
+  function getGeneralPerkNames() {
+    return Object.entries(window.PERKS || {})
+      .filter(([_, p]) => p && p.killer === 'General')
+      .map(([name]) => name);
+  }
+
+  function pickDistinctRandom(arr, count) {
+    return shuffle(arr || []).slice(0, Math.max(0, count || 0));
+  }
+
+  function getFallbackScoreSequence(score, opts) {
+    const addOneFirst = !opts || opts.addOneFirst !== false;
+    const seq = [];
+    const push = (v) => {
+      if (typeof v !== 'number') return;
+      if (v < 0 || v > 5) return;
+      if (!seq.includes(v)) seq.push(v);
+    };
+
+    push(score);
+    if (addOneFirst) {
+      push(score + 1);
+      push(score - 1);
+    } else {
+      push(score - 1);
+      push(score + 1);
+    }
+    for (let delta = 2; delta <= 5; delta++) {
+      push(score + delta);
+      push(score - delta);
+    }
+    return seq;
+  }
+
+  function pickFromPoolPreferDistinct(pool, usedSet, allowDuplicateFallback) {
+    const used = usedSet || new Set();
+    let filtered = (pool || []).filter(name => !used.has(name));
+    if (!filtered.length && allowDuplicateFallback) {
+      filtered = (pool || []).slice();
+    }
+    if (!filtered.length) return null;
+    return getRandomItem(filtered);
+  }
+
+  function buildPerkSelectionForScores(targetScores, options) {
+    const opts = options || {};
+    const used = new Set(opts.initialUsed || []);
+    const result = [];
+
+    for (const score of targetScores) {
+      let chosen = null;
+      const sequence = typeof opts.scoreFallbackSequence === 'function'
+        ? opts.scoreFallbackSequence(score)
+        : [score];
+      for (const s of sequence) {
+        const pool = getPerkNamesByScores([s]);
+        chosen = pickFromPoolPreferDistinct(pool, used, !!opts.allowDuplicateFallback);
+        if (chosen) break;
+      }
+      if (!chosen) return null;
+      result.push(chosen);
+      used.add(chosen);
+    }
+    return result;
+  }
+
+  function buildAddonSelectionForScores(killerKey, targetScores, options) {
+    const opts = options || {};
+    const used = new Set(opts.initialUsed || []);
+    const result = [];
+
+    for (const score of targetScores) {
+      let chosen = null;
+      const sequence = typeof opts.scoreFallbackSequence === 'function'
+        ? opts.scoreFallbackSequence(score)
+        : [score];
+      for (const s of sequence) {
+        const pool = getAddonNamesByScoresForKiller(killerKey, [s]);
+        // 配件永遠禁止重複，因此這裡不接受 duplicate fallback
+        chosen = pickFromPoolPreferDistinct(pool, used, false);
+        if (chosen) break;
+      }
+      if (!chosen) return null;
+      result.push(chosen);
+      used.add(chosen);
+    }
+    return result;
+  }
+
+  function sanitizeAddonState(state) {
+    if (!state || !state.killerKey) return state;
+
+    const killerKey = state.killerKey;
+    const killerPool = getAddonNamesForKiller(killerKey);
+    const validSet = new Set(killerPool);
+    const original = Array.isArray(state.addons) ? state.addons.slice(0, 2) : [];
+    const result = [];
+    const used = new Set();
+
+    for (const name of original) {
+      if (!name) {
+        result.push(null);
+        continue;
+      }
+      if (!validSet.has(name) || used.has(name)) {
+        result.push(null);
+        continue;
+      }
+      result.push(name);
+      used.add(name);
+    }
+
+    while (result.length < 2) result.push(null);
+
+    for (let i = 0; i < 2; i++) {
+      if (result[i]) continue;
+      const pool = killerPool.filter(name => !used.has(name));
+      const chosen = getRandomItem(pool);
+      if (!chosen) break;
+      result[i] = chosen;
+      used.add(chosen);
+    }
+
+    state.addons = result.slice(0, 2).filter(Boolean);
+    return state;
+  }
+
+  function rerollPerkSlotByScore(slotIdx, scoreSequence, options) {
+    if (slotIdx < 0 || slotIdx > 3) return false;
+    const perks = currentState.perks.slice();
+    const other = perks.filter((_, i) => i !== slotIdx);
+    for (const score of scoreSequence) {
+      let pool = getPerkNamesByScores([score]).filter(name => !other.includes(name) && name !== perks[slotIdx]);
+      if (!pool.length && options && options.allowKeepSameName) {
+        pool = getPerkNamesByScores([score]).filter(name => !other.includes(name));
+      }
+      if (!pool.length && options && options.allowDuplicateFallback) {
+        pool = getPerkNamesByScores([score]).filter(name => name !== perks[slotIdx]);
+      }
+      if (!pool.length) continue;
+      const chosen = getRandomItem(pool);
+      if (!chosen) continue;
+      perks[slotIdx] = chosen;
+      currentState.perks = perks;
+      return true;
+    }
+    return false;
+  }
+
+  function rerollAddonSlotByScore(slotIdx, scoreSequence, options) {
+    if (slotIdx < 0 || slotIdx > 1) return false;
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+    const addons = currentState.addons.slice();
+    const other = addons.filter((_, i) => i !== slotIdx);
+    for (const score of scoreSequence) {
+      let pool = getAddonNamesByScoresForKiller(killerKey, [score]).filter(name => !other.includes(name) && name !== addons[slotIdx]);
+      if (!pool.length && options && options.allowKeepSameName) {
+        pool = getAddonNamesByScoresForKiller(killerKey, [score]).filter(name => !other.includes(name));
+      }
+      // 配件永遠禁止重複，因此這裡不做 duplicate fallback
+      if (!pool.length) continue;
+      const chosen = getRandomItem(pool);
+      if (!chosen) continue;
+      addons[slotIdx] = chosen;
+      currentState.addons = addons;
+      return true;
+    }
+    return false;
   }
 
   // ==========================
@@ -923,7 +1307,7 @@
 
     excludeIds = excludeIds || [];
 
-    // 特殊卡：目前支援 card1 / card28（總機率 5%）
+    // 特殊卡：目前支援 card1 / card28 / card30 / card33（總機率 5%）
     const specialIds = ['card1', 'card28', 'card30', 'card33'];
     const specials = CARDS.filter(c => specialIds.includes(c.id));
     const normals = CARDS.filter(c => !specialIds.includes(c.id));
@@ -944,6 +1328,15 @@
   function pickThreeCards(extraExcludeIds) {
     const chosen = [];
     const exclude = new Set(extraExcludeIds || []);
+
+    const forced = getForcedCards(Array.from(exclude));
+    forced.forEach((card) => {
+      if (!exclude.has(card.id) && chosen.length < 3) {
+        exclude.add(card.id);
+        chosen.push(card);
+      }
+    });
+
     let safety = 0;
     while (chosen.length < 3 && safety < 100) {
       safety++;
@@ -1090,6 +1483,389 @@
     panel.appendChild(actions);
     overlay.appendChild(panel);
     document.body.appendChild(overlay);
+  }
+
+
+function showCard17ScoreChoiceOverlay(options) {
+  const overlay = document.createElement('div');
+  overlay.id = 'cardBinaryChoiceOverlay';
+
+  const panel = document.createElement('div');
+  panel.className = 'card-binary-panel';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'card-binary-title';
+  titleEl.textContent = options.title || '選擇一個分數';
+
+  panel.appendChild(titleEl);
+
+  const ruleLines = Array.isArray(options.ruleLines) ? options.ruleLines.filter(Boolean) : [];
+  if (ruleLines.length) {
+    const rules = document.createElement('div');
+    rules.className = 'card17-choice-rules';
+    rules.style.margin = '10px 0 14px';
+    rules.style.padding = '10px 12px';
+    rules.style.borderRadius = '10px';
+    rules.style.background = 'rgba(255,255,255,0.05)';
+    rules.style.border = '1px solid rgba(255,255,255,0.08)';
+    rules.style.textAlign = 'left';
+    rules.style.lineHeight = '1.65';
+
+    ruleLines.forEach((line, idx) => {
+      const row = document.createElement('div');
+      row.className = 'card17-choice-rule-line';
+      row.textContent = line;
+      row.style.fontSize = '13px';
+      row.style.color = idx === 0 ? '#7CFFB2' : (idx === 1 ? '#FF8E8E' : '#FFD36E');
+      rules.appendChild(row);
+    });
+
+    panel.appendChild(rules);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'card-binary-actions';
+  actions.style.gridTemplateColumns = 'repeat(6, 1fr)';
+
+  (options.values || []).forEach((value) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card-binary-btn';
+    btn.style.textAlign = 'center';
+
+    const label = document.createElement('div');
+    label.className = 'card-binary-label';
+    label.textContent = String(value);
+    label.style.fontSize = '26px';
+    label.style.textAlign = 'center';
+
+    btn.appendChild(label);
+    btn.addEventListener('click', () => {
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      if (typeof options.onPick === 'function') options.onPick(value);
+    });
+    actions.appendChild(btn);
+  });
+
+  panel.appendChild(actions);
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+}
+
+  function showInfoPopup(title, body, onClose) {
+    const overlay = document.createElement('div');
+    overlay.id = 'cardInvalidOverlay';
+
+    const panel = document.createElement('div');
+    panel.className = 'card-invalid-panel';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'card-invalid-title';
+    titleEl.textContent = title || '提示';
+
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'card-invalid-body';
+    bodyEl.textContent = body || '';
+
+    const btn = document.createElement('div');
+    btn.className = 'card-invalid-btn';
+    btn.textContent = '確認';
+    btn.addEventListener('click', () => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onClose === 'function') onClose();
+    });
+
+    panel.appendChild(titleEl);
+    panel.appendChild(bodyEl);
+    panel.appendChild(btn);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+  }
+
+
+  let card17AnimStyleInjected = false;
+  function ensureCard17AnimStyles() {
+    if (card17AnimStyleInjected) return;
+    card17AnimStyleInjected = true;
+
+    const style = document.createElement('style');
+    style.id = 'card17-duel-styles';
+    style.textContent = `
+      #card17DuelOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 21000;
+        background: radial-gradient(circle at top, rgba(43, 58, 112, 0.45), rgba(0, 0, 0, 0.90) 62%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .card17-duel-panel {
+        width: min(760px, calc(100vw - 28px));
+        border-radius: 24px;
+        padding: 22px 22px 18px;
+        background: linear-gradient(180deg, rgba(8, 11, 20, 0.96), rgba(14, 18, 34, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        color: #f3f6ff;
+      }
+      .card17-duel-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        margin-bottom: 10px;
+      }
+      .card17-duel-sub {
+        text-align: center;
+        font-size: 13px;
+        color: rgba(225, 232, 255, 0.72);
+        margin-bottom: 18px;
+      }
+      .card17-duel-vs {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+      }
+      .card17-duel-side {
+        border-radius: 20px;
+        padding: 18px 14px;
+        min-height: 220px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .card17-duel-side::before {
+        content: '';
+        position: absolute;
+        inset: -30% auto auto -20%;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%);
+        pointer-events: none;
+      }
+      .card17-duel-label {
+        font-size: 13px;
+        color: rgba(225, 232, 255, 0.72);
+        margin-bottom: 10px;
+        letter-spacing: 0.14em;
+      }
+      .card17-duel-score {
+        width: 116px;
+        height: 116px;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        font-weight: 900;
+        background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: inset 0 0 22px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.35);
+        text-shadow: 0 0 20px rgba(255,255,255,0.18);
+        transform: scale(1);
+      }
+      .card17-duel-score.rolling {
+        animation: card17ScoreRoll 0.18s linear infinite;
+      }
+      .card17-duel-score.locked {
+        animation: card17ScoreLock 0.35s ease-out;
+      }
+      .card17-duel-score.win {
+        box-shadow: inset 0 0 26px rgba(255,255,255,0.08), 0 0 36px rgba(115, 255, 176, 0.42);
+      }
+      .card17-duel-score.lose {
+        box-shadow: inset 0 0 26px rgba(255,255,255,0.06), 0 0 36px rgba(255, 100, 126, 0.34);
+      }
+      .card17-duel-mid {
+        font-size: 36px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.92);
+        text-shadow: 0 0 18px rgba(255,255,255,0.22);
+      }
+      .card17-duel-status {
+        margin-top: 18px;
+        min-height: 56px;
+        border-radius: 16px;
+        padding: 14px 16px;
+        text-align: center;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #f3f6ff;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+      .card17-duel-status.result-win {
+        background: rgba(62, 161, 103, 0.14);
+        border-color: rgba(115,255,176,0.26);
+      }
+      .card17-duel-status.result-lose {
+        background: rgba(181, 59, 96, 0.16);
+        border-color: rgba(255,115,151,0.24);
+      }
+      .card17-duel-status.result-draw {
+        background: rgba(91, 118, 201, 0.16);
+        border-color: rgba(122,167,255,0.22);
+      }
+      .card17-duel-hint {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(225, 232, 255, 0.55);
+      }
+      #card17DuelOverlay.ready {
+        cursor: pointer;
+      }
+      #card17DuelOverlay.ready .card17-duel-panel {
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58), 0 0 0 1px rgba(140, 190, 255, 0.10), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+      @keyframes card17ScoreRoll {
+        0% { transform: translateY(0) scale(1); filter: brightness(0.96); }
+        50% { transform: translateY(-2px) scale(1.04); filter: brightness(1.08); }
+        100% { transform: translateY(0) scale(1); filter: brightness(0.96); }
+      }
+      @keyframes card17ScoreLock {
+        0% { transform: scale(1.14); }
+        100% { transform: scale(1); }
+      }
+      @media (max-width: 640px) {
+        .card17-duel-vs { grid-template-columns: 1fr; }
+        .card17-duel-mid { display: none; }
+        .card17-duel-side { min-height: 170px; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function showCard17DuelAnimation(playerScore, dealerScore, result, onDone) {
+    ensureCard17AnimStyles();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'card17DuelOverlay';
+
+    const panel = document.createElement('div');
+    panel.className = 'card17-duel-panel';
+
+    const title = document.createElement('div');
+    title.className = 'card17-duel-title';
+    title.textContent = '狂賭之冤';
+
+    const sub = document.createElement('div');
+    sub.className = 'card17-duel-sub';
+    sub.textContent = '分數對決中……';
+
+    const vs = document.createElement('div');
+    vs.className = 'card17-duel-vs';
+
+    function makeSide(labelText) {
+      const side = document.createElement('div');
+      side.className = 'card17-duel-side';
+      const label = document.createElement('div');
+      label.className = 'card17-duel-label';
+      label.textContent = labelText;
+      const score = document.createElement('div');
+      score.className = 'card17-duel-score rolling';
+      score.textContent = '?';
+      side.appendChild(label);
+      side.appendChild(score);
+      return { side, score };
+    }
+
+    const player = makeSide('玩家');
+    const dealer = makeSide('莊家');
+    const mid = document.createElement('div');
+    mid.className = 'card17-duel-mid';
+    mid.textContent = 'VS';
+
+    vs.appendChild(player.side);
+    vs.appendChild(mid);
+    vs.appendChild(dealer.side);
+
+    const status = document.createElement('div');
+    status.className = 'card17-duel-status';
+    status.textContent = '莊家正在擲骰……';
+
+    const hint = document.createElement('div');
+    hint.className = 'card17-duel-hint';
+    hint.textContent = '結果揭曉中……';
+
+    panel.appendChild(title);
+    panel.appendChild(sub);
+    panel.appendChild(vs);
+    panel.appendChild(status);
+    panel.appendChild(hint);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    const handles = [];
+    let canClose = false;
+    const close = () => {
+      handles.forEach(id => {
+        clearInterval(id);
+        clearTimeout(id);
+      });
+      overlay.removeEventListener('click', onOverlayClick, true);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onDone === 'function') onDone();
+    };
+
+    function onOverlayClick(e) {
+      if (!canClose) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      close();
+    }
+
+    overlay.addEventListener('click', onOverlayClick, true);
+
+    const playerRoll = setInterval(() => {
+      player.score.textContent = String(Math.floor(Math.random() * 6));
+    }, 80);
+    const dealerRoll = setInterval(() => {
+      dealer.score.textContent = String(Math.floor(Math.random() * 7));
+    }, 80);
+    handles.push(playerRoll, dealerRoll);
+
+    handles.push(setTimeout(() => {
+      clearInterval(playerRoll);
+      player.score.classList.remove('rolling');
+      player.score.classList.add('locked');
+      player.score.textContent = String(playerScore);
+      status.textContent = '你的分數已鎖定，等待莊家……';
+    }, 650));
+
+    handles.push(setTimeout(() => {
+      clearInterval(dealerRoll);
+      dealer.score.classList.remove('rolling');
+      dealer.score.classList.add('locked');
+      dealer.score.textContent = String(dealerScore);
+
+      let resultText = '平手';
+      if (result === 'win') resultText = '你贏了';
+      else if (result === 'lose') resultText = '你輸了';
+
+      status.classList.add(result === 'win' ? 'result-win' : (result === 'lose' ? 'result-lose' : 'result-draw'));
+      status.textContent = `${resultText}！ 玩家 ${playerScore} ： 莊家 ${dealerScore}`;
+      sub.textContent = result === 'win'
+        ? '莊家比較大，依規則你獲勝。'
+        : (result === 'lose' ? '莊家比較小，依規則你失敗。' : '雙方相同，依規則平手。');
+
+      player.score.classList.add(result === 'lose' ? 'lose' : 'win');
+      dealer.score.classList.add(result === 'win' ? 'win' : (result === 'lose' ? 'lose' : 'win'));
+
+      canClose = true;
+      overlay.classList.add('ready');
+      hint.textContent = '點擊任意位置進入結算';
+    }, 1350));
   }
 
 
@@ -1259,7 +2035,7 @@
     ensureStyles();
     ensureCardContainer();
 
-    currentState = cloneState(state || {});
+    currentState = sanitizeAddonState(cloneState(state || {}));
     applyCallback = options && typeof options.onApplied === 'function'
       ? options.onApplied
       : null;
@@ -1387,9 +2163,24 @@
       case 'replace_skill_general':
         ok = doReplaceSkillGeneral(slotIndex);
         break;
+      case 'replace_skill_general_choice':
+        doReplaceSkillGeneralChoice(slotIndex, (card.effect.data && card.effect.data.choices) || 5);
+        return;
       case 'replace_addons_by_color':
         ok = doReplaceAddonsByColor(card.effect.data && card.effect.data.colors);
         break;
+      case 'card03_addons_sum_7':
+        ok = doCard03AddonsSum7();
+        break;
+      case 'card04_reroll_perks_not_lower_than_slot':
+        ok = doCard04RerollPerksNotLowerThanSlot(slotIndex);
+        break;
+      case 'card05_reroll_three_with_fixed_high_slot':
+        ok = doCard05RerollThreeWithFixedHighSlot(slotIndex);
+        break;
+      case 'card06_double_choice_random_perk_slot':
+        doCard06DoubleChoiceRandomPerkSlot(card);
+        return;
       case 'upgrade_addons_color':
         ok = doUpgradeAddonsColor(slotIndex, 1, 0);
         break;
@@ -1437,8 +2228,27 @@
       case 'card37_restart_slot':
         ok = doCard37RestartSlot(card);
         break;
+      case 'card38_speed_choice':
+        ok = doCard38SpeedChoice(slotIndex);
+        if (ok) return;
+        break;
+      case 'card39_quiz':
+        doCard39Quiz();
+        return;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
+        break;
+      case 'card17_score_duel_minigame':
+        doCard17ScoreDuelMinigame(card);
+        return;
+      case 'card18_average_addons':
+        ok = doCard18AverageAddons();
+        break;
+      case 'card20_equalize_all_scores':
+        ok = doCard20EqualizeAllScores();
+        break;
+      case 'card16_all_slots_plus_one_wrap':
+        ok = doCard16AllSlotsPlusOneWrap();
         break;
       case 'card19_zero_and_plus_one':
         ok = doCard19ZeroAndPlusOne(slotIndex);
@@ -2266,6 +3076,7 @@
     return true;
   }
 
+
   function doReplaceSkillGeneral(slotIndex) {
     const isPerk = slotIndex >= 3 && slotIndex <= 6;
     if (!isPerk) return false;
@@ -2274,10 +3085,7 @@
     const perks = currentState.perks.slice();
     const currentName = perks[idx];
     const other = perks.filter((_, i) => i !== idx);
-
-    const poolAll = Object.entries(window.PERKS || {})
-      .filter(([name, p]) => p && p.killer === 'General')
-      .map(([name]) => name);
+    const poolAll = getGeneralPerkNames();
 
     if (!poolAll.length) return false;
 
@@ -2289,6 +3097,811 @@
     perks[idx] = chosen;
     currentState.perks = perks;
     return true;
+  }
+
+  function doReplaceSkillGeneralChoice(slotIndex, choiceCount) {
+    const isPerk = slotIndex >= 3 && slotIndex <= 6;
+    if (!isPerk) return;
+    const idx = slotIndex - 3;
+
+    const perks = currentState.perks.slice();
+    const currentName = perks[idx];
+    const other = perks.filter((_, i) => i !== idx);
+    let pool = getGeneralPerkNames().filter(n => !other.includes(n) && n !== currentName);
+    if (!pool.length) pool = getGeneralPerkNames().filter(n => n !== currentName);
+    if (!pool.length) return;
+
+    const candidates = shuffle(pool).slice(0, Math.min(choiceCount || 5, pool.length));
+    if (!candidates.length) return;
+    if (candidates.length === 1) {
+      perks[idx] = candidates[0];
+      currentState.perks = perks;
+      finishCardPhase();
+      return;
+    }
+
+    showChoiceOverlay({
+      type: 'perk',
+      candidates,
+      title: '選擇要替換成哪個通用技能：',
+      onPick: (name) => {
+        const next = currentState.perks.slice();
+        next[idx] = name;
+        currentState.perks = next;
+        finishCardPhase();
+      }
+    });
+  }
+
+  function doCard03AddonsSum7() {
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+    const addonNames = getAddonNamesForKiller(killerKey);
+    if (addonNames.length < 2) return false;
+
+    const pairs = [];
+    for (let i = 0; i < addonNames.length; i++) {
+      for (let j = i + 1; j < addonNames.length; j++) {
+        const a = addonNames[i];
+        const b = addonNames[j];
+        const sa = getAddonScore(a);
+        const sb = getAddonScore(b);
+        if (typeof sa !== 'number' || typeof sb !== 'number') continue;
+        if (sa + sb === 7) pairs.push([a, b]);
+      }
+    }
+    if (!pairs.length) return false;
+
+    const picked = getRandomItem(pairs);
+    if (!picked) return false;
+    currentState.addons = picked.slice();
+    return true;
+  }
+
+  function doCard04RerollPerksNotLowerThanSlot(slotIndex) {
+    if (slotIndex < 3 || slotIndex > 6) return false;
+    const sourceIdx = slotIndex - 3;
+    const sourceName = currentState.perks[sourceIdx];
+    const minScore = getPerkScore(sourceName);
+    if (typeof minScore !== 'number') return false;
+
+    const pool = Object.entries(window.PERKS || {})
+      .filter(([_, p]) => p && typeof p.score === 'number' && p.score >= minScore)
+      .map(([name]) => name);
+    if (pool.length < 4) return false;
+
+    const chosen = [];
+    for (const name of shuffle(pool)) {
+      if (!chosen.includes(name)) chosen.push(name);
+      if (chosen.length === 4) break;
+    }
+    if (chosen.length !== 4) return false;
+
+    currentState.perks = chosen;
+    return true;
+  }
+
+  function doCard05RerollThreeWithFixedHighSlot(slotIndex) {
+    if (slotIndex < 3 || slotIndex > 6) return false;
+    const fixedIdx = slotIndex - 3;
+    const original = currentState.perks.slice();
+    if (original.length < 4) return false;
+
+    const otherIndices = [0, 1, 2, 3].filter(i => i !== fixedIdx);
+    const randomOther = pickDistinctRandom(otherIndices, 2);
+    const targetIndices = [fixedIdx].concat(randomOther);
+
+    const next = original.slice();
+    const used = new Set(original.filter((_, i) => !targetIndices.includes(i)));
+
+    let fixedPool = getPerkNamesByScores([4, 5]).filter(name => !used.has(name) && name !== original[fixedIdx]);
+    if (!fixedPool.length) fixedPool = getPerkNamesByScores([4, 5]).filter(name => !used.has(name));
+    const fixedPick = getRandomItem(fixedPool);
+    if (!fixedPick) return false;
+    next[fixedIdx] = fixedPick;
+    used.add(fixedPick);
+
+    for (const idx of randomOther) {
+      let pool = getAllPerksExcept(next.filter((_, i) => i !== idx)).filter(name => !used.has(name));
+      if (!pool.length) pool = getAllPerksExcept(next.filter((_, i) => i !== idx));
+      const pick = getRandomItem(pool);
+      if (!pick) return false;
+      next[idx] = pick;
+      used.add(pick);
+    }
+
+    currentState.perks = next;
+    return true;
+  }
+
+  function doCard06DoubleChoiceRandomPerkSlot(card) {
+    const data = (card && card.effect && card.effect.data) ? card.effect.data : {};
+    const rounds = Math.max(1, Math.min(4, data.rounds || 2));
+    const choiceCount = Math.max(1, Math.min(5, data.choices || 5));
+    const scores = Array.isArray(data.scores) && data.scores.length ? data.scores : [3, 4, 5];
+    const availableSlots = shuffle([0, 1, 2, 3]).slice(0, Math.min(rounds, 4));
+
+    const step = (roundIndex) => {
+      if (roundIndex >= availableSlots.length) {
+        finishCardPhase();
+        return;
+      }
+
+      const slotIdx = availableSlots[roundIndex];
+      const currentPerks = currentState.perks.slice();
+      const currentName = currentPerks[slotIdx];
+      const other = currentPerks.filter((_, i) => i !== slotIdx);
+      let pool = getPerkNamesByScores(scores).filter(name => !other.includes(name) && name !== currentName);
+      if (!pool.length) pool = getPerkNamesByScores(scores).filter(name => name !== currentName);
+      if (!pool.length) {
+        step(roundIndex + 1);
+        return;
+      }
+
+      const candidates = shuffle(pool).slice(0, Math.min(choiceCount, pool.length));
+      const applyPick = (name) => {
+        const perks = currentState.perks.slice();
+        perks[slotIdx] = name;
+        currentState.perks = perks;
+        step(roundIndex + 1);
+      };
+
+      if (candidates.length === 1) {
+        applyPick(candidates[0]);
+        return;
+      }
+
+      showChoiceOverlay({
+        type: 'perk',
+        candidates,
+        title: `第 ${roundIndex + 1} 次選擇：技能會隨機替換到第 ${slotIdx + 1} 個技能欄位`,
+        onPick: applyPick
+      });
+    };
+
+    step(0);
+  }
+
+  function doCard16AllSlotsPlusOneWrap() {
+    if (!currentState) return false;
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+
+    const addonScores = currentState.addons.map(name => {
+      const s = getAddonScore(name);
+      return typeof s === 'number' ? ((s + 1) % 6) : null;
+    });
+    const perkScores = currentState.perks.map(name => {
+      const s = getPerkScore(name);
+      return typeof s === 'number' ? ((s + 1) % 6) : null;
+    });
+    if (addonScores.some(s => s == null) || perkScores.some(s => s == null)) return false;
+
+    const newAddons = buildAddonSelectionForScores(killerKey, addonScores, {
+      allowDuplicateFallback: false,
+      scoreFallbackSequence: (score) => [score]
+    });
+    const newPerks = buildPerkSelectionForScores(perkScores, {
+      allowDuplicateFallback: false,
+      scoreFallbackSequence: (score) => [score]
+    });
+    if (!newAddons || !newPerks) return false;
+
+    currentState.addons = newAddons;
+    currentState.perks = newPerks;
+    return true;
+  }
+
+  function applyScoreToAllNonKillerSlots(score, options) {
+    const killerKey = currentState.killerKey;
+    if (!killerKey) return false;
+    const opts = options || {};
+
+    const addonScore = getFallbackScoreSequence(score, { addOneFirst: opts.addOneFirst !== false })
+      .find(s => getAddonNamesByScoresForKiller(killerKey, [s]).length > 0);
+    const perkScore = getFallbackScoreSequence(score, { addOneFirst: opts.addOneFirst !== false })
+      .find(s => getPerkNamesByScores([s]).length > 0);
+    if (addonScore == null || perkScore == null) return false;
+
+    const newAddons = buildAddonSelectionForScores(killerKey, [addonScore, addonScore], {
+      allowDuplicateFallback: false,
+      scoreFallbackSequence: (s) => [s]
+    });
+    const newPerks = buildPerkSelectionForScores([perkScore, perkScore, perkScore, perkScore], {
+      allowDuplicateFallback: false,
+      scoreFallbackSequence: (s) => [s]
+    });
+    if (!newAddons || !newPerks) return false;
+
+    currentState.addons = newAddons;
+    currentState.perks = newPerks;
+    return true;
+  }
+
+function applyScoreToRandomNonKillerSlots(score, count, options) {
+  if (!currentState || !currentState.killerKey) return false;
+  const opts = options || {};
+  const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
+  let applied = 0;
+
+  for (const slot of slotOrder) {
+    let ok = false;
+    if (slot === 1 || slot === 2) {
+      ok = rerollAddonSlotByScore(slot - 1, getFallbackScoreSequence(score, {
+        addOneFirst: opts.addOneFirst !== false
+      }), {
+        allowDuplicateFallback: false,
+        allowKeepSameName: true
+      });
+    } else {
+      ok = rerollPerkSlotByScore(slot - 3, getFallbackScoreSequence(score, {
+        addOneFirst: opts.addOneFirst !== false
+      }), {
+        allowDuplicateFallback: true,
+        allowKeepSameName: true
+      });
+    }
+
+    if (ok) {
+      applied += 1;
+      if (applied >= count) return true;
+    }
+  }
+
+  return applied > 0;
+}
+
+function applyCard17WinReward(score) {
+  if (!currentState || !currentState.killerKey) return false;
+
+  const addonSequence = [];
+  if (typeof score === 'number' && score >= 0 && score <= 5) addonSequence.push(score);
+  if (!addonSequence.includes(1)) addonSequence.push(1);
+  if (!addonSequence.includes(2)) addonSequence.push(2);
+  for (const s of getFallbackScoreSequence(score, { addOneFirst: true })) {
+    if (!addonSequence.includes(s)) addonSequence.push(s);
+  }
+
+  const perkSequence = getFallbackScoreSequence(score, { addOneFirst: true });
+
+  let applied = 0;
+
+  for (let i = 0; i < 2; i++) {
+    const ok = rerollAddonSlotByScore(i, addonSequence, {
+      allowDuplicateFallback: false,
+      allowKeepSameName: true
+    });
+    if (!ok) return false;
+    applied += 1;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const ok = rerollPerkSlotByScore(i, perkSequence, {
+      allowDuplicateFallback: true,
+      allowKeepSameName: true
+    });
+    if (!ok) return false;
+    applied += 1;
+  }
+
+  return applied === 6;
+}
+
+function clampCard39Score(isAddon, score) {
+  if (typeof score !== 'number') return isAddon ? 1 : 0;
+  if (isAddon) return Math.max(1, Math.min(5, score));
+  return Math.max(0, Math.min(5, score));
+}
+
+function getCard39SlotMeta(slotIndex) {
+  if (slotIndex === 1 || slotIndex === 2) {
+    const addonIdx = slotIndex - 1;
+    const addonName = currentState && currentState.addons ? currentState.addons[addonIdx] : null;
+    return {
+      slotIndex,
+      isAddon: true,
+      label: `配件 ${addonIdx + 1}`,
+      name: addonName,
+      zh: addonName ? (getAddonZh(addonName) || addonName) : '未知配件',
+      score: addonName ? getAddonScore(addonName) : null
+    };
+  }
+  if (slotIndex >= 3 && slotIndex <= 6) {
+    const perkIdx = slotIndex - 3;
+    const perkName = currentState && currentState.perks ? currentState.perks[perkIdx] : null;
+    return {
+      slotIndex,
+      isAddon: false,
+      label: `技能 ${perkIdx + 1}`,
+      name: perkName,
+      zh: perkName ? (getPerkZh(perkName) || perkName) : '未知技能',
+      score: perkName ? getPerkScore(perkName) : null
+    };
+  }
+  return null;
+}
+
+function applyCard39DeltaToSlot(slotIndex, delta) {
+  const meta = getCard39SlotMeta(slotIndex);
+  if (!meta || typeof meta.score !== 'number') return false;
+
+  const targetScore = clampCard39Score(meta.isAddon, meta.score + delta);
+
+  if (meta.isAddon) {
+    let scoreSequence = [targetScore];
+
+    // 39 號卡的簡單保護：
+    // 若配件扣到 1 分，但該殺手沒有 1 分配件，就直接改試 2 分
+    if (targetScore === 1) {
+      const hasScore1 = getAddonNamesByScoresForKiller(currentState && currentState.killerKey, [1]).length > 0;
+      if (!hasScore1) scoreSequence = [2];
+    }
+
+    return rerollAddonSlotByScore(slotIndex - 1, scoreSequence, {
+      allowDuplicateFallback: false,
+      allowKeepSameName: true
+    });
+  }
+
+  return rerollPerkSlotByScore(slotIndex - 3, [targetScore], {
+    allowDuplicateFallback: true,
+    allowKeepSameName: true
+  });
+}
+
+function showCard39SlotPicker(onDone) {
+  const slots = [1, 2, 3, 4, 5, 6].map(getCard39SlotMeta).filter(Boolean);
+  const selected = [];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'card39SlotPickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:100004;';
+
+  const panel = document.createElement('div');
+  panel.style.cssText = 'width:min(720px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+
+  const title = document.createElement('div');
+  title.textContent = '選擇兩個欄位';
+  title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
+
+  const sub = document.createElement('div');
+  sub.textContent = '請選兩個非殺手欄位，之後會進入快問快答。';
+  sub.style.cssText = 'font-size:13px;color:#bfc7da;margin-bottom:14px;';
+
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;';
+
+  slots.forEach((meta) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:92px;';
+    btn.innerHTML = `<div style="font-weight:800;margin-bottom:4px;">${meta.label}</div><div style="font-size:13px;color:#d7deef;line-height:1.4;">${meta.zh}</div><div style="font-size:12px;color:#8fa2ca;margin-top:8px;">目前分數：${typeof meta.score === 'number' ? meta.score : '?'}</div>`;
+
+    btn.addEventListener('click', () => {
+      if (selected.includes(meta.slotIndex)) return;
+      selected.push(meta.slotIndex);
+      btn.style.borderColor = '#ffd36e';
+      btn.style.boxShadow = '0 0 0 1px rgba(255,211,110,0.55)';
+      btn.style.background = '#2b3344';
+
+      if (selected.length >= 2) {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        if (typeof onDone === 'function') onDone(selected.slice(0, 2));
+      }
+    });
+
+    grid.appendChild(btn);
+  });
+
+  panel.appendChild(title);
+  panel.appendChild(sub);
+  panel.appendChild(grid);
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+}
+
+function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
+  const q = questionData || {};
+  const limitMs = typeof timeoutMs === 'number' ? timeoutMs : 5000;
+  let done = false;
+  let remain = Math.ceil(limitMs / 1000);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'card39QuizOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100004;';
+
+  const panel = document.createElement('div');
+  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(90deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+
+  const title = document.createElement('div');
+  title.textContent = '快問快答';
+  title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
+
+  const timerEl = document.createElement('div');
+  timerEl.textContent = `剩餘時間：${remain} 秒`;
+  timerEl.style.cssText = 'font-size:13px;color:#ffd36e;margin-bottom:8px;';
+
+  const barWrap = document.createElement('div');
+  barWrap.style.cssText = 'width:100%;height:10px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin:0 0 14px 0;border:1px solid rgba(255,255,255,0.06);';
+
+  const bar = document.createElement('div');
+  bar.style.cssText = 'height:100%;width:100%;background:linear-gradient(90deg,#6effa2,#ffd36e);transition:width 0.08s linear;';
+  barWrap.appendChild(bar);
+
+  const questionEl = document.createElement('div');
+  questionEl.textContent = q.question || '題目讀取失敗';
+  questionEl.style.cssText = 'font-size:16px;font-weight:700;line-height:1.6;color:#fff;margin-bottom:14px;white-space:pre-wrap;';
+
+  const actions = document.createElement('div');
+  actions.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;';
+
+  const startAt = Date.now();
+
+  function finish(payload) {
+    if (done) return;
+    done = true;
+    clearInterval(intervalId);
+    clearInterval(progressTimerId);
+    clearTimeout(timeoutId);
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (typeof onAnswer === 'function') onAnswer(payload);
+  }
+
+  const choices = Array.isArray(q.options) && q.options.length
+    ? q.options.map(opt => ({
+        value: opt.label,
+        label: `${opt.label}. ${opt.text}`,
+        raw: opt
+      }))
+    : [
+        { value: '是', label: '是' },
+        { value: '否', label: '否' }
+      ];
+
+  choices.forEach((choice) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;font-size:14px;line-height:1.5;';
+    btn.textContent = choice.label;
+    btn.addEventListener('click', () => {
+      const normalizedUser = normalizeCard39AnswerToken(choice.value);
+      const normalizedAnswer = normalizeCard39AnswerToken(q.answer);
+      const correctByLabel = normalizedUser === normalizedAnswer;
+      const correctByText = choice.raw && normalizeCard39AnswerToken(choice.raw.text) === normalizedAnswer;
+      finish({
+        correct: !!(correctByLabel || correctByText),
+        timedOut: false,
+        question: q
+      });
+    });
+    actions.appendChild(btn);
+  });
+
+  const timeoutId = setTimeout(() => {
+    finish({ correct: false, timedOut: true, question: q });
+  }, limitMs);
+
+  const intervalId = setInterval(() => {
+    remain -= 1;
+    if (remain < 0) remain = 0;
+    timerEl.textContent = `剩餘時間：${remain} 秒`;
+  }, 1000);
+
+  const progressTimerId = setInterval(() => {
+    const elapsed = Date.now() - startAt;
+    const ratio = Math.max(0, 1 - (elapsed / limitMs));
+    bar.style.width = `${ratio * 100}%`;
+    if (ratio <= 0) clearInterval(progressTimerId);
+  }, 50);
+
+  panel.appendChild(title);
+  panel.appendChild(timerEl);
+  panel.appendChild(barWrap);
+  panel.appendChild(questionEl);
+  panel.appendChild(actions);
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+}
+
+function doCard39Quiz() {
+  if (!currentState) return;
+
+  showCard39SlotPicker((selectedSlots) => {
+    const question = getRandomItem(CARD39_QUIZ_DATA);
+    if (!question) {
+      showInfoPopup('快問快答', '題庫是空的。', () => finishCardPhase());
+      return;
+    }
+
+    showCard39QuizOverlay(question, (result) => {
+      const delta = result && result.correct ? 2 : -1;
+      const changed = selectedSlots.map((slotIndex) => ({
+        meta: getCard39SlotMeta(slotIndex),
+        ok: applyCard39DeltaToSlot(slotIndex, delta)
+      }));
+
+      const title = result && result.correct ? '答對了' : (result && result.timedOut ? '超時了' : '答錯了');
+      const lines = [
+        question.question
+      ];
+
+      lines.push(`正解：${question.answer}`);
+      if (question.note) lines.push(`註釋：${question.note}`);
+
+      const changedSummary = changed.map(({ meta, ok }) => {
+        const changeText = delta > 0 ? '+2' : '-1';
+        return `${meta ? meta.label : '欄位'}：${changeText}${ok ? '' : '（無法套用）'}`;
+      });
+      lines.push(changedSummary.join(' / '));
+
+      showInfoPopup(title, lines.join('\n'), () => finishCardPhase());
+    }, 5000);
+  });
+}
+
+function doCard38SpeedChoice(slotIndex) {
+  const isPerk = slotIndex >= 3 && slotIndex <= 6;
+  if (!isPerk || !currentState || !Array.isArray(currentState.perks)) return false;
+
+  const preferredPerkIdx = slotIndex - 3;
+  const allPerkIdxs = [0, 1, 2, 3];
+  const roundOrder = [preferredPerkIdx].concat(allPerkIdxs.filter(i => i !== preferredPerkIdx));
+
+  function autoFillRemainingLowScore(startRoundIdx) {
+    for (let i = startRoundIdx; i < roundOrder.length; i++) {
+      const perkIdx = roundOrder[i];
+      rerollPerkSlotByScore(perkIdx, [0, 1, 2], {
+        allowDuplicateFallback: false,
+        allowKeepSameName: true
+      });
+    }
+  }
+
+  function showTimeoutWarningAndFinish(startRoundIdx) {
+    const warn = document.createElement('div');
+    warn.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:100005;';
+    warn.innerHTML = `
+      <div style="text-align:center;padding:24px 28px;border-radius:18px;background:rgba(20,24,35,0.96);border:1px solid rgba(255,255,255,0.08);box-shadow:0 24px 60px rgba(0,0,0,0.55);">
+        <div style="color:#ff3b3b;font-size:52px;font-weight:900;letter-spacing:0.08em;line-height:1.1;">已超時</div>
+        <div style="margin-top:10px;color:#cfd6ea;font-size:14px;">按一下後，剩下未選的技能會由系統自動改成 0–2 分技能。</div>
+      </div>
+    `;
+    warn.addEventListener('click', () => {
+      if (warn.parentNode) warn.parentNode.removeChild(warn);
+      autoFillRemainingLowScore(startRoundIdx);
+      finishCardPhase();
+    }, { once: true });
+    document.body.appendChild(warn);
+  }
+
+  function runRound(roundIdx) {
+    if (roundIdx >= roundOrder.length) {
+      finishCardPhase();
+      return;
+    }
+
+    const perkIdx = roundOrder[roundIdx];
+    const currentName = currentState.perks[perkIdx] || null;
+    const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
+
+    const highPoolBase = getPerkNamesByScores([3, 4, 5]).filter(name =>
+      name !== currentName && !lockedPerks.includes(name)
+    );
+    const lowPoolBase = getPerkNamesByScores([0, 1, 2]).filter(name =>
+      name !== currentName && !lockedPerks.includes(name)
+    );
+
+    let currentChoices = pickDistinctRandom(highPoolBase, 4);
+    if (!currentChoices.length) {
+      runRound(roundIdx + 1);
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'card38SpeedChoiceOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100003;';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'width:min(920px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+
+    const title = document.createElement('div');
+    title.textContent = `第 ${roundIdx + 1} / 4 輪：3 秒內選 1 個技能`;
+    title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
+
+    const timerEl = document.createElement('div');
+    timerEl.style.cssText = 'font-size:13px;color:#ffd36e;margin-bottom:8px;';
+    timerEl.textContent = '剩餘時間：3 秒';
+
+    const barWrap = document.createElement('div');
+    barWrap.style.cssText = 'width:100%;height:10px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin:0 0 14px 0;border:1px solid rgba(255,255,255,0.06);';
+
+    const bar = document.createElement('div');
+    bar.style.cssText = 'height:100%;width:100%;background:linear-gradient(90deg,#6effa2,#ffd36e);transition:width 0.08s linear;';
+    barWrap.appendChild(bar);
+
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:13px;color:#c8d0e5;margin-bottom:14px;';
+    hint.textContent = '前 3 秒是 3–5 分技能；時間到沒選，剩下未選欄位會由系統自動改成 0–2 分技能。';
+
+    const slotHint = document.createElement('div');
+    slotHint.style.cssText = 'font-size:12px;color:#8fa3cf;margin-bottom:14px;';
+    slotHint.textContent = `本輪替換技能欄位：${perkIdx + 1}`;
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;';
+
+    let done = false;
+    let remain = 3;
+    const startAt = Date.now();
+
+    function cleanup() {
+      clearInterval(intervalId);
+      clearInterval(progressTimerId);
+      clearTimeout(timeoutId);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }
+
+    function applyChoice(name) {
+      if (done) return;
+      done = true;
+      cleanup();
+      currentState.perks[perkIdx] = name;
+      runRound(roundIdx + 1);
+    }
+
+    function renderChoices(choiceNames) {
+      grid.innerHTML = '';
+      choiceNames.forEach((name) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'padding:10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:132px;';
+        const zh = getPerkZh(name) || name;
+        const score = getPerkScore(name);
+        const img = getPerkImg(name);
+        btn.innerHTML = `
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="width:54px;height:54px;border-radius:10px;background:#0e121d;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+              ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:contain;">` : ''}
+            </div>
+            <div style="min-width:0;">
+              <div style="font-size:14px;font-weight:700;line-height:1.4;">${zh}</div>
+              <div style="font-size:12px;color:#9fb0d6;margin-top:4px;">分數：${typeof score === 'number' ? score : '?'}</div>
+            </div>
+          </div>
+        `;
+        btn.addEventListener('click', () => applyChoice(name));
+        grid.appendChild(btn);
+      });
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (done) return;
+      done = true;
+      cleanup();
+      showTimeoutWarningAndFinish(roundIdx);
+    }, 3000);
+
+    const intervalId = setInterval(() => {
+      remain -= 1;
+      if (remain < 0) remain = 0;
+      timerEl.textContent = `剩餘時間：${remain} 秒`;
+    }, 1000);
+
+    const progressTimerId = setInterval(() => {
+      const elapsed = Date.now() - startAt;
+      const ratio = Math.max(0, 1 - (elapsed / 3000));
+      bar.style.width = `${ratio * 100}%`;
+      if (ratio <= 0) clearInterval(progressTimerId);
+    }, 50);
+
+    renderChoices(currentChoices);
+    panel.appendChild(title);
+    panel.appendChild(timerEl);
+    panel.appendChild(barWrap);
+    panel.appendChild(hint);
+    panel.appendChild(slotHint);
+    panel.appendChild(grid);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+  }
+
+  runRound(0);
+  return true;
+}
+
+function doCard17LosePenalty() {
+  const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
+  let applied = 0;
+
+  for (const slot of slotOrder) {
+    let ok = false;
+
+    if (slot === 1 || slot === 2) {
+      const preferredScore = Math.random() < 0.5 ? 0 : 1;
+      const fallbackScore = preferredScore === 0 ? 1 : 0;
+      ok = rerollAddonSlotByScore(slot - 1, [preferredScore, fallbackScore], {
+        allowDuplicateFallback: false,
+        allowKeepSameName: true
+      });
+    } else {
+      ok = rerollPerkSlotByScore(slot - 3, [0, 1], {
+        allowDuplicateFallback: true,
+        allowKeepSameName: true
+      });
+    }
+
+    if (ok) {
+      applied += 1;
+      if (applied >= 3) return true;
+    }
+  }
+
+  return applied > 0;
+}
+
+function doCard17ScoreDuelMinigame() {
+  if (!currentState) return;
+
+  showCard17ScoreChoiceOverlay({
+    title: '選擇你的分數（0–5）',
+    values: [0, 1, 2, 3, 4, 5],
+    ruleLines: [
+      '勝利：6 個欄位變為該分數重抽（若配件沒有 0 分，會自動改試 1 分，再不行試 2 分）',
+      '失敗：隨機 3 個欄位變為 0–1 分重抽',
+      '平手：隨機 4 個欄位變為該分數重抽'
+    ],
+    onPick: (playerScore) => {
+      const dealerScore = Math.floor(Math.random() * 7);
+      let result = 'draw';
+      if (dealerScore > playerScore) result = 'win';
+      else if (dealerScore < playerScore) result = 'lose';
+
+      let ok = false;
+      if (result === 'win') ok = applyCard17WinReward(playerScore);
+      else if (result === 'draw') ok = applyScoreToRandomNonKillerSlots(playerScore, 4, { addOneFirst: false });
+      else ok = doCard17LosePenalty();
+
+      const title = result === 'win' ? '你贏了' : (result === 'lose' ? '你輸了' : '平手');
+      const bodyLines = [
+        `玩家分數：${playerScore}`,
+        `莊家分數：${dealerScore}`,
+        result === 'win'
+          ? '莊家比較大，依規則你獲勝。6 個非殺手欄位已重抽，配件若沒有 0 分會自動改試 1 分，再不行試 2 分。'
+          : (result === 'lose'
+            ? '莊家比較小，依規則你失敗。系統已盡量讓隨機 3 欄變為 0–1 分重抽。'
+            : '分數相同，依規則平手。隨機 4 個非殺手欄位已依該分數重抽。')
+      ];
+
+      showInfoPopup(title, bodyLines.join('\n'), () => {
+        if (ok) finishCardPhase();
+      });
+    }
+  });
+}
+
+  function doCard18AverageAddons() {
+    const killerKey = currentState.killerKey;
+    if (!killerKey || !currentState.addons || currentState.addons.length < 2) return false;
+    const s1 = getAddonScore(currentState.addons[0]);
+    const s2 = getAddonScore(currentState.addons[1]);
+    if (typeof s1 !== 'number' || typeof s2 !== 'number') return false;
+
+    const targetScore = Math.floor((s1 + s2 + 2) / 2);
+    const newAddons = buildAddonSelectionForScores(killerKey, [targetScore, targetScore], {
+      allowDuplicateFallback: false,
+      scoreFallbackSequence: () => [targetScore, targetScore - 1]
+    });
+    if (!newAddons) return false;
+
+    currentState.addons = newAddons;
+    return true;
+  }
+
+  function doCard20EqualizeAllScores() {
+    const scores = currentState.addons.map(getAddonScore).concat(currentState.perks.map(getPerkScore));
+    if (scores.some(s => typeof s !== 'number')) return false;
+    const avg = Math.floor(scores.reduce((a, b) => a + b, 0) / scores.length);
+    return applyScoreToAllNonKillerSlots(avg, { addOneFirst: false });
   }
 
   function doReplaceAddonsByColor(colors) {
@@ -2511,64 +4124,34 @@
     if (!currentState) return;
 
     const data = (card && card.effect && card.effect.data) ? card.effect.data : {};
-    const settings = window.SlotSettings || {};
-
-    // 若使用者開了「自選殺手鎖定」，就直接用鎖定殺手，不再跳選擇
-    const lockedKiller = (settings.lockKiller && settings.lockKillerKey) ? settings.lockKillerKey : null;
-
-    // 保留原本四個技能（本卡不會改技能）
     const originalPerks = Array.isArray(currentState.perks) ? currentState.perks.slice() : [];
 
     function applyWithKiller(killerKey) {
       if (!killerKey) return false;
       if (!window.KILLERS || !window.KILLERS[killerKey]) return false;
 
-      // 指定殺手（若被鎖定，外部 index 會覆蓋回去；但這裡仍照流程寫入 currentState）
       currentState.killerKey = killerKey;
 
-      // 重抽兩個配件（從該殺手配件池中抽，不重複；配件抽不到 5 分）
-      const addonPool = getAddonNamesForKiller(killerKey).filter(n => getAddonScore(n) !== 5);
+      const addonPool = getAddonNamesForKiller(killerKey).filter((name) => getAddonScore(name) !== 5);
       if (!addonPool || addonPool.length < 2) return false;
+
       const newAddons = shuffle(addonPool).slice(0, 2);
       if (newAddons.length !== 2) return false;
-      currentState.addons = newAddons;
 
-      // ✅ 技能不變：直接還原原本四個技能
-      currentState.perks = Array.isArray(originalPerks) ? originalPerks.slice() : [];
+      currentState.addons = newAddons;
+      currentState.perks = originalPerks.slice();
       return true;
     }
 
-    // 有鎖定殺手 → 直接套用（不彈窗）
-    if (lockedKiller) {
-      const ok = applyWithKiller(lockedKiller);
-      if (!ok) {
-
-        return;
-      }
-      finishCardPhase();
-      return;
-    }
-
-    // 玩家自選：先抽 5 位殺手讓他選
     const killerKeys = Object.keys(window.KILLERS || {});
-    if (!killerKeys.length) {
-
-      return;
-    }
+    if (!killerKeys.length) return;
 
     const candidates = shuffle(Array.from(new Set(killerKeys))).slice(0, 5);
-    if (candidates.length < 1) {
+    if (!candidates.length) return;
 
-      return;
-    }
-
-    // 只有 1 個候選就直接用（保險）
     if (candidates.length === 1) {
       const ok = applyWithKiller(candidates[0]);
-      if (!ok) {
-
-        return;
-      }
+      if (!ok) return;
       finishCardPhase();
       return;
     }
@@ -2578,12 +4161,9 @@
       candidates,
       title: '選擇要指定的殺手（偷天換日）：',
       onPick: (picked) => {
-        data.killerKey = picked; // 記錄一下（方便未來除錯/顯示）
+        data.killerKey = picked;
         const ok = applyWithKiller(picked);
-        if (!ok) {
-
-          return;
-        }
+        if (!ok) return;
         finishCardPhase();
       }
     });
@@ -2789,7 +4369,7 @@
     }
 
     if (typeof applyCallback === 'function') {
-      const finalState = cloneState(currentState);
+      const finalState = sanitizeAddonState(cloneState(currentState));
       applyCallback(finalState);
       if (window.lockSlotLever) {
         window.lockSlotLever(500);
@@ -2985,7 +4565,8 @@
   // 12. 對外介面
   // ==========================
   window.CardSystem = {
-    startCardPhase
+    startCardPhase,
+    FORCE_DRAW_CARD_IDS
   };
 
 

@@ -656,7 +656,7 @@
     }
 
     .id-killer-nameplate #killerName {
-      font-size: 22px;
+      font-size: 16px;
       font-weight: 900;
       letter-spacing: 0.08em;
       line-height: 1.05;
@@ -865,6 +865,7 @@
       margin-top: 24px;
       display: flex;
       justify-content: center;
+      position: relative;
     }
 
     .slot-machine {
@@ -1443,6 +1444,281 @@
     }
 
     /* === Slot Settings (Slot mode only) === */
+
+
+    .pity-action-bar {
+      display: none !important;
+    }
+
+    .slot-reward-row {
+      position: relative;
+      z-index: 120;
+      width: 1150px;
+      max-width: 100%;
+      margin: 10px auto 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    }
+
+    .slot-reward-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .slot-reward-row.hidden {
+      display: none !important;
+    }
+
+    #slotRewardRow #cardContainer {
+      width: auto;
+      max-width: none;
+      margin: 0;
+      flex: 0 1 auto;
+      justify-content: center;
+    }
+
+    .emergency-pity-wrap {
+      width: 112px;
+      display: flex;
+      flex: 0 0 112px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      pointer-events: auto;
+      opacity: 1;
+      transition: opacity 0.18s ease;
+    }
+
+    .emergency-pity-wrap.is-hidden {
+      display: none !important;
+    }
+
+    .pity-page-icon {
+      display: none !important;
+    }
+
+    .pity-btn {
+      position: relative;
+      width: 96px;
+      min-height: 96px;
+      border: none;
+      border-radius: 999px;
+      padding: 0;
+      background: radial-gradient(circle at 50% 35%, #fff6d9 0%, #efe5c8 42%, #cfb98a 100%);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.38), inset 0 3px 0 rgba(255, 255, 255, 0.82), inset 0 -8px 14px rgba(0, 0, 0, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-weight: 700;
+    }
+
+    .pity-btn::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #d3cbc0 0%, #bcb2a1 100%);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+    }
+
+    .pity-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent 40%);
+      pointer-events: none;
+    }
+
+    .pity-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.15);
+    }
+
+    .pity-btn:not(:disabled):hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 50px rgba(0, 0, 0, 0.42), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .pity-btn-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pity-btn-top,
+    .pity-btn-emergency,
+    .pity-btn-label {
+      display: none;
+    }
+
+    .pity-btn-inner-icon {
+      font-size: 34px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 6px solid #932a27;
+      background: radial-gradient(circle at 35% 30%, #ff8a7c 0%, #f14836 45%, #b41310 100%);
+      box-shadow:
+        inset 0 10px 16px rgba(255, 255, 255, 0.32),
+        inset 0 -12px 18px rgba(0, 0, 0, 0.24),
+        0 12px 20px rgba(0, 0, 0, 0.32);
+
+      color: #fff8ef;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    .pity-status {
+      display: none;
+    }
+
+    @media (max-width: 1080px) {
+      .slot-reward-row {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .emergency-pity-wrap {
+        position: static;
+        width: min(100%, 200px);
+        flex: none;
+        margin-top: 12px;
+      }
+
+      #slotRewardRow #cardContainer {
+        width: 100%;
+      }
+    }
+
+    .pity-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100120;
+      padding: 16px;
+    }
+
+    .pity-modal.open {
+      display: flex;
+    }
+
+    .pity-panel {
+      width: min(720px, 100%);
+      background: #121622;
+      border-radius: 16px;
+      border: 1px solid #2a3044;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      padding: 18px;
+    }
+
+    .pity-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pity-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .pity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pity-choice {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 10px;
+      text-align: left;
+      min-height: 84px;
+      transition: border-color .16s ease, background .16s ease, transform .08s ease;
+    }
+
+    .pity-choice:hover {
+      border-color: rgba(122, 167, 255, 0.75);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .pity-choice.selected {
+      border-color: var(--accent-soft);
+      background: radial-gradient(circle at top left, rgba(63, 130, 255, 0.22), rgba(255, 255, 255, 0.04));
+      box-shadow: 0 0 0 1px rgba(63, 130, 255, 0.34);
+    }
+
+    .pity-choice-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .pity-choice-name {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .pity-footer {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pity-selected-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pity-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 700px) {
+      .pity-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 500px) {
+      .pity-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .slot-settings-btn {
       position: fixed;
       right: 24px;
@@ -2108,8 +2384,6 @@
 
         <div class="slot-hint"></div>
 
-
-
       </div>
 
       <!-- Slot settings (Slot mode only) -->
@@ -2174,8 +2448,37 @@
         </div>
       </div>
     </div>
+
+    <div id="slotRewardRow" class="slot-reward-row hidden" aria-hidden="true">
+      <div id="slotPityWrap" class="emergency-pity-wrap">
+        <button id="slotPityBtn" type="button" class="pity-btn" disabled>
+          <span class="pity-btn-inner">
+            <span class="pity-btn-inner-icon" aria-label="重整">↻</span>
+          </span>
+        </button>
+        <div id="slotPityStatus" class="pity-status">抽滿 7 格後可使用：保留 2 格，其餘重抽。你可以選卡片，也可以直接按 🔄。</div>
+      </div>
+    </div>
   </div>
 
+
+
+
+
+  <div id="pityModal" class="pity-modal" aria-hidden="true">
+    <div class="pity-panel" role="dialog" aria-modal="true" aria-labelledby="pityTitle">
+      <div id="pityTitle" class="pity-title">🔄 重整</div>
+      <div class="pity-sub">請選擇 2 個要保留的欄位。殺手會固定保留，其餘未選欄位會立刻重抽，並且這一局不會套用卡片效果。</div>
+      <div id="pityChoiceGrid" class="pity-grid"></div>
+      <div class="pity-footer">
+        <div id="pitySelectedCount" class="pity-selected-count">已選擇 0 / 2</div>
+        <div class="pity-actions">
+          <button id="pityCancelBtn" type="button" class="outline">取消</button>
+          <button id="pityConfirmBtn" type="button" class="primary">套用重整</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <button id="floatingToolboxBtn" class="floating-toolbox-btn" type="button" title="工具箱">
@@ -2289,6 +2592,19 @@
     const slotBoardEl = document.getElementById('slotBoard');
     const slotBtn = document.getElementById('slotBtn');
     const slotResetBtn = document.getElementById('slotResetBtn');
+
+    const slotPityBtn = document.getElementById('slotPityBtn');
+    const slotPityStatus = document.getElementById('slotPityStatus');
+    const pityModal = document.getElementById('pityModal');
+    const pityChoiceGrid = document.getElementById('pityChoiceGrid');
+    const pitySelectedCount = document.getElementById('pitySelectedCount');
+    const pityCancelBtn = document.getElementById('pityCancelBtn');
+    const pityConfirmBtn = document.getElementById('pityConfirmBtn');
+    const slotRewardRow = document.getElementById('slotRewardRow');
+    const slotPityWrap = document.getElementById('slotPityWrap');
+    let pitySelectedIndices = [];
+    let roundLockSnapshot = null;
+
     const slotOverlayEl = document.getElementById('slotOverlay');
     const leverNormalEl = document.getElementById('leverNormal');
     const leverBottomEl = document.getElementById('leverBottom');
@@ -2575,7 +2891,6 @@
             cardContainer.innerHTML = '';
             cardContainer.classList.remove('card-visible');
             if (window.SlotSettings.cardsEnabled === false) {
-              cardContainer.classList.add('hidden');
             } else {
               cardContainer.classList.remove('hidden');
             }
@@ -2592,6 +2907,11 @@
       }
     })();
 
+    const rewardRowObserver = new MutationObserver(() => {
+      ensureRewardRowLayout();
+      syncRewardRowVisibility();
+    });
+    rewardRowObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 
 
     let currentMode = 'points';
@@ -2613,6 +2933,7 @@
       locked: false,
       animTimeout: null,
       afterFull: false,
+      pityUsed: false,
     };
     // 讓設定系統/卡片系統可讀取拉霸狀態
     window.slotState = slotState;
@@ -3236,6 +3557,9 @@
           icon.textContent = '—';
         }
       }
+
+
+      syncPityButtonState();
     }
 
     function resetSlotState() {
@@ -3244,6 +3568,10 @@
       slotState.perks = [];
       slotState.locked = false;
       slotState.afterFull = false;
+      slotState.pityUsed = false;
+      releaseRoundKillerLock();
+      closePityModal();
+      clearVisibleCards();
 
       if (slotState.animTimeout) {
         clearTimeout(slotState.animTimeout);
@@ -3301,6 +3629,321 @@
       return arr[idx];
     }
 
+    function getSlotFilledCount() {
+      return (slotState.killerKey ? 1 : 0) + slotState.addons.length + slotState.perks.length;
+    }
+
+    function getSlotLabelByIndex(index) {
+      const labels = ['殺手', '配件 1', '配件 2', '技能 1', '技能 2', '技能 3', '技能 4'];
+      return labels[index] || `欄位 ${index + 1}`;
+    }
+
+    function getSlotDisplayNameByIndex(index) {
+      if (index === 0) {
+        const killer = slotState.killerKey ? KILLERS?.[slotState.killerKey] : null;
+        if (!killer || !slotState.killerKey) return '未抽取';
+        return killer.zh ? `${killer.zh} / ${slotState.killerKey}` : slotState.killerKey;
+      }
+
+      if (index === 1 || index === 2) {
+        const addonName = slotState.addons[index - 1];
+        const addon = addonName ? ADDONS?.[addonName] : null;
+        if (!addonName || !addon) return '未抽取';
+        return addon.zh ? `${addon.zh} / ${addonName}` : addonName;
+      }
+
+      const perkName = slotState.perks[index - 3];
+      const perk = perkName ? PERKS?.[perkName] : null;
+      if (!perkName || !perk) return '未抽取';
+      return perk.zh ? `${perk.zh} / ${perkName}` : perkName;
+    }
+
+    function ensureRewardRowLayout() {
+      if (!slotRewardRow) return null;
+      const cardContainer = document.getElementById('cardContainer');
+      const pityWrapEl = document.getElementById('slotPityWrap');
+      if (cardContainer && cardContainer.parentNode !== slotRewardRow) {
+        if (pityWrapEl && pityWrapEl.parentNode === slotRewardRow) {
+          slotRewardRow.insertBefore(cardContainer, pityWrapEl);
+        } else {
+          slotRewardRow.appendChild(cardContainer);
+        }
+      } else if (cardContainer && pityWrapEl && cardContainer.nextSibling !== pityWrapEl) {
+        slotRewardRow.insertBefore(cardContainer, pityWrapEl);
+      }
+      return cardContainer;
+    }
+
+    function syncRewardRowVisibility() {
+      if (!slotRewardRow) return;
+      const cardContainer = ensureRewardRowLayout();
+      const cardsVisible = !!(cardContainer && !cardContainer.classList.contains('hidden') && (cardContainer.classList.contains('card-visible') || cardContainer.children.length > 0));
+      const shouldShow = currentMode === 'slot' && cardsVisible;
+      slotRewardRow.classList.toggle('hidden', !shouldShow);
+      slotRewardRow.classList.toggle('visible', shouldShow);
+      slotRewardRow.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    }
+
+    function captureRoundLockSnapshot() {
+      if (roundLockSnapshot || !window.SlotSettings) return;
+      roundLockSnapshot = {
+        lockKiller: !!window.SlotSettings.lockKiller,
+        lockKillerKey: window.SlotSettings.lockKillerKey || ''
+      };
+    }
+
+    function applyRoundKillerLock(killerKey) {
+      if (!killerKey || !window.SlotSettings) return;
+      captureRoundLockSnapshot();
+      window.SlotSettings.lockKiller = true;
+      window.SlotSettings.lockKillerKey = killerKey;
+    }
+
+    function releaseRoundKillerLock() {
+      if (!roundLockSnapshot || !window.SlotSettings) return;
+      window.SlotSettings.lockKiller = roundLockSnapshot.lockKiller;
+      window.SlotSettings.lockKillerKey = roundLockSnapshot.lockKillerKey;
+      roundLockSnapshot = null;
+    }
+
+    function closePityModal() {
+      pitySelectedIndices = [];
+      if (pityModal) {
+        pityModal.classList.remove('open');
+        pityModal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function updatePitySelectedCount() {
+      if (!pitySelectedCount) return;
+      pitySelectedCount.textContent = `已選擇 ${pitySelectedIndices.length} / 2`;
+    }
+
+    function syncPityButtonState() {
+      if (!slotPityBtn || !slotPityWrap) return;
+      const filled = getSlotFilledCount();
+      const ready = filled >= 7 && slotState.afterFull && !slotState.pityUsed;
+      slotPityBtn.disabled = !ready;
+      slotPityWrap.classList.toggle('is-hidden', currentMode !== 'slot');
+
+      if (slotPityStatus) {
+        if (!slotState.afterFull || filled < 7) {
+          slotPityStatus.textContent = '抽滿 7 格後可使用：保留 2 格，其餘重抽。你可以選卡片，也可以直接按 🔄。';
+        } else if (slotState.pityUsed) {
+          slotPityStatus.textContent = '本局已使用重整。';
+        } else {
+          slotPityStatus.textContent = '可使用重整：殺手固定保留，另外保留 2 格。卡片與 🔄 會同時存在，按下 🔄 後才會取消卡片。';
+        }
+      }
+      syncRewardRowVisibility();
+    }
+
+    function buildPityChoiceGrid() {
+      if (!pityChoiceGrid) return;
+      pityChoiceGrid.innerHTML = '';
+      for (let i = 1; i < 7; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pity-choice';
+        btn.dataset.index = String(i);
+        btn.innerHTML = `
+          <div class="pity-choice-label">${getSlotLabelByIndex(i)}</div>
+          <div class="pity-choice-name">${getSlotDisplayNameByIndex(i)}</div>
+        `;
+        btn.addEventListener('click', () => {
+          const idx = pitySelectedIndices.indexOf(i);
+          if (idx >= 0) {
+            pitySelectedIndices.splice(idx, 1);
+            btn.classList.remove('selected');
+          } else {
+            if (pitySelectedIndices.length >= 2) return;
+            pitySelectedIndices.push(i);
+            btn.classList.add('selected');
+          }
+          updatePitySelectedCount();
+        });
+        pityChoiceGrid.appendChild(btn);
+      }
+      updatePitySelectedCount();
+    }
+
+    function pickRandomUnique(arr, usedSet) {
+      const pool = arr.filter(name => !usedSet.has(name));
+      if (!pool.length) return null;
+      return getRandomItem(pool);
+    }
+
+    function getAllowedPerkPool() {
+      const settings = window.SlotSettings || {};
+      let allowedSet = null;
+      if (settings.customPerksEnabled && Array.isArray(settings.allowedPerks)) {
+        allowedSet = new Set(settings.allowedPerks);
+      }
+      return Object.entries(PERKS || {})
+        .filter(([perkName, perk]) => {
+          if (!perk || typeof perk !== 'object') return false;
+          if (allowedSet && !allowedSet.has(perkName)) return false;
+          return true;
+        })
+        .map(([perkName]) => perkName);
+    }
+
+    function getAddonPoolForKiller(killerKey) {
+      return Object.entries(ADDONS || {})
+        .filter(([name, addon]) => addon && addon.killer === killerKey)
+        .map(([name]) => name);
+    }
+
+    function getKillerPool() {
+      return Object.keys(KILLERS || {});
+    }
+
+
+    function getNonFiveAddonPoolForKiller(killerKey, currentAddons = []) {
+      let pool = Object.entries(ADDONS || {})
+        .filter(([name, addon]) => addon && addon.killer === killerKey && Number(addon.score) !== 5)
+        .map(([name]) => name);
+
+      if (pool.length < 2) {
+        pool = getAddonPoolForKiller(killerKey);
+      }
+
+      const noDup = pool.filter(name => !currentAddons.includes(name));
+      if (noDup.length >= 2) pool = noDup;
+      return pool;
+    }
+
+    function normalizeCardUpdatedState(prevState, updatedState) {
+      return {
+        killerKey: (updatedState && typeof updatedState.killerKey !== 'undefined')
+          ? (updatedState.killerKey || null)
+          : (prevState.killerKey || null),
+        addons: Array.isArray(updatedState?.addons) ? [...updatedState.addons] : [...(prevState.addons || [])],
+        perks: Array.isArray(updatedState?.perks) ? [...updatedState.perks] : [...(prevState.perks || [])]
+      };
+    }
+
+    function clearVisibleCards() {
+      const cardContainer = document.getElementById('cardContainer');
+      if (cardContainer) {
+        cardContainer.innerHTML = '';
+        cardContainer.classList.remove('card-visible');
+      }
+      const machineEl = document.querySelector('.slot-machine');
+      if (machineEl) {
+        machineEl.classList.remove('glow');
+      }
+      syncRewardRowVisibility();
+    }
+
+    function applySlotStateAnimated(updatedState) {
+      const prevState = {
+        killerKey: slotState.killerKey,
+        addons: Array.isArray(slotState.addons) ? [...slotState.addons] : [],
+        perks: Array.isArray(slotState.perks) ? [...slotState.perks] : []
+      };
+
+      const changedIndices = [];
+      if ((updatedState.killerKey || null) !== (prevState.killerKey || null)) changedIndices.push(0);
+      for (let i = 0; i < 2; i++) {
+        if ((updatedState.addons?.[i] || null) !== (prevState.addons[i] || null)) changedIndices.push(1 + i);
+      }
+      for (let i = 0; i < 4; i++) {
+        if ((updatedState.perks?.[i] || null) !== (prevState.perks[i] || null)) changedIndices.push(3 + i);
+      }
+
+      const uniqueChanged = [...new Set(changedIndices)];
+      const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+      const DURATION = 300;
+
+      const applyStateNow = () => {
+        const lockedKillerKey = updatedState.killerKey || slotState.killerKey || null;
+        slotState.killerKey = lockedKillerKey;
+        if (lockedKillerKey) applyRoundKillerLock(lockedKillerKey);
+        slotState.addons = Array.isArray(updatedState.addons) ? [...updatedState.addons] : [];
+        slotState.perks = Array.isArray(updatedState.perks) ? [...updatedState.perks] : [];
+        renderSlotBoard();
+      };
+
+      if (!uniqueChanged.length) {
+        applyStateNow();
+        return;
+      }
+
+      uniqueChanged.forEach((idx) => {
+        const cell = cells[idx];
+        if (cell) cell.classList.add('slot-anim-out');
+      });
+
+      setTimeout(() => {
+        applyStateNow();
+        const freshCells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
+        uniqueChanged.forEach((idx) => {
+          const cell = freshCells[idx];
+          if (!cell) return;
+          cell.classList.remove('slot-anim-out');
+          cell.classList.add('slot-anim-in');
+          setTimeout(() => cell.classList.remove('slot-anim-in'), DURATION);
+        });
+      }, DURATION);
+    }
+
+    function performPityReroll() {
+      const selected = [...pitySelectedIndices].sort((a, b) => a - b);
+      if (selected.length !== 2) {
+        alert('請選擇 2 個要保留的欄位。');
+        return;
+      }
+
+      const selectedAddons = selected.filter(idx => idx === 1 || idx === 2);
+      const nextState = {
+        killerKey: slotState.killerKey || null,
+        addons: [null, null],
+        perks: [null, null, null, null]
+      };
+
+      selectedAddons.forEach(idx => {
+        const addonIndex = idx - 1;
+        nextState.addons[addonIndex] = slotState.addons[addonIndex] || null;
+      });
+
+      selected.filter(idx => idx >= 3).forEach(idx => {
+        const perkIndex = idx - 3;
+        nextState.perks[perkIndex] = slotState.perks[perkIndex] || null;
+      });
+
+      const usedAddonNames = new Set(nextState.addons.filter(Boolean));
+      const addonPool = getAddonPoolForKiller(nextState.killerKey);
+      for (let i = 0; i < 2; i++) {
+        if (nextState.addons[i]) continue;
+        const picked = pickRandomUnique(addonPool, usedAddonNames);
+        if (picked) {
+          nextState.addons[i] = picked;
+          usedAddonNames.add(picked);
+        }
+      }
+
+      const usedPerkNames = new Set(nextState.perks.filter(Boolean));
+      const perkPool = getAllowedPerkPool();
+      for (let i = 0; i < 4; i++) {
+        if (nextState.perks[i]) continue;
+        const picked = pickRandomUnique(perkPool, usedPerkNames);
+        if (picked) {
+          nextState.perks[i] = picked;
+          usedPerkNames.add(picked);
+        }
+      }
+
+      slotState.pityUsed = true;
+      slotState.afterFull = true;
+      slotState.locked = false;
+      clearVisibleCards();
+      closePityModal();
+      applySlotStateAnimated(nextState);
+      syncPityButtonState();
+    }
+
+
     function drawOneSlot() {
       if (slotState.locked || slotState.afterFull) return;
 
@@ -3322,6 +3965,7 @@
           if (!killerKeys.length) return;
           slotState.killerKey = getRandomItem(killerKeys);
         }
+        if (slotState.killerKey) applyRoundKillerLock(slotState.killerKey);
 
       } else if (step === 1 || step === 2) {
         const pool = Object.entries(ADDONS || {})
@@ -3374,98 +4018,62 @@
 
         if (window.CardSystem && typeof CardSystem.startCardPhase === 'function') {
           try {
+            const cardContainer = document.getElementById('cardContainer');
+            if (cardContainer) {
+              cardContainer.classList.remove('hidden');
+            }
+            syncPityButtonState();
+            syncRewardRowVisibility();
             CardSystem.startCardPhase(slotState, {
               onApplied: (updatedState) => {
                 if (updatedState) {
-                  // 先記錄舊狀態，用來判斷哪些格子有變化
                   const prevState = {
                     killerKey: slotState.killerKey,
                     addons: Array.isArray(slotState.addons) ? [...slotState.addons] : [],
                     perks: Array.isArray(slotState.perks) ? [...slotState.perks] : []
                   };
 
+                  const normalizedState = normalizeCardUpdatedState(prevState, updatedState);
                   const changedIndices = [];
 
-                  // 殺手格：index 0
-                  {
-                    const settings = window.SlotSettings || {};
-                    const effectiveKillerKey = (settings.lockKiller && settings.lockKillerKey) ? settings.lockKillerKey : updatedState.killerKey;
-                    if (typeof effectiveKillerKey !== 'undefined' && effectiveKillerKey !== prevState.killerKey) {
-                      changedIndices.push(0);
-                    }
+                  if ((prevState.killerKey || null) !== (normalizedState.killerKey || null)) changedIndices.push(0);
+
+                  for (let i = 0; i < 2; i++) {
+                    const beforeAddon = prevState.addons[i] || null;
+                    const afterAddon = normalizedState.addons[i] || null;
+                    if (beforeAddon !== afterAddon) changedIndices.push(1 + i);
                   }
 
-                  // 配件格：index 1,2
-                  if (Array.isArray(updatedState.addons)) {
-                    for (let i = 0; i < 2; i++) {
-                      const beforeAddon = prevState.addons[i] || null;
-                      const afterAddon = updatedState.addons[i] || null;
-                      if (beforeAddon !== afterAddon) {
-                        changedIndices.push(1 + i);
-                      }
-                    }
-                  }
-
-                  // 技能格：index 3,4,5,6
-                  if (Array.isArray(updatedState.perks)) {
-                    for (let i = 0; i < 4; i++) {
-                      const beforePerk = prevState.perks[i] || null;
-                      const afterPerk = updatedState.perks[i] || null;
-                      if (beforePerk !== afterPerk) {
-                        changedIndices.push(3 + i);
-                      }
-                    }
+                  for (let i = 0; i < 4; i++) {
+                    const beforePerk = prevState.perks[i] || null;
+                    const afterPerk = normalizedState.perks[i] || null;
+                    if (beforePerk !== afterPerk) changedIndices.push(3 + i);
                   }
 
                   const uniqueChanged = [...new Set(changedIndices)];
                   const hasChanged = uniqueChanged.length > 0;
 
-                  if (!hasChanged) {
-                    // 沒東西變化就正常套用
-                    const settings = window.SlotSettings || {};
-                    if (typeof updatedState.killerKey !== 'undefined') {
-                      // 自選殺手開啟時：卡片造成的換殺手效果不影響
-                      if (settings.lockKiller && settings.lockKillerKey) {
-                        slotState.killerKey = settings.lockKillerKey;
-                      } else {
-                        slotState.killerKey = updatedState.killerKey;
-                      }
-                    }
-                    if (Array.isArray(updatedState.addons)) {
-                      slotState.addons = [...updatedState.addons];
-                    }
-                    if (Array.isArray(updatedState.perks)) {
-                      slotState.perks = [...updatedState.perks];
-                    }
+                  const applyNormalizedState = () => {
+                    slotState.killerKey = normalizedState.killerKey || prevState.killerKey || null;
+                    if (slotState.killerKey) applyRoundKillerLock(slotState.killerKey);
+                    slotState.addons = Array.isArray(normalizedState.addons) ? [...normalizedState.addons] : [];
+                    slotState.perks = Array.isArray(normalizedState.perks) ? [...normalizedState.perks] : [];
                     renderSlotBoard();
+                  };
+
+                  if (!hasChanged) {
+                    applyNormalizedState();
                   } else {
                     const cells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
                     const DURATION = 300;
 
-                    // 先讓舊的圖示往上淡出
                     uniqueChanged.forEach((idx) => {
                       const cell = cells[idx];
-                      if (cell) {
-                        cell.classList.add('slot-anim-out');
-                      }
+                      if (cell) cell.classList.add('slot-anim-out');
                     });
 
                     setTimeout(() => {
-                      // 套用新狀態
-                      if (typeof updatedState.killerKey !== 'undefined') {
-                        slotState.killerKey = updatedState.killerKey;
-                      }
-                      if (Array.isArray(updatedState.addons)) {
-                        slotState.addons = [...updatedState.addons];
-                      }
-                      if (Array.isArray(updatedState.perks)) {
-                        slotState.perks = [...updatedState.perks];
-                      }
-
-                      // 重畫整個 board
-                      renderSlotBoard();
-
-                      // 讓新的圖示由下往上淡入
+                      applyNormalizedState();
                       const freshCells = Array.from(slotBoardEl.querySelectorAll('.slot-cell'));
                       uniqueChanged.forEach((idx) => {
                         const cell = freshCells[idx];
@@ -3481,6 +4089,12 @@
                   }
                 }
                 slotState.locked = false;
+                const cardContainer = document.getElementById('cardContainer');
+                if (cardContainer) {
+                  cardContainer.classList.remove('hidden');
+                }
+                syncPityButtonState();
+                syncRewardRowVisibility();
               }
             });
           } catch (e) {
@@ -3491,6 +4105,32 @@
           slotState.locked = false;
         }
       }
+    }
+
+
+
+    if (slotPityBtn) {
+      slotPityBtn.addEventListener('click', () => {
+        if (slotPityBtn.disabled) return;
+        pitySelectedIndices = [];
+        buildPityChoiceGrid();
+        pityModal.classList.add('open');
+        pityModal.setAttribute('aria-hidden', 'false');
+      });
+    }
+
+    if (pityCancelBtn) {
+      pityCancelBtn.addEventListener('click', closePityModal);
+    }
+
+    if (pityConfirmBtn) {
+      pityConfirmBtn.addEventListener('click', performPityReroll);
+    }
+
+    if (pityModal) {
+      pityModal.addEventListener('click', (e) => {
+        if (e.target === pityModal) closePityModal();
+      });
     }
 
     // ==========================
@@ -3513,8 +4153,9 @@
       // 切到配分模式時，隱藏拉霸卡片區域（但不清除內容）
       const cardContainer = document.getElementById('cardContainer');
       if (cardContainer) {
-        cardContainer.classList.add('hidden');
       }
+      syncPityButtonState();
+      syncRewardRowVisibility();
     });
 
     tabSlot.addEventListener('click', () => {
@@ -3537,6 +4178,8 @@
       if (cardContainer) {
         cardContainer.classList.remove('hidden');
       }
+      syncPityButtonState();
+      syncRewardRowVisibility();
     });
 
 
@@ -4316,6 +4959,7 @@
       z-index: 2500;
       perspective: 1200px;
     }
+
     #polyDiceFlight {
       position: absolute;
       left: 50%;
@@ -4325,42 +4969,48 @@
       margin-left: -90px;
       margin-top: -90px;
       will-change: transform;
-      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.45));
-      transition: transform 820ms cubic-bezier(.2,.9,.2,1);
+      filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
+      transition: transform 820ms cubic-bezier(.2, .9, .2, 1);
     }
+
     #polyDiceCanvasWrap {
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
     }
+
     #polyDiceCanvas {
       width: 100%;
       height: 100%;
       display: block;
       background: transparent;
     }
+
     #polyDiceResultModal {
       position: fixed;
       inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.58);
+      background: rgba(0, 0, 0, 0.58);
       z-index: 2600;
     }
+
     #polyDiceResultModal .box {
       min-width: 260px;
       padding: 18px 20px;
       border-radius: 16px;
-      background: linear-gradient(145deg, rgba(12,15,25,0.98), rgba(20,25,38,0.98));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 18px 38px rgba(0,0,0,0.75);
+      background: linear-gradient(145deg, rgba(12, 15, 25, 0.98), rgba(20, 25, 38, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.75);
       text-align: center;
     }
+
     #polyDiceResultModal h3 {
       margin: 0 0 8px;
       font-size: 20px;
     }
+
     #polyDiceResultValue {
       font-size: 34px;
       font-weight: 800;
@@ -4423,9 +5073,9 @@
       let targetRot = { x: 0, y: 0, z: 0 };
 
       const diceStyles = {
-        4:  { fill: '#7fa4ff', edge: '#eef4ff', glow: 'rgba(127,164,255,.36)', radius: 80, shadowScale: 1.05 },
-        6:  { fill: '#77a0ff', edge: '#eef4ff', glow: 'rgba(119,160,255,.36)', radius: 78, shadowScale: 1.00 },
-        8:  { fill: '#7aa8ff', edge: '#eef4ff', glow: 'rgba(122,168,255,.36)', radius: 82, shadowScale: 1.05 },
+        4: { fill: '#7fa4ff', edge: '#eef4ff', glow: 'rgba(127,164,255,.36)', radius: 80, shadowScale: 1.05 },
+        6: { fill: '#77a0ff', edge: '#eef4ff', glow: 'rgba(119,160,255,.36)', radius: 78, shadowScale: 1.00 },
+        8: { fill: '#7aa8ff', edge: '#eef4ff', glow: 'rgba(122,168,255,.36)', radius: 82, shadowScale: 1.05 },
         12: { fill: '#c99a3a', edge: '#ffefb8', glow: 'rgba(201,154,58,.34)', radius: 86, shadowScale: 1.10 },
         20: { fill: '#84adff', edge: '#f1f6ff', glow: 'rgba(132,173,255,.34)', radius: 90, shadowScale: 1.12 }
       };
