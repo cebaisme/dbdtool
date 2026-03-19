@@ -735,7 +735,7 @@ function normalizeCard39AnswerToken(value) {
   // 例：const FORCE_DRAW_CARD_IDS = [17];
   // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
   // ==========================
-  const FORCE_DRAW_CARD_IDS = [39];
+  const FORCE_DRAW_CARD_IDS = [];
 
   function normalizeForcedCardId(value) {
     if (value == null) return null;
