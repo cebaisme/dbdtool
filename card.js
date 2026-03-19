@@ -584,19 +584,19 @@
   }
 
 const CARD39_QUIZ_RAW = String.raw`題目
-dbd裡面 版權角色全部都可以用暗金細胞買
+DBD中所有版權角色都可以用暗金細胞購買
 答 否 註釋:比爾
 
 dbd是一個鮮少有bug的遊戲
 答 否 註釋:dead bug daylight
 
-若是攜帶風敏的「機械技術」在對上佛萊迪入夢的時候 發電機技能檢驗失敗沒有爆點能醒來嗎
-答 是 註釋:冷知識 醒來是因為炸機而不是巨大聲響或爆點 所以這樣就能在沒有爆點的情況下醒來
+攜帶鳳敏的「機械技術」時，對上佛萊迪入夢狀態，技能檢驗失敗沒有爆點時可以醒來嗎？
+答 是 註釋:醒來判定來自「炸機」而不是爆點或巨大聲響
 
-對上地獄修士時 被鎖鏈綁的時候可以開門嗎
-答 是 註釋:遇到醫生瘋狂三時也可以 是個很重要的小知識
+對上地獄修士時，被鎖鏈綁住仍然可以開門嗎？
+答 是 註釋:遇到醫生瘋狂三時也可以，是個很重要的小知識
 
-深度傷口在解醫生瘋狂的時候 仍然會持續倒退
+深度傷口在解除醫生瘋狂時仍會持續倒退
 答 否 註釋:黃條解瘋狂期間不會倒退
 
 幽靈殺手本名菲利浦
@@ -605,71 +605,71 @@ dbd是一個鮮少有bug的遊戲
 最大的地圖是黑水沼澤蒼白玫瑰
 答 否 註釋:最大的地圖是阿札羅夫長眠處(資料來源wikigg)
 
-小丑斬殺男性倖存者時 是拿走右手小指
-答 否 註釋:是左手小指 女性倖存者是右手食指
+小丑在斬殺男性倖存者時會拿走右手小指
+答 否 註釋:是左手小指，女性倖存者是右手食指
 
-在陰屍路章節時 遊戲出現了不下百個bug 請問當時以下哪位殺手成功倖存沒有bug?
+陰屍路章節剛推出時出現海量Bug，下列哪位殺手成功倖存沒有Bug？
 A.醫生
 B.淤神
 C.未知惡物
 D.以上皆非
-答 以上皆非 註釋:醫生電可以打斷翻窗 淤神會導致伺服器崩潰 未知惡物的幻影會不見 這個版本沒有殺手倖存ヽ(ﾟ∀。)ﾉ
+答 D 註釋:醫生的電可以打斷翻窗、淤神會導致伺服器崩潰、偽人的幻影會不見，實際上這個版本並沒有殺手倖存ヽ(ﾟ∀。)ﾉ
 
-據說每張地圖裡面都會藏有一個黃金工具箱 請問米德威治小學的黃金工具箱在哪裡
+據說每張地圖裡面都會藏有一個黃金工具箱，請問米德威治小學的黃金工具箱在哪裡？
 A.圖書室
 B.化學室
 C.中庭花園
 D.二樓廁所
-答 化學室 註釋:在終局的時候會從肉塊中慢慢長出來
+答 B 註釋:在終局的時候會從房間正中間的桌子上肉塊中慢慢長出來
 
-下列何者不能從殺手外觀來判斷殺手能力現況
+下列何者無法從外觀判斷能力狀態？
 A.追跡者
 B.好孩子娃娃
 C.鬼臉
 D.鬼武者
-答 鬼臉 註釋:追跡者可以透過手臂來看出現在階級 恰吉把刀反拿代表隱身 鬼武者開大的時候會噴紅煙
+答 C 註釋:追跡者可以透過手臂來看出現在階級、恰吉把刀反拿代表隱身、鬼武者開大的時候會噴紅煙
 
-邁爾斯攜帶「死兔子」配件 技能攜帶「恐懼釋放」和「監控與打擊」 在跟蹤模式下追逐倖存者 請問此時恐懼範圍約為多少公尺
+邁爾斯攜帶「死兔子」配件，技能攜帶「恐懼釋放」和「監控與打擊」，在跟蹤模式下追逐倖存者，請問此時恐懼範圍約為多少公尺？
 A.0
 B.18
 C.24
 D.36
-答 0 註釋:跟蹤模式下隱身
+答 A 註釋:跟蹤模式下隱身
 
-若是我今天想要到陰屍路的專屬地圖 我在燒祭品的情況下機率為多少
+若是我今天想要到陰屍路的專屬地圖，我在燒祭品的情況下機率為多少？
 A.0%
 B.2.33%
-C.6.86%
+C.6.81%
 D.17.49%
-答 6.86% 註釋:祭品成功的情況下進到該圖是5% 沒成功的情況下是1/43 乘上80%大約是1.86% 所以是6.86% 跟部分遊戲抽卡出金的機率差不多喔
+答 C 註釋:祭品成功生效的機率是20%，並且同領域的地圖有四張，所以祭品成功並且到達目標地圖機率是5%；未成功時為44張地圖抽1，乘上80%約為1.81%，總計約6.81%。跟某些遊戲抽卡出金的機率差不多喔¯\(ツ)/¯
 
-網站作者名?
-A.ceba
+本網站作者名？
+A.cade
 B.oeba
 C.eba
-D.cade
-答 A
+D.ceba
+答 D 註釋:你好我是ceba，請多指教(￣▽￣)ノ
 
-下列哪隻殺手沒有搖籃曲
+下列哪位殺手沒有搖籃曲？
 A.怨靈
 B.雙胞胎
 C.騙術師
 D.女獵人
-答 怨靈 註釋:怨靈的只是風聲音效 不是搖籃曲
+答 A 註釋:怨靈的只是風聲音效，並不是搖籃曲
 
-下列哪隻殺手設定上最年輕
+下列哪隻殺手設定上最年輕？
 A.怨靈
 B.異形
 C.妖婆
 D.維克多
-答 異形 註釋:怨靈18-20歲 妖婆17-18歲 維克多推測在6-7歲時掛掉 異形才剛出生不到幾個小時
+答 B 註釋:怨靈18-20歲、妖婆17-18歲、維克多推測在6-7歲時掛掉、異形才剛出生不到幾個小時
 
-以下殺手哪位沒有特殊斬殺
+以下殺手哪位沒有特殊斬殺？
 A.原初者
 B.貞子
 C.劊子手
 D.騎士
-答 騎士 註釋:貞子迷咒7層可以特殊斬殺 三角頭二掛+折磨狀態可以特殊斬殺 原初者二掛+標記四層可以特殊斬殺`;
+答 D 註釋:貞子迷咒7層可以特殊斬殺、三角頭二掛+折磨狀態可以特殊斬殺、原初者二掛+標記四層可以特殊斬殺`;
 
 function parseCard39QuizRaw(raw) {
   const blocks = String(raw || '')
@@ -741,14 +741,28 @@ function normalizeCard39AnswerToken(value) {
     if (value == null) return null;
     const raw = String(value).trim();
     if (!raw) return null;
+
+    const candidates = [];
     if (/^card\d+$/i.test(raw)) {
-      const digits = raw.replace(/^card/i, '');
-      return 'card' + digits.padStart(2, '0');
+      const digits = String(parseInt(raw.replace(/^card/i, ''), 10));
+      if (digits && digits !== 'NaN') {
+        candidates.push('card' + digits);
+        candidates.push('card' + digits.padStart(2, '0'));
+      }
+    } else if (/^\d+$/.test(raw)) {
+      const digits = String(parseInt(raw, 10));
+      if (digits && digits !== 'NaN') {
+        candidates.push('card' + digits);
+        candidates.push('card' + digits.padStart(2, '0'));
+      }
+    } else {
+      return null;
     }
-    if (/^\d+$/.test(raw)) {
-      return 'card' + raw.padStart(2, '0');
+
+    for (const id of candidates) {
+      if (CARDS.some(c => c && c.id === id)) return id;
     }
-    return null;
+    return candidates[0] || null;
   }
 
   function getForcedCards(extraExcludeIds) {
@@ -3393,6 +3407,85 @@ function clampCard39Score(isAddon, score) {
   return Math.max(0, Math.min(5, score));
 }
 
+
+function getCard39SlotElement(slotIndex) {
+  const cells = Array.from(document.querySelectorAll('.slot-cell'));
+  if (!cells.length) return null;
+  return cells[slotIndex] || null;
+}
+
+function showCard39BigText(text, color) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100020;pointer-events:none;';
+  const el = document.createElement('div');
+  el.textContent = text;
+  el.style.cssText = `
+    color:${color || '#fff'};
+    font-size:min(72px,14vw);
+    font-weight:900;
+    letter-spacing:0.08em;
+    text-shadow:0 0 24px rgba(0,0,0,0.85),0 0 12px ${color || '#fff'};
+    opacity:0;
+    transform:scale(0.82);
+    transition:all 0.22s ease-out;
+  `;
+  overlay.appendChild(el);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'scale(1)';
+  });
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'scale(1.18)';
+  }, 560);
+  setTimeout(() => {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }, 860);
+}
+
+function showCard39FloatingDelta(slotIndex, delta) {
+  const host = getCard39SlotElement(slotIndex);
+  if (!host) return;
+  if (!host.style.position) host.style.position = 'relative';
+
+  const float = document.createElement('div');
+  float.textContent = delta > 0 ? `+${delta}` : `${delta}`;
+  float.style.cssText = `
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+    color:${delta > 0 ? '#5bff9b' : '#ff6d6d'};
+    font-size:28px;
+    font-weight:900;
+    text-shadow:0 0 10px rgba(0,0,0,0.85);
+    pointer-events:none;
+    z-index:40;
+    opacity:1;
+    transition:transform 0.62s ease, opacity 0.62s ease;
+  `;
+  host.appendChild(float);
+  requestAnimationFrame(() => {
+    float.style.transform = 'translate(-50%, -110%)';
+    float.style.opacity = '0';
+  });
+  setTimeout(() => {
+    if (float.parentNode) float.parentNode.removeChild(float);
+  }, 700);
+}
+
+function showCard39AnswerReveal(question, result, onClose) {
+  const title = result && result.correct ? '✔ 正確！' : (result && result.timedOut ? 'TIME UP' : '✖ 錯誤！');
+  const lines = [
+    question && question.question ? question.question : '題目讀取失敗',
+    '',
+    `正解：${question && question.answer ? question.answer : '未知'}`
+  ];
+  if (question && question.note) lines.push(`註釋：${question.note}`);
+  showInfoPopup(title, lines.join('\n'), onClose);
+}
+
 function getCard39SlotMeta(slotIndex) {
   if (slotIndex === 1 || slotIndex === 2) {
     const addonIdx = slotIndex - 1;
@@ -3458,41 +3551,46 @@ function showCard39SlotPicker(onDone) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:100004;';
 
   const panel = document.createElement('div');
-  panel.style.cssText = 'width:min(720px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
 
   const title = document.createElement('div');
   title.textContent = '選擇兩個欄位';
   title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
 
   const sub = document.createElement('div');
-  sub.textContent = '請選兩個非殺手欄位，之後會進入快問快答。';
+  sub.textContent = '請選兩個非殺手欄位，再按同一格可取消。';
   sub.style.cssText = 'font-size:13px;color:#bfc7da;margin-bottom:14px;';
 
   const grid = document.createElement('div');
   grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;';
 
+  function setSelectedStyle(btn, on) {
+    btn.style.borderColor = on ? '#ffd36e' : 'rgba(255,255,255,0.1)';
+    btn.style.boxShadow = on ? '0 0 0 1px rgba(255,211,110,0.55)' : 'none';
+    btn.style.background = on ? '#2b3344' : '#202633';
+  }
+
   slots.forEach((meta) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:92px;';
-    btn.innerHTML = `<div style="font-weight:800;margin-bottom:4px;">${meta.label}</div><div style="font-size:13px;color:#d7deef;line-height:1.4;">${meta.zh}</div><div style="font-size:12px;color:#8fa2ca;margin-top:8px;">目前分數：${typeof meta.score === 'number' ? meta.score : '?'}</div>`;
+    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:96px;';
+    btn.innerHTML = `
+      <div style="font-size:13px;color:#9fb0d6;margin-bottom:6px;">${meta.label}</div>
+      <div style="font-size:15px;font-weight:700;line-height:1.45;">${meta.zh || meta.name || '未知'}</div>
+      <div style="font-size:12px;color:#c8d0e5;margin-top:6px;">目前分數：${meta.score ?? '?'}</div>
+    `;
+    setSelectedStyle(btn, false);
 
     btn.addEventListener('click', () => {
-      if (selected.includes(meta.slotIndex)) {
-        const idx = selected.indexOf(meta.slotIndex);
-        if (idx !== -1) selected.splice(idx, 1);
-        btn.style.borderColor = 'rgba(255,255,255,0.1)';
-        btn.style.boxShadow = 'none';
-        btn.style.background = '#202633';
+      const idx = selected.indexOf(meta.slotIndex);
+      if (idx !== -1) {
+        selected.splice(idx, 1);
+        setSelectedStyle(btn, false);
         return;
       }
-
       if (selected.length >= 2) return;
-
       selected.push(meta.slotIndex);
-      btn.style.borderColor = '#ffd36e';
-      btn.style.boxShadow = '0 0 0 1px rgba(255,211,110,0.55)';
-      btn.style.background = '#2b3344';
+      setSelectedStyle(btn, true);
 
       if (selected.length >= 2) {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -3508,6 +3606,7 @@ function showCard39SlotPicker(onDone) {
   panel.appendChild(grid);
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
+  return true;
 }
 
 function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
@@ -3518,10 +3617,10 @@ function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
 
   const overlay = document.createElement('div');
   overlay.id = 'card39QuizOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100004;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100005;';
 
   const panel = document.createElement('div');
-  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(90deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
 
   const title = document.createElement('div');
   title.textContent = '快問快答';
@@ -3550,7 +3649,7 @@ function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
   function finish(payload) {
     if (done) return;
     done = true;
-    clearInterval(intervalId);
+    clearInterval(secondTimerId);
     clearInterval(progressTimerId);
     clearTimeout(timeoutId);
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -3588,19 +3687,25 @@ function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
   });
 
   const timeoutId = setTimeout(() => {
-    finish({ correct: false, timedOut: true, question: q });
+    timerEl.textContent = 'TIME UP';
+    timerEl.style.color = '#ff6d6d';
+    bar.style.width = '0%';
+    bar.style.background = 'linear-gradient(90deg,#ff7b7b,#ff3b3b)';
+    setTimeout(() => finish({ correct: false, timedOut: true, question: q }), 260);
   }, limitMs);
 
-  const intervalId = setInterval(() => {
+  const secondTimerId = setInterval(() => {
     remain -= 1;
     if (remain < 0) remain = 0;
     timerEl.textContent = `剩餘時間：${remain} 秒`;
+    if (remain <= 1) timerEl.style.color = '#ff6d6d';
   }, 1000);
 
   const progressTimerId = setInterval(() => {
     const elapsed = Date.now() - startAt;
     const ratio = Math.max(0, 1 - (elapsed / limitMs));
     bar.style.width = `${ratio * 100}%`;
+    if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
     if (ratio <= 0) clearInterval(progressTimerId);
   }, 50);
 
@@ -3611,6 +3716,7 @@ function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
   panel.appendChild(actions);
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
+  return true;
 }
 
 function doCard39Quiz() {
@@ -3625,26 +3731,24 @@ function doCard39Quiz() {
 
     showCard39QuizOverlay(question, (result) => {
       const delta = result && result.correct ? 2 : -1;
-      const changed = selectedSlots.map((slotIndex) => ({
-        meta: getCard39SlotMeta(slotIndex),
-        ok: applyCard39DeltaToSlot(slotIndex, delta)
-      }));
 
-      const title = result && result.correct ? '答對了' : (result && result.timedOut ? '超時了' : '答錯了');
-      const lines = [
-        question.question
-      ];
+      if (result && result.correct) {
+        showCard39BigText('CORRECT', '#5bff9b');
+      } else if (result && result.timedOut) {
+        showCard39BigText('TIME UP', '#ff5e5e');
+      } else {
+        showCard39BigText('WRONG', '#ff5e5e');
+      }
 
-      lines.push(`正解：${question.answer}`);
-      if (question.note) lines.push(`註釋：${question.note}`);
-
-      const changedSummary = changed.map(({ meta, ok }) => {
-        const changeText = delta > 0 ? '+2' : '-1';
-        return `${meta ? meta.label : '欄位'}：${changeText}${ok ? '' : '（無法套用）'}`;
-      });
-      lines.push(changedSummary.join(' / '));
-
-      showInfoPopup(title, lines.join('\n'), () => finishCardPhase());
+      setTimeout(() => {
+        showCard39AnswerReveal(question, result, () => {
+          selectedSlots.forEach((slotIndex) => {
+            applyCard39DeltaToSlot(slotIndex, delta);
+            showCard39FloatingDelta(slotIndex, delta);
+          });
+          setTimeout(() => finishCardPhase(), 720);
+        });
+      }, 650);
     }, 5000);
   });
 }
@@ -3660,28 +3764,29 @@ function doCard38SpeedChoice(slotIndex) {
   function autoFillRemainingLowScore(startRoundIdx) {
     for (let i = startRoundIdx; i < roundOrder.length; i++) {
       const perkIdx = roundOrder[i];
-      rerollPerkSlotByScore(perkIdx, [0, 1, 2], {
-        allowDuplicateFallback: false,
-        allowKeepSameName: true
-      });
+      const currentName = currentState.perks[perkIdx] || null;
+      const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
+      const pool = getPerkNamesByScores([0, 1, 2]).filter(name =>
+        name !== currentName && !lockedPerks.includes(name)
+      );
+      const chosen = getRandomItem(pool);
+      if (chosen) currentState.perks[perkIdx] = chosen;
     }
+    finishCardPhase();
   }
 
-  function showTimeoutWarningAndFinish(startRoundIdx) {
-    const warn = document.createElement('div');
-    warn.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:100005;';
-    warn.innerHTML = `
-      <div style="text-align:center;padding:24px 28px;border-radius:18px;background:rgba(20,24,35,0.96);border:1px solid rgba(255,255,255,0.08);box-shadow:0 24px 60px rgba(0,0,0,0.55);">
-        <div style="color:#ff3b3b;font-size:52px;font-weight:900;letter-spacing:0.08em;line-height:1.1;">已超時</div>
-        <div style="margin-top:10px;color:#cfd6ea;font-size:14px;">按一下後，剩下未選的技能會由系統自動改成 0–2 分技能。</div>
-      </div>
-    `;
-    warn.addEventListener('click', () => {
-      if (warn.parentNode) warn.parentNode.removeChild(warn);
+  function showTimeoutConfirm(startRoundIdx) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:100010;';
+    const box = document.createElement('div');
+    box.style.cssText = 'padding:20px 24px;border-radius:18px;background:rgba(22,14,18,0.96);border:1px solid rgba(255,80,80,0.25);box-shadow:0 24px 60px rgba(0,0,0,0.55);';
+    box.innerHTML = '<div style="font-size:min(64px,13vw);font-weight:900;color:#ff4d4d;letter-spacing:0.08em;text-shadow:0 0 20px rgba(255,0,0,0.35);">已超時</div><div style="text-align:center;color:#ffb0b0;margin-top:10px;font-size:14px;">點擊任意位置後，剩餘未選技能將自動補成 0–2 分</div>';
+    overlay.appendChild(box);
+    overlay.addEventListener('click', () => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
       autoFillRemainingLowScore(startRoundIdx);
-      finishCardPhase();
     }, { once: true });
-    document.body.appendChild(warn);
+    document.body.appendChild(overlay);
   }
 
   function runRound(roundIdx) {
@@ -3697,11 +3802,8 @@ function doCard38SpeedChoice(slotIndex) {
     const highPoolBase = getPerkNamesByScores([3, 4, 5]).filter(name =>
       name !== currentName && !lockedPerks.includes(name)
     );
-    const lowPoolBase = getPerkNamesByScores([0, 1, 2]).filter(name =>
-      name !== currentName && !lockedPerks.includes(name)
-    );
 
-    let currentChoices = pickDistinctRandom(highPoolBase, 4);
+    const currentChoices = pickDistinctRandom(highPoolBase, 4);
     if (!currentChoices.length) {
       runRound(roundIdx + 1);
       return;
@@ -3731,7 +3833,7 @@ function doCard38SpeedChoice(slotIndex) {
 
     const hint = document.createElement('div');
     hint.style.cssText = 'font-size:13px;color:#c8d0e5;margin-bottom:14px;';
-    hint.textContent = '前 3 秒是 3–5 分技能；時間到沒選，剩下未選欄位會由系統自動改成 0–2 分技能。';
+    hint.textContent = '3 秒內從 3–5 分技能中選 1 個；超時則剩下未選欄位會由系統補成 0–2 分。';
 
     const slotHint = document.createElement('div');
     slotHint.style.cssText = 'font-size:12px;color:#8fa3cf;margin-bottom:14px;';
@@ -3742,12 +3844,14 @@ function doCard38SpeedChoice(slotIndex) {
 
     let done = false;
     let remain = 3;
-    const startAt = Date.now();
+    let progressTimerId = null;
+    let secondTimerId = null;
+    let timeoutId = null;
 
     function cleanup() {
-      clearInterval(intervalId);
-      clearInterval(progressTimerId);
-      clearTimeout(timeoutId);
+      if (progressTimerId) clearInterval(progressTimerId);
+      if (secondTimerId) clearInterval(secondTimerId);
+      if (timeoutId) clearTimeout(timeoutId);
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
     }
 
@@ -3759,52 +3863,51 @@ function doCard38SpeedChoice(slotIndex) {
       runRound(roundIdx + 1);
     }
 
-    function renderChoices(choiceNames) {
-      grid.innerHTML = '';
-      choiceNames.forEach((name) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.style.cssText = 'padding:10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:132px;';
-        const zh = getPerkZh(name) || name;
-        const score = getPerkScore(name);
-        const img = getPerkImg(name);
-        btn.innerHTML = `
-          <div style="display:flex;gap:10px;align-items:center;">
-            <div style="width:54px;height:54px;border-radius:10px;background:#0e121d;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
-              ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:contain;">` : ''}
-            </div>
-            <div style="min-width:0;">
-              <div style="font-size:14px;font-weight:700;line-height:1.4;">${zh}</div>
-              <div style="font-size:12px;color:#9fb0d6;margin-top:4px;">分數：${typeof score === 'number' ? score : '?'}</div>
-            </div>
+    currentChoices.forEach((name) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.cssText = 'padding:10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:132px;';
+      const zh = getPerkZh(name) || name;
+      const score = getPerkScore(name);
+      const img = getPerkImg(name);
+      btn.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="width:54px;height:54px;border-radius:10px;background:#0e121d;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+            ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:contain;">` : ''}
           </div>
-        `;
-        btn.addEventListener('click', () => applyChoice(name));
-        grid.appendChild(btn);
-      });
-    }
+          <div style="min-width:0;">
+            <div style="font-size:14px;font-weight:700;line-height:1.4;">${zh}</div>
+            <div style="font-size:12px;color:#9fb0d6;margin-top:4px;">分數：${typeof score === 'number' ? score : '?'}</div>
+          </div>
+        </div>
+      `;
+      btn.addEventListener('click', () => applyChoice(name));
+      grid.appendChild(btn);
+    });
 
-    const timeoutId = setTimeout(() => {
-      if (done) return;
-      done = true;
-      cleanup();
-      showTimeoutWarningAndFinish(roundIdx);
-    }, 3000);
-
-    const intervalId = setInterval(() => {
+    const startedAt = Date.now();
+    secondTimerId = setInterval(() => {
       remain -= 1;
       if (remain < 0) remain = 0;
       timerEl.textContent = `剩餘時間：${remain} 秒`;
+      if (remain <= 1) timerEl.style.color = '#ff6d6d';
     }, 1000);
 
-    const progressTimerId = setInterval(() => {
-      const elapsed = Date.now() - startAt;
+    progressTimerId = setInterval(() => {
+      const elapsed = Date.now() - startedAt;
       const ratio = Math.max(0, 1 - (elapsed / 3000));
       bar.style.width = `${ratio * 100}%`;
+      if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
       if (ratio <= 0) clearInterval(progressTimerId);
     }, 50);
 
-    renderChoices(currentChoices);
+    timeoutId = setTimeout(() => {
+      if (done) return;
+      done = true;
+      cleanup();
+      showTimeoutConfirm(roundIdx);
+    }, 3000);
+
     panel.appendChild(title);
     panel.appendChild(timerEl);
     panel.appendChild(barWrap);
