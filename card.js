@@ -4684,3 +4684,24 @@ function doCard17ScoreDuelMinigame() {
 
 
 })();
+
+
+// === Tooltip 顯示分數 PATCH（安全版）===
+(function () {
+  function applyScoreTooltip() {
+    const cells = document.querySelectorAll('.slot-cell');
+    cells.forEach(cell => {
+      const name = cell.getAttribute('title') || '';
+      let score = null;
+
+      if (window.getPerkScore) score = getPerkScore(name);
+      if (score == null && window.getAddonScore) score = getAddonScore(name);
+
+      if (typeof score === 'number') {
+        cell.setAttribute('title', name + '\n分數：' + score);
+      }
+    });
+  }
+
+  document.addEventListener('mouseover', applyScoreTooltip);
+})();
