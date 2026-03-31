@@ -620,7 +620,7 @@ A.圖書室
 B.化學室
 C.中庭花園
 D.二樓廁所
-答 B 註釋:在終局的時候會從化學室正中間桌子上的肉塊中慢慢長出來
+答 B 註釋:在終局的時候會從房間正中間的桌子上肉塊中慢慢長出來
 
 下列何者無法從外觀判斷能力狀態？
 A.追跡者
@@ -654,7 +654,7 @@ D.ceba
 A.怨靈
 B.雙胞胎
 C.騙術師
-D.貞子
+D.女獵人
 答 A 註釋:怨靈的只是風聲音效，並不是搖籃曲
 
 下列哪隻殺手設定上最年輕？
@@ -3952,45 +3952,654 @@ function doCard17LosePenalty() {
   return applied > 0;
 }
 
-function doCard17ScoreDuelMinigame() {
-  if (!currentState) return;
 
-  showCard17ScoreChoiceOverlay({
-    title: '選擇你的分數（0–5）',
-    values: [0, 1, 2, 3, 4, 5],
-    ruleLines: [
-      '勝利：6 個欄位變為該分數重抽（若配件沒有 0 分，會自動改試 1 分，再不行試 2 分）',
-      '失敗：隨機 3 個欄位變為 0–1 分重抽',
-      '平手：隨機 4 個欄位變為該分數重抽'
-    ],
-    onPick: (playerScore) => {
-      const dealerScore = Math.floor(Math.random() * 7);
-      let result = 'draw';
-      if (dealerScore > playerScore) result = 'win';
-      else if (dealerScore < playerScore) result = 'lose';
+  let card17GuessStyleInjected = false;
+  function ensureCard17GuessStyles() {
+    if (card17GuessStyleInjected) return;
+    card17GuessStyleInjected = true;
 
-      let ok = false;
-      if (result === 'win') ok = applyCard17WinReward(playerScore);
-      else if (result === 'draw') ok = applyScoreToRandomNonKillerSlots(playerScore, 4, { addOneFirst: false });
-      else ok = doCard17LosePenalty();
+    const style = document.createElement('style');
+    style.id = 'card17-guess-styles';
+    style.textContent = `
+      #card17GuessOverlay,
+      #card17RewardPickerOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100020;
+        background: rgba(0, 0, 0, 0.78);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .card17-guess-panel,
+      .card17-picker-panel {
+        width: min(860px, calc(100vw - 24px));
+        background: linear-gradient(180deg,#0f1423,#101728);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 24px;
+        padding: 22px 22px 18px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.52);
+        color: #fff;
+      }
+      .card17-guess-title,
+      .card17-picker-title {
+        font-size: 24px;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 6px;
+      }
+      .card17-guess-sub,
+      .card17-picker-sub {
+        font-size: 13px;
+        color: #bfc7da;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+      .card17-guess-vs {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+        gap: 16px;
+        align-items: center;
+      }
+      .card17-guess-side {
+        min-height: 290px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 16px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .card17-guess-label {
+        font-size: 14px;
+        color: #d5def5;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+      .card17-guess-imgwrap {
+        width: 126px;
+        height: 126px;
+        border-radius: 20px;
+        background: linear-gradient(180deg,#1a2440,#18233c);
+        border: 1px solid rgba(255,255,255,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 12px;
+        transform-style: preserve-3d;
+      }
+      .card17-guess-imgwrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+      .card17-guess-imgwrap.hidden-card {
+        position: relative;
+        background: linear-gradient(180deg,#1d2a49,#16233d);
+      }
+      .card17-guess-imgwrap.hidden-card::before {
+        content: '?';
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.92);
+        z-index: 2;
+      }
+      .card17-guess-imgwrap.hidden-card img {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .card17-guess-imgwrap.hidden-card.revealed {
+        animation: card17FlipReveal 0.55s ease forwards;
+      }
+      .card17-guess-imgwrap.hidden-card.revealed::before {
+        display: none;
+      }
+      .card17-guess-imgwrap.hidden-card.revealed img {
+        opacity: 1;
+        visibility: visible;
+      }
+      .card17-guess-score {
+        width: 112px;
+        min-height: 60px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 52px;
+        font-weight: 900;
+        background: linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.04));
+        border: 1px solid rgba(255,255,255,0.12);
+        margin-bottom: 10px;
+        box-shadow: inset 0 0 20px rgba(255,255,255,0.04);
+      }
+      .card17-guess-score.hidden-score {
+        color: rgba(255,255,255,0.92);
+      }
+      .card17-guess-name {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #e5ecff;
+        text-align: center;
+        min-height: 38px;
+        word-break: break-word;
+      }
+      .card17-guess-name.masked {
+        letter-spacing: 0.25em;
+      }
+      .card17-guess-mid {
+        font-size: 50px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.9);
+        text-shadow: 0 0 20px rgba(255,255,255,0.18);
+      }
+      .card17-guess-actions {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .card17-choice-btn {
+        min-width: 120px;
+        border: none;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 22px;
+        font-weight: 900;
+        color: #fff;
+        background: linear-gradient(135deg, #74a7ff, #4f7ee8);
+        box-shadow: 0 8px 22px rgba(79,126,232,0.34);
+        cursor: pointer;
+      }
+      .card17-choice-btn:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+      .card17-result-text {
+        margin-top: 14px;
+        min-height: 60px;
+        text-align: center;
+        font-size: 44px;
+        font-weight: 1000;
+        letter-spacing: 0.08em;
+        opacity: 0;
+        transform: translateY(14px) scale(0.92);
+        text-shadow: 0 0 18px rgba(255,255,255,0.14);
+      }
+      .card17-result-text.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        transition: transform 0.28s ease, opacity 0.28s ease;
+      }
+      .card17-result-text.win { color: #6effa2; }
+      .card17-result-text.lose { color: #ff6a82; }
+      .card17-result-text.draw { color: #ffd36e; }
+      .card17-continue-hint {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(225,232,255,0.65);
+        opacity: 0;
+      }
+      #card17GuessOverlay.ready .card17-continue-hint {
+        opacity: 1;
+      }
+      .card17-picker-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px;
+      }
+      .card17-picker-btn {
+        padding: 12px 12px;
+        border-radius: 14px;
+        background: #202633;
+        border: 1px solid rgba(255,255,255,0.10);
+        color: #fff;
+        text-align: left;
+        min-height: 112px;
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 12px;
+        align-items: center;
+        cursor: pointer;
+      }
+      .card17-picker-btn.selected {
+        border-color: #77ffb4;
+        box-shadow: 0 0 0 1px rgba(119,255,180,0.55);
+        background: #2b3344;
+      }
+      .card17-picker-thumb {
+        width: 74px;
+        height: 74px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: #121827;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card17-picker-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+      .card17-picker-meta { min-width: 0; }
+      .card17-picker-name {
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.4;
+        margin-bottom: 6px;
+        word-break: break-word;
+      }
+      .card17-picker-score {
+        font-size: 12px;
+        color: #c8d0e5;
+      }
+      .card17-picker-label {
+        font-size: 12px;
+        color: #8fb0ff;
+        margin-bottom: 4px;
+      }
+      @keyframes card17FlipReveal {
+        0% { transform: rotateY(0deg) scale(1); }
+        49% { transform: rotateY(90deg) scale(1.03); }
+        50% { transform: rotateY(90deg) scale(1.03); }
+        100% { transform: rotateY(0deg) scale(1); }
+      }
+      @media (max-width: 720px) {
+        .card17-guess-vs { grid-template-columns: 1fr; }
+        .card17-guess-mid { display: none; }
+        .card17-picker-grid { grid-template-columns: 1fr; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
-      const title = result === 'win' ? '你贏了' : (result === 'lose' ? '你輸了' : '平手');
-      const bodyLines = [
-        `玩家分數：${playerScore}`,
-        `莊家分數：${dealerScore}`,
-        result === 'win'
-          ? '莊家比較大，依規則你獲勝。6 個非殺手欄位已重抽，配件若沒有 0 分會自動改試 1 分，再不行試 2 分。'
-          : (result === 'lose'
-            ? '莊家比較小，依規則你失敗。系統已盡量讓隨機 3 欄變為 0–1 分重抽。'
-            : '分數相同，依規則平手。隨機 4 個非殺手欄位已依該分數重抽。')
-      ];
+  function getCard17KnownPerkMeta(perkIdx) {
+    if (!currentState || !Array.isArray(currentState.perks)) return null;
+    const name = currentState.perks[perkIdx];
+    if (!name) return null;
+    const score = getPerkScore(name);
+    if (typeof score !== 'number' || score < 1 || score > 4) return null;
+    return {
+      perkIdx,
+      name,
+      zh: getPerkZh(name) || '',
+      img: getPerkImg(name) || '',
+      score
+    };
+  }
 
-      showInfoPopup(title, bodyLines.join('\n'), () => {
-        if (ok) finishCardPhase();
+  function getCard17PerkMetaAny(perkIdx) {
+    if (!currentState || !Array.isArray(currentState.perks)) return null;
+    const name = currentState.perks[perkIdx];
+    if (!name) return null;
+    const score = getPerkScore(name);
+    if (typeof score !== 'number') return null;
+    return {
+      perkIdx,
+      name,
+      zh: getPerkZh(name) || '',
+      img: getPerkImg(name) || '',
+      score
+    };
+  }
+
+  function getCard17RewardMeta(slotIndex) {
+    if (slotIndex === 1 || slotIndex === 2) {
+      const addonIdx = slotIndex - 1;
+      const addonName = currentState && currentState.addons ? currentState.addons[addonIdx] : null;
+      return {
+        slotIndex,
+        isAddon: true,
+        label: `配件 ${addonIdx + 1}`,
+        name: addonName,
+        zh: addonName ? (getAddonZh(addonName) || addonName) : '未知配件',
+        img: addonName ? (getAddonImg(addonName) || '') : '',
+        score: addonName ? getAddonScore(addonName) : null
+      };
+    }
+    if (slotIndex >= 3 && slotIndex <= 6) {
+      const perkIdx = slotIndex - 3;
+      const perkName = currentState && currentState.perks ? currentState.perks[perkIdx] : null;
+      return {
+        slotIndex,
+        isAddon: false,
+        label: `技能 ${perkIdx + 1}`,
+        name: perkName,
+        zh: perkName ? (getPerkZh(perkName) || perkName) : '未知技能',
+        img: perkName ? (getPerkImg(perkName) || '') : '',
+        score: perkName ? getPerkScore(perkName) : null
+      };
+    }
+    return null;
+  }
+
+  function applyCard17DeltaToSlot(slotIndex, delta) {
+    const meta = getCard17RewardMeta(slotIndex);
+    if (!meta || typeof meta.score !== 'number') return false;
+
+    if (meta.isAddon) {
+      let target = meta.score + delta;
+      if (target > 5) target = 5;
+      if (target < 1) target = 1;
+      return rerollAddonSlotByScore(slotIndex - 1, getFallbackScoreSequence(target, {
+        addOneFirst: delta >= 0
+      }), {
+        allowDuplicateFallback: false,
+        allowKeepSameName: true
       });
     }
-  });
-}
+
+    let target = meta.score + delta;
+    if (target > 5) target = 5;
+    if (target < 0) target = 0;
+    return rerollPerkSlotByScore(slotIndex - 3, getFallbackScoreSequence(target, {
+      addOneFirst: delta >= 0
+    }), {
+      allowDuplicateFallback: true,
+      allowKeepSameName: true
+    });
+  }
+
+  function showCard17RewardPicker(options) {
+    ensureCard17GuessStyles();
+
+    const opts = options || {};
+    const maxPick = Math.max(1, Math.min(6, Number(opts.maxPick) || 1));
+    const picked = [];
+    const metas = [1, 2, 3, 4, 5, 6].map(getCard17RewardMeta).filter(Boolean);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'card17RewardPickerOverlay';
+
+    const panel = document.createElement('div');
+    panel.className = 'card17-picker-panel';
+
+    const title = document.createElement('div');
+    title.className = 'card17-picker-title';
+    title.textContent = opts.title || '選擇欄位';
+
+    const sub = document.createElement('div');
+    sub.className = 'card17-picker-sub';
+    sub.textContent = opts.sub || (maxPick === 1 ? '請選 1 個非殺手欄位。' : `請選 ${maxPick} 個非殺手欄位。`);
+
+    const grid = document.createElement('div');
+    grid.className = 'card17-picker-grid';
+
+    metas.forEach((meta) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'card17-picker-btn';
+      btn.innerHTML = `
+        <div class="card17-picker-thumb">${meta.img ? `<img src="${meta.img}" alt="">` : ''}</div>
+        <div class="card17-picker-meta">
+          <div class="card17-picker-label">${meta.label}</div>
+          <div class="card17-picker-name">${meta.zh || meta.name || '未知'}</div>
+          <div class="card17-picker-score">目前分數：${typeof meta.score === 'number' ? meta.score : '?'}</div>
+        </div>
+      `;
+
+      btn.addEventListener('click', () => {
+        const idx = picked.indexOf(meta.slotIndex);
+        if (idx !== -1) {
+          picked.splice(idx, 1);
+          btn.classList.remove('selected');
+          return;
+        }
+        if (picked.length >= maxPick) return;
+        picked.push(meta.slotIndex);
+        btn.classList.add('selected');
+
+        if (picked.length >= maxPick) {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          if (typeof opts.onDone === 'function') opts.onDone(picked.slice(0, maxPick));
+        }
+      });
+
+      grid.appendChild(btn);
+    });
+
+    panel.appendChild(title);
+    panel.appendChild(sub);
+    panel.appendChild(grid);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    return true;
+  }
+
+  function showCard17GuessGame(knownPerkIdx, hiddenPerkIdx, onDone) {
+    ensureCard17GuessStyles();
+
+    const known = getCard17PerkMetaAny(knownPerkIdx);
+    const hidden = getCard17PerkMetaAny(hiddenPerkIdx);
+    if (!known || !hidden) {
+      if (typeof onDone === 'function') onDone('draw');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'card17GuessOverlay';
+
+    const panel = document.createElement('div');
+    panel.className = 'card17-guess-panel';
+
+    const title = document.createElement('div');
+    title.className = 'card17-guess-title';
+    title.textContent = '狂賭之冤';
+
+    const sub = document.createElement('div');
+    sub.className = 'card17-guess-sub';
+    sub.textContent = '左邊已知，請猜右邊技能分數比較大還是比較小。';
+
+    const vs = document.createElement('div');
+    vs.className = 'card17-guess-vs';
+
+    const left = document.createElement('div');
+    left.className = 'card17-guess-side';
+    left.innerHTML = `
+      <div class="card17-guess-label">已知技能</div>
+      <div class="card17-guess-imgwrap">${known.img ? `<img src="${known.img}" alt="">` : ''}</div>
+      <div class="card17-guess-score">${known.score}</div>
+      <div class="card17-guess-name">${known.zh ? `${known.name} / ${known.zh}` : known.name}</div>
+    `;
+
+    const right = document.createElement('div');
+    right.className = 'card17-guess-side';
+    right.innerHTML = `
+      <div class="card17-guess-label">未知技能</div>
+      <div class="card17-guess-imgwrap hidden-card" id="card17HiddenImgWrap">${hidden.img ? `<img src="${hidden.img}" alt="">` : ''}</div>
+      <div class="card17-guess-score hidden-score" id="card17HiddenScore">?</div>
+      <div class="card17-guess-name masked" id="card17HiddenName">？？？</div>
+    `;
+
+    const mid = document.createElement('div');
+    mid.className = 'card17-guess-mid';
+    mid.textContent = 'VS';
+
+    vs.appendChild(left);
+    vs.appendChild(mid);
+    vs.appendChild(right);
+
+    const actions = document.createElement('div');
+    actions.className = 'card17-guess-actions';
+
+    const bigBtn = document.createElement('button');
+    bigBtn.type = 'button';
+    bigBtn.className = 'card17-choice-btn';
+    bigBtn.textContent = '比較大';
+
+    const smallBtn = document.createElement('button');
+    smallBtn.type = 'button';
+    smallBtn.className = 'card17-choice-btn';
+    smallBtn.textContent = '比較小';
+
+    actions.appendChild(bigBtn);
+    actions.appendChild(smallBtn);
+
+    const resultText = document.createElement('div');
+    resultText.className = 'card17-result-text';
+
+    const continueHint = document.createElement('div');
+    continueHint.className = 'card17-continue-hint';
+    continueHint.textContent = '點擊任意位置繼續';
+
+    panel.appendChild(title);
+    panel.appendChild(sub);
+    panel.appendChild(vs);
+    panel.appendChild(actions);
+    panel.appendChild(resultText);
+    panel.appendChild(continueHint);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    let resolved = false;
+    let canContinue = false;
+    let finalResult = 'draw';
+
+    const hiddenImgWrap = right.querySelector('#card17HiddenImgWrap');
+    const hiddenScoreEl = right.querySelector('#card17HiddenScore');
+    const hiddenNameEl = right.querySelector('#card17HiddenName');
+
+    function enableContinue() {
+      canContinue = true;
+      overlay.classList.add('ready');
+    }
+
+    function cleanupAndDone() {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onDone === 'function') onDone(finalResult);
+    }
+
+    overlay.addEventListener('click', (e) => {
+      if (!canContinue) return;
+      if (e.target.closest('.card17-choice-btn')) return;
+      cleanupAndDone();
+    });
+
+    function handleGuess(choice) {
+      if (resolved) return;
+      resolved = true;
+      bigBtn.disabled = true;
+      smallBtn.disabled = true;
+
+      hiddenImgWrap.classList.add('revealed');
+      hiddenScoreEl.textContent = String(hidden.score);
+      hiddenNameEl.textContent = hidden.zh ? `${hidden.name} / ${hidden.zh}` : hidden.name;
+      hiddenNameEl.classList.remove('masked');
+
+      if (hidden.score > known.score) finalResult = (choice === 'big') ? 'win' : 'lose';
+      else if (hidden.score < known.score) finalResult = (choice === 'small') ? 'win' : 'lose';
+      else finalResult = 'draw';
+
+      setTimeout(() => {
+        resultText.classList.add('show');
+        if (finalResult === 'win') {
+          resultText.classList.add('win');
+          resultText.textContent = 'WIN';
+        } else if (finalResult === 'lose') {
+          resultText.classList.add('lose');
+          resultText.textContent = 'LOSE';
+        } else {
+          resultText.classList.add('draw');
+          resultText.textContent = 'DRAW';
+        }
+        enableContinue();
+      }, 380);
+    }
+
+    bigBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleGuess('big');
+    });
+    smallBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleGuess('small');
+    });
+  }
+
+  function doCard17ScoreDuelMinigame() {
+    if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 2) return;
+
+    const knownCandidates = [0, 1, 2, 3]
+      .map(getCard17KnownPerkMeta)
+      .filter(Boolean)
+      .map(meta => meta.perkIdx);
+
+    if (knownCandidates.length < 1) {
+      showInfoPopup('狂賭之冤', '沒有 1～4 分的技能可作為左邊明牌，無法使用。', () => finishCardPhase());
+      return;
+    }
+
+    const knownPerkIdx = getRandomItem(knownCandidates);
+    const hiddenCandidates = [0, 1, 2, 3]
+      .filter(i => i !== knownPerkIdx && !!getCard17PerkMetaAny(i));
+
+    if (hiddenCandidates.length < 1) {
+      showInfoPopup('狂賭之冤', '可用技能數量不足，無法使用。', () => finishCardPhase());
+      return;
+    }
+
+    const hiddenPerkIdx = getRandomItem(hiddenCandidates);
+
+    showCard17GuessGame(knownPerkIdx, hiddenPerkIdx, (result) => {
+      if (result === 'win') {
+        showCard17RewardPicker({
+          title: '狂賭之冤',
+          sub: '你猜對了，請選 2 個非殺手欄位 +2 分。',
+          maxPick: 2,
+          onDone: (picked) => {
+            (picked || []).forEach((slotIndex) => {
+              applyCard17DeltaToSlot(slotIndex, 2);
+              if (typeof showCard39FloatingDelta === 'function') {
+                showCard39FloatingDelta(slotIndex, 2);
+              }
+            });
+            setTimeout(() => finishCardPhase(), 720);
+          }
+        });
+        return;
+      }
+
+      if (result === 'lose') {
+        shuffle([1, 2, 3, 4, 5, 6]).slice(0, 2).forEach((slotIndex) => {
+          applyCard17DeltaToSlot(slotIndex, -2);
+          if (typeof showCard39FloatingDelta === 'function') {
+            showCard39FloatingDelta(slotIndex, -2);
+          }
+        });
+        setTimeout(() => finishCardPhase(), 720);
+        return;
+      }
+
+      showCard17RewardPicker({
+        title: '狂賭之冤',
+        sub: '平手，請選 1 個非殺手欄位 +1 分。',
+        maxPick: 1,
+        onDone: (picked) => {
+          (picked || []).forEach((slotIndex) => {
+            applyCard17DeltaToSlot(slotIndex, 1);
+            if (typeof showCard39FloatingDelta === 'function') {
+              showCard39FloatingDelta(slotIndex, 1);
+            }
+          });
+          setTimeout(() => finishCardPhase(), 720);
+        }
+      });
+    });
+  }
+
 
   function doCard18AverageAddons() {
     const killerKey = currentState.killerKey;
