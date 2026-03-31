@@ -45,7 +45,7 @@
       zh: '汰舊換新',
       target: 'addon',
       colorType: 'addon',
-      summary: '系統會在後台自動重抽兩個配件，直到得到可用且總分為 7 的組合。',
+      summary: '重抽兩個配件，兩者總分會是7分。',
       effect: { type: 'card03_addons_sum_7', data: {} }
     },
 
