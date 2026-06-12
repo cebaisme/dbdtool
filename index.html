@@ -2545,6 +2545,9 @@
   <script src="killers.js"></script>
   <script src="addons.js"></script>
   <script src="perks.js"></script>
+  <!-- 卡片使用完成音效：把 complet.mp3 放在 index.html 同一層資料夾 -->
+  <audio id="cardUseSound" src="./images/other/complet.mp3" preload="auto"></audio>
+
   <script src="card.js"></script>
 
   <script>
@@ -3622,6 +3625,29 @@
       } catch (e) { }
     };
 
+    // 播放「卡片使用完成」音效
+    function playUseCompleteSound() {
+      const audio = document.getElementById('cardUseSound');
+      if (!audio) return;
+
+      try {
+        audio.volume = 0.3;
+        audio.pause();
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            // 瀏覽器可能會擋掉非使用者互動觸發的音效，這裡靜默處理避免報錯。
+          });
+        }
+      } catch (e) {
+        // 避免音效播放失敗影響卡片效果。
+      }
+    }
+
+    // 相容舊呼叫名稱，避免名稱打錯時讓拉霸卡死。
+    window.playCardCompleteSound = playUseCompleteSound;
+
 
     function getRandomItem(arr) {
       if (!arr.length) return null;
@@ -4026,6 +4052,8 @@
             syncRewardRowVisibility();
             CardSystem.startCardPhase(slotState, {
               onApplied: (updatedState) => {
+                playUseCompleteSound();
+
                 if (updatedState) {
                   const prevState = {
                     killerKey: slotState.killerKey,
