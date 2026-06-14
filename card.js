@@ -45,7 +45,7 @@
       zh: '汰舊換新',
       target: 'addon',
       colorType: 'addon',
-      summary: '重抽兩個配件，兩者總分會是7分。',
+      summary: '系統會在後台自動重抽兩個配件，直到得到可用且總分為 7 的組合。',
       effect: { type: 'card03_addons_sum_7', data: {} }
     },
 
@@ -434,7 +434,40 @@
       effect: { type: 'card39_quiz', data: {} }
     },
 
+    // 40. 賽巴精選：選兩個技能欄位，套用隨機套餐，配件各降 1 分
+    {
+      id: 'card40',
+      zh: '賽巴精選',
+      target: 'any',
+      colorType: 'all-colored',
+      summary: '選擇兩個技能欄位，抽出賽巴精選套餐並套用技能；配件 -1 分重抽。',
+      effect: { type: 'card40_ceba_combo', data: {} }
+    },
 
+
+  ];
+
+  const CEBA_COMBOS = [
+    { name: '與心愛的你行至世界盡頭', perks: ['牢牢緊握', '欣喜若狂'] },
+    { name: '滾雪球', perks: ['超級死黨', '鬼祟追逐'] },
+    { name: '強到靠杯', perks: ['死者開關', '禍害之鉤:痛苦迴響'] },
+    { name: '可能有點過期的', perks: ['爆發', '海之喚'] },
+    { name: '查無此人', perks: ['感染碰觸', '遊蕩之眼'] },
+    { name: '金剛腿', perks: ['所向無敵', '怒火中燒'] },
+    { name: '鐵頭功', perks: ['耐力持久', '暴怒怨靈'] },
+    { name: '多米諾骨牌', perks: ['恐懼傳染', '強制減速'] },
+    { name: '你看不到我啊', perks: ['出乎意料', '折磨之路'] },
+    { name: 'Need Some Pressure', perks: ['心驚肉跳', '逆轉時光'] },
+    { name: '禁止攜帶入場', perks: ['富蘭克林之死', '魔網同調'] },
+    { name: '40米長刀', perks: ['恩賜解脫', '震撼雷霆'] },
+    { name: '舉重選手', perks: ['永世糾纏', '怒火中燒'] },
+    { name: 'Party Walk', perks: ['疾速殘暴', '把最好的留在最後'] },
+    { name: '讓我康康', perks: ['了如指掌', '壓制'] },
+    { name: '懶得踹機', perks: ['突爆', '逆轉時光'] },
+    { name: '再給我兩分鐘', perks: ['無路可逃', '勿忘我'] },
+    { name: '拆圖騰模擬器', perks: ['厄咒:玩物', '厄咒:修飾痕'] },
+    { name: '我看到你了', perks: ['致命追逐者', '人肉燒烤'] },
+    { name: '後果自負', perks: ['厄咒:以眼還眼', '驕兵必破'] }
   ];
 
   // ==========================
@@ -735,7 +768,7 @@ function normalizeCard39AnswerToken(value) {
   // 例：const FORCE_DRAW_CARD_IDS = [17];
   // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
   // ==========================
-  const FORCE_DRAW_CARD_IDS = [];
+  const FORCE_DRAW_CARD_IDS = [40];
 
   function normalizeForcedCardId(value) {
     if (value == null) return null;
@@ -2249,6 +2282,9 @@ function showCard17ScoreChoiceOverlay(options) {
       case 'card39_quiz':
         doCard39Quiz();
         return;
+      case 'card40_ceba_combo':
+        doCard40CebaCombo();
+        return;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -2706,6 +2742,290 @@ function showCard17ScoreChoiceOverlay(options) {
   // 36 號卡：一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
 
   // 37. 殺手皇后：敗者食塵（直接回到拉霸階段）
+
+  function playCard40CompleteSound() {
+    try {
+      const audio = new Audio('./complet.mp3');
+      audio.volume = 0.35;
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') p.catch(() => { });
+    } catch (e) { }
+  }
+
+  function findPerkKeyByZhOrKey(name) {
+    if (!name) return null;
+    if (window.PERKS && window.PERKS[name]) return name;
+    const found = findPerkKeyByZh(name);
+    if (found) return found;
+    const norm = String(name).replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+    for (const [key, perk] of Object.entries(window.PERKS || {})) {
+      const zh = perk && perk.zh ? String(perk.zh) : '';
+      const keyNorm = String(key).replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+      const zhNorm = zh.replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+      if (keyNorm === norm || zhNorm === norm) return key;
+    }
+    return null;
+  }
+
+  function findAddonKeyByName(name) {
+    if (!name) return null;
+    if (window.ADDONS && window.ADDONS[name]) return name;
+    const norm = String(name).replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+    for (const [key, addon] of Object.entries(window.ADDONS || {})) {
+      const zh = addon && addon.zh ? String(addon.zh) : '';
+      const keyNorm = String(key).replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+      const zhNorm = zh.replace(/\s+/g, '').replace(/[：:]/g, ':').toLowerCase();
+      if (keyNorm === norm || zhNorm === norm) return key;
+    }
+    return null;
+  }
+
+  function getAddonScoreSafe(name) {
+    const key = findAddonKeyByName(name);
+    return key ? getAddonScore(key) : null;
+  }
+
+  function rerollCard40AddonsMinusOne() {
+    if (!currentState || !currentState.killerKey || !Array.isArray(currentState.addons)) return false;
+
+    const killerKey = currentState.killerKey;
+    const original = currentState.addons.slice(0, 2).map(findAddonKeyByName);
+    if (original.length < 2 || original.some(a => !a)) return false;
+
+    const oldScores = original.map(a => getAddonScoreSafe(a));
+    if (oldScores.some(s => typeof s !== 'number')) return false;
+
+    const allAddons = getAddonNamesForKiller(killerKey).filter(a => !original.includes(a));
+    if (allAddons.length < 2) return false;
+
+    const minusPairs = [];
+    const samePairs = [];
+    const plusPairs = [];
+
+    for (let i = 0; i < allAddons.length; i++) {
+      for (let j = i + 1; j < allAddons.length; j++) {
+        const a = allAddons[i];
+        const b = allAddons[j];
+
+        const sa = getAddonScoreSafe(a);
+        const sb = getAddonScoreSafe(b);
+        if (typeof sa !== 'number' || typeof sb !== 'number') continue;
+
+        // 第一優先：兩個配件都各 -1 分
+        if ((sa === oldScores[0] - 1 && sb === oldScores[1] - 1) ||
+            (sa === oldScores[1] - 1 && sb === oldScores[0] - 1)) {
+          minusPairs.push([a, b]);
+        }
+
+        // 第二優先：兩個配件都同分重抽
+        if ((sa === oldScores[0] && sb === oldScores[1]) ||
+            (sa === oldScores[1] && sb === oldScores[0])) {
+          samePairs.push([a, b]);
+        }
+
+        // 第三優先：兩個配件都各 +1 分
+        if ((sa === oldScores[0] + 1 && sb === oldScores[1] + 1) ||
+            (sa === oldScores[1] + 1 && sb === oldScores[0] + 1)) {
+          plusPairs.push([a, b]);
+        }
+      }
+    }
+
+    if (minusPairs.length) {
+      currentState.addons = getRandomItem(minusPairs);
+      return true;
+    }
+
+    if (samePairs.length) {
+      currentState.addons = getRandomItem(samePairs);
+      return true;
+    }
+
+    if (plusPairs.length) {
+      currentState.addons = getRandomItem(plusPairs);
+      return true;
+    }
+
+    return false;
+  }
+
+  function pickCard40ComboForSlots(slotIdxs) {
+    if (!Array.isArray(CEBA_COMBOS) || !CEBA_COMBOS.length) return null;
+    const selectedSlots = new Set(slotIdxs || []);
+    const existingOutsideSelected = new Set(
+      (currentState.perks || []).filter((_, idx) => !selectedSlots.has(idx))
+    );
+
+    const candidates = shuffle(CEBA_COMBOS).map(combo => {
+      const perkKeys = Array.isArray(combo.perks) ? combo.perks.map(findPerkKeyByZhOrKey) : [];
+      return { combo, perkKeys };
+    }).filter(item => {
+      if (!item.combo || item.perkKeys.length < 2 || item.perkKeys.some(k => !k)) return false;
+      if (item.perkKeys[0] === item.perkKeys[1]) return false;
+      return item.perkKeys.every(k => !existingOutsideSelected.has(k));
+    });
+
+    return candidates[0] || null;
+  }
+
+  function showCard40ComboResult(combo, onClose) {
+    const overlay = document.createElement('div');
+    overlay.id = 'card40ComboOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.76);display:flex;align-items:center;justify-content:center;z-index:100030;color:#fff;cursor:pointer;padding:24px;box-sizing:border-box;';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'max-width:980px;width:min(980px,94vw);text-align:center;pointer-events:none;background:linear-gradient(135deg,#d11b4f,#510a1e);border:1px solid rgba(255,255,255,0.22);border-radius:18px;padding:34px 32px 30px;box-shadow:0 22px 54px rgba(0,0,0,0.72),0 0 34px rgba(209,27,79,0.28),inset 0 0 0 1px rgba(255,255,255,0.06);';
+
+    const pre = document.createElement('div');
+    pre.textContent = '賽巴精選';
+    pre.style.cssText = 'font-size:20px;letter-spacing:0.16em;color:rgba(255,255,255,0.72);font-weight:800;margin-bottom:22px;';
+
+    const line = document.createElement('div');
+    line.style.cssText = 'display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;line-height:1.05;';
+
+    const title = document.createElement('span');
+    title.textContent = `「${combo.name}」`;
+    title.style.cssText = 'font-size:clamp(44px,7.2vw,104px);font-weight:1000;text-shadow:0 0 24px rgba(255,255,255,0.16),0 8px 30px rgba(0,0,0,0.75);';
+
+    const suffix = document.createElement('span');
+    suffix.textContent = '套餐';
+    suffix.style.cssText = 'font-size:clamp(22px,3vw,40px);font-weight:900;color:rgba(255,255,255,0.82);';
+
+    const hint = document.createElement('div');
+    hint.textContent = '點任意位置繼續';
+    hint.style.cssText = 'font-size:16px;margin-top:28px;color:rgba(255,255,255,0.55);';
+
+    line.appendChild(title);
+    line.appendChild(suffix);
+    panel.appendChild(pre);
+    panel.appendChild(line);
+    panel.appendChild(hint);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    function closeOnce() {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onClose === 'function') onClose();
+    }
+    overlay.addEventListener('click', closeOnce, { once: true });
+  }
+
+  function showCard40SlotPicker(onPick) {
+    const overlay = document.createElement('div');
+    overlay.id = 'card40SlotPickerOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100029;color:#fff;padding:18px;box-sizing:border-box;';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'width:min(980px,96vw);background:#1b1b1b;border:1px solid rgba(255,255,255,0.16);border-radius:18px;padding:22px;box-shadow:0 18px 36px rgba(0,0,0,0.7);';
+
+    const title = document.createElement('div');
+    title.textContent = '賽巴精選：選兩個技能欄位';
+    title.style.cssText = 'font-size:22px;font-weight:900;text-align:center;margin-bottom:8px;';
+
+    const sub = document.createElement('div');
+    sub.textContent = '已選 0 / 2';
+    sub.style.cssText = 'font-size:14px;color:rgba(255,255,255,0.68);text-align:center;margin-bottom:16px;';
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;';
+
+    const selected = [];
+    const buttons = [];
+    for (let i = 0; i < 4; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const perkName = currentState && currentState.perks ? currentState.perks[i] : '';
+      const zh = getPerkZh(perkName) || perkName || `技能 ${i + 1}`;
+      const imgSrc = getPerkImg(perkName);
+      btn.style.cssText = 'border-radius:14px;border:1px solid rgba(255,255,255,0.16);background:#2a2a2a;color:#fff;cursor:pointer;padding:10px 8px 12px;min-height:142px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;transition:background .12s ease, transform .12s ease, outline .12s ease;';
+
+      const icon = document.createElement('div');
+      icon.style.cssText = 'width:82px;height:82px;border-radius:8px;background:#050505;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(0,0,0,.35);';
+      if (imgSrc) {
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = zh;
+        img.style.cssText = 'width:82px;height:82px;object-fit:contain;display:block;';
+        icon.appendChild(img);
+      } else {
+        icon.textContent = `${i + 1}`;
+        icon.style.fontSize = '28px';
+        icon.style.fontWeight = '900';
+        icon.style.color = 'rgba(255,255,255,.55)';
+      }
+
+      const label = document.createElement('div');
+      label.textContent = zh;
+      label.style.cssText = 'font-size:13px;font-weight:700;line-height:1.25;text-align:center;min-height:34px;display:flex;align-items:center;justify-content:center;word-break:break-word;';
+
+      const slot = document.createElement('div');
+      slot.textContent = `技能欄位 ${i + 1}`;
+      slot.style.cssText = 'font-size:11px;color:rgba(255,255,255,.55);line-height:1;';
+
+      btn.appendChild(icon);
+      btn.appendChild(label);
+      btn.appendChild(slot);
+      btn.addEventListener('click', () => {
+        const at = selected.indexOf(i);
+        if (at >= 0) selected.splice(at, 1);
+        else if (selected.length < 2) selected.push(i);
+        buttons.forEach((b, idx) => {
+          const on = selected.includes(idx);
+          b.style.outline = on ? '3px solid rgba(246,183,60,0.95)' : 'none';
+          b.style.background = on ? '#3a3324' : '#2a2a2a';
+          b.style.transform = on ? 'translateY(-1px)' : 'translateY(0)';
+        });
+        sub.textContent = `已選 ${selected.length} / 2`;
+        if (selected.length === 2) {
+          setTimeout(() => {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            onPick(selected.slice());
+          }, 140);
+        }
+      });
+      buttons.push(btn);
+      grid.appendChild(btn);
+    }
+
+    panel.appendChild(title);
+    panel.appendChild(sub);
+    panel.appendChild(grid);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+  }
+
+  function doCard40CebaCombo() {
+    if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
+      showInfoPopup('賽巴精選', '目前沒有足夠技能欄位可以套用。', () => finishCardPhase());
+      return;
+    }
+    if (!currentState.killerKey || !Array.isArray(currentState.addons) || currentState.addons.length < 2) {
+      showInfoPopup('賽巴精選', '目前沒有足夠配件欄位可以降分重抽。', () => finishCardPhase());
+      return;
+    }
+
+    showCard40SlotPicker((slotIdxs) => {
+      const picked = pickCard40ComboForSlots(slotIdxs);
+      if (!picked || !picked.combo || !Array.isArray(picked.perkKeys) || picked.perkKeys.length < 2) {
+        showInfoPopup('賽巴精選', '沒有可用套餐：抽出的套餐會和未選欄位技能重複。', () => finishCardPhase());
+        return;
+      }
+
+      if (!rerollCard40AddonsMinusOne()) {
+        showInfoPopup('賽巴精選', '配件 -1 分、同分、+1 分重抽都失敗，無法使用。', () => finishCardPhase());
+        return;
+      }
+
+      const newPerks = currentState.perks.slice();
+      newPerks[slotIdxs[0]] = picked.perkKeys[0];
+      newPerks[slotIdxs[1]] = picked.perkKeys[1];
+      currentState.perks = newPerks;
+
+      playCard40CompleteSound();
+      showCard40ComboResult(picked.combo, () => finishCardPhase());
+    });
+  }
+
   function doCard37RestartSlot(card) {
     isActive = false;
     currentCards = [];

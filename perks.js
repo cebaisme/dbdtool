@@ -317,7 +317,7 @@ zh: "禍害之鉤:行刑者的技巧",
 "Surveillance": {
 zh: "了如指掌",
     score: 3,
-    aliases: ["surveillance", "發電機"],
+    aliases: ["surveillance", "瞭如指掌", "發電機"],
     killer: "The Pig",
     img: "./images/perks/surveillance.png"
   },
