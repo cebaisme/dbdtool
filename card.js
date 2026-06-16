@@ -29,14 +29,14 @@
       }
     },
 
-    // 2. 5 個通用技能擇一
+    // 2. 指定欄位單純重抽，並可再用一次剩餘卡片
     {
       id: 'card02',
       zh: '起床重睡',
-      target: 'slot-perk',
-      colorType: 'perk-slot',
-      summary: '該技能欄位抽出 5 個通用技能，五選一替換。',
-      effect: { type: 'replace_skill_general_choice', data: { choices: 5 } }
+      target: 'slot-addon-perk',
+      colorType: 'slot',
+      summary: '指定一個配件或技能欄位單純重抽。此卡使用後不結束卡片階段，可再使用一次剩餘卡片。',
+      effect: { type: 'card02_reroll_slot_extra_card', data: {} }
     },
 
     // 3. 兩個配件總分為 7
@@ -2155,6 +2155,7 @@ function showCard17ScoreChoiceOverlay(options) {
     if (t === 'addon') return isAddon;
     if (t === 'perk') return isPerk;
     if (t === 'slot-any') return true;
+    if (t === 'slot-addon-perk') return isAddon || isPerk;
     if (t === 'slot-perk') return isPerk;
     return false;
   }
@@ -2187,6 +2188,10 @@ function showCard17ScoreChoiceOverlay(options) {
         break;
       case 'reroll_target_perk':
         ok = doRerollTargetPerk(slotIndex);
+        break;
+      case 'card02_reroll_slot_extra_card':
+        ok = doCard02RerollSlotExtraCard(card, slotIndex);
+        if (ok) return;
         break;
       case 'reroll_random_slots_0_6':
         ok = doRerollRandomSlots(card.effect.data && card.effect.data.min, card.effect.data && card.effect.data.max);
@@ -2435,6 +2440,100 @@ function showCard17ScoreChoiceOverlay(options) {
     if (newAddons.length !== 2) return false;
 
     currentState.addons = newAddons;
+    return true;
+  }
+
+
+  function doRerollSingleSlot(slotIndex) {
+    if (!currentState) return false;
+
+    const isAddonSlot = slotIndex === 1 || slotIndex === 2;
+    const isPerkSlot = slotIndex >= 3 && slotIndex <= 6;
+    if (!isAddonSlot && !isPerkSlot) return false;
+
+    if (isAddonSlot) {
+      const killerKey = currentState.killerKey;
+      if (!killerKey || !Array.isArray(currentState.addons) || currentState.addons.length < 2) return false;
+
+      const idx = slotIndex - 1;
+      const originalAddons = currentState.addons.slice();
+      const usedByOtherSlot = originalAddons.filter((_, i) => i !== idx);
+      const pool = getAddonNamesForKiller(killerKey).filter(name => {
+        return name !== originalAddons[idx] && !usedByOtherSlot.includes(name);
+      });
+      if (!pool.length) return false;
+
+      const picked = getRandomItem(pool);
+      if (!picked) return false;
+
+      const newAddons = originalAddons.slice();
+      newAddons[idx] = picked;
+      currentState.addons = newAddons;
+      return true;
+    }
+
+    const idx = slotIndex - 3;
+    if (!Array.isArray(currentState.perks) || currentState.perks.length < 4) return false;
+
+    const originalPerks = currentState.perks.slice();
+    const usedByOtherSlots = originalPerks.filter((_, i) => i !== idx);
+    const pool = Object.keys(window.PERKS || {}).filter(name => {
+      return name !== originalPerks[idx] && !usedByOtherSlots.includes(name);
+    });
+    if (!pool.length) return false;
+
+    const picked = getRandomItem(pool);
+    if (!picked) return false;
+
+    const newPerks = originalPerks.slice();
+    newPerks[idx] = picked;
+    currentState.perks = newPerks;
+    return true;
+  }
+
+  function syncCurrentStateToBoardWithoutEndingPhase() {
+    if (typeof applyCallback !== 'function') return;
+    try {
+      applyCallback(sanitizeAddonState(cloneState(currentState)));
+    } catch (e) {
+      console.warn('起床重睡同步目前配置失敗:', e);
+    }
+  }
+
+  function continueCardPhaseWithRemainingCards(usedCard, messageTitle, messageBody) {
+    dragInfo = null;
+    clearDropHighlights();
+
+    if (Array.isArray(currentCards)) {
+      currentCards = currentCards.filter(c => !usedCard || c.id !== usedCard.id);
+    }
+
+    // 先同步畫面，讓玩家立刻看到指定欄位已經重抽。
+    syncCurrentStateToBoardWithoutEndingPhase();
+
+    if (currentCards && currentCards.length > 0) {
+      decorateCardSummaries();
+      renderCards();
+      showInfoPopup(
+        messageTitle || '起床重睡',
+        messageBody || '請再次選擇使用一張卡片。',
+        () => {}
+      );
+      return;
+    }
+
+    finishCardPhase();
+  }
+
+  function doCard02RerollSlotExtraCard(card, slotIndex) {
+    const ok = doRerollSingleSlot(slotIndex);
+    if (!ok) return false;
+
+    continueCardPhaseWithRemainingCards(
+      card,
+      '起床重睡',
+      '指定欄位已重抽。本卡不結束卡片階段，請從剩餘卡片中再使用一張。'
+    );
     return true;
   }
 
