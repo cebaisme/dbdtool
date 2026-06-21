@@ -613,7 +613,7 @@ window.ADDONS = {
     zh: "俗氣的耳環",
     score: 4,
     aliases: ["跟蹤時的移動速度增加20%", "白配"],
-    img: "./images/addons/tackyearrings.png", 
+    img: "./images/addons/tackyearrings.png",
     killer: "The Shape",
   },
   "Dead Rabbit": {
@@ -1944,7 +1944,7 @@ window.ADDONS = {
   "Defaced Smiley Pin": {
     zh: "塗鴉笑臉飾針",
     score: 3,
-    aliases: ["重傷",  "斷骨", "60秒", "綠配"],
+    aliases: ["重傷", "斷骨", "60秒", "綠配"],
     img: "./images/addons/defacedsmileypin.png",
     killer: "The Legion",
   },
@@ -2800,7 +2800,7 @@ window.ADDONS = {
   "Black Strap": {
     zh: "黑色掛帶",
     score: 4,
-    aliases: ["距離增加25%","寬度減少25%", "白配"],
+    aliases: ["距離增加25%", "寬度減少25%", "白配"],
     img: "./images/addons/blackstrap.png",
     killer: "The Executioner",
   },
@@ -2821,7 +2821,7 @@ window.ADDONS = {
   "Lead Ring": {
     zh: "鉛環",
     score: 1,
-    aliases: ["距離減少25%","寬度增加25%", "白配"],
+    aliases: ["距離減少25%", "寬度增加25%", "白配"],
     img: "./images/addons/leadring.png",
     killer: "The Executioner",
   },
@@ -2849,14 +2849,14 @@ window.ADDONS = {
   "Spearhead": {
     zh: "槍尖",
     score: 2,
-    aliases: ["牢籠" ,"氣場", "8秒", "綠配"],
+    aliases: ["牢籠", "氣場", "8秒", "綠配"],
     img: "./images/addons/spearhead.png",
     killer: "The Executioner",
   },
   "Wax Doll": {
     zh: "蠟製娃娃",
     score: 3,
-    aliases: ["距離增加5%","綠配"],
+    aliases: ["距離增加5%", "綠配"],
     img: "./images/addons/waxdoll.png",
     killer: "The Executioner",
   },
@@ -3900,7 +3900,7 @@ window.ADDONS = {
   "Mother's Comb": {
     zh: "母親的梳子",
     score: 4,
-    aliases: ["黃色氣場","關機的電視", "藍配"],
+    aliases: ["黃色氣場", "關機的電視", "藍配"],
     img: "./images/addons/motherscomb.png",
     killer: "The Onryo",
   },
@@ -3935,7 +3935,7 @@ window.ADDONS = {
   "Tape Editing Deck": {
     zh: "錄影剪輯設備",
     score: 2,
-    aliases: ["最遠","氣場", "6秒", "紫配"],
+    aliases: ["最遠", "氣場", "6秒", "紫配"],
     img: "./images/addons/tapeeditingdeck.png",
     killer: "The Onryo",
   },
@@ -3963,7 +3963,7 @@ window.ADDONS = {
   "Remote Control": {
     zh: "遙控器",
     score: 5,
-    aliases: ["開機電視","12公尺", "12米", "氣場","7秒", "紅配"],
+    aliases: ["開機電視", "12公尺", "12米", "氣場", "7秒", "紅配"],
     img: "./images/addons/remotecontrol.png",
     killer: "The Onryo",
   },
@@ -6026,8 +6026,8 @@ window.ADDONS = {
     img: "./images/addons/shreddedgown.png",
     killer: "The Krasue",
   },
-  
-  
+
+
 
 
   // 亨利
@@ -6173,5 +6173,153 @@ window.ADDONS = {
     aliases: ["虹彩索泰里亞晶片", "隱形", "隱身", "氣場", "12公尺", "12米", "紅配"],
     img: "./images/addons/iridescentsoteriachip.png",
     killer: "The First",
+  },
+
+
+
+
+  // 傑森
+
+
+
+  "Bent Wheel": {
+    zh: "彎曲的輪子",
+    score: 3,
+    aliases: ["跳嚇", "瞄準距離", "4公尺", "4米", "白配"],
+    img: "./images/addons/bentwheel.png",
+    killer: "The Slasher",
+  },
+  "Garden Claw": {
+    zh: "花園爪",
+    score: 3,
+    aliases: ["殺手本能", "2秒", "白配"],
+    img: "./images/addons/gardenclaw.png",
+    killer: "The Slasher",
+  },
+  "Knitting Needle": {
+    zh: "編織針",
+    score: 3,
+    aliases: ["鉤刺", "拔刺", "20%", "白配"],
+    img: "./images/addons/knittingneedle.png",
+    killer: "The Slasher",
+  },
+  "Orderly's Shoe": {
+    zh: "護理員的鞋子",
+    score: 4,
+    aliases: ["跳嚇", "迅捷", "加速", "5秒", "白配"],
+    img: "./images/addons/orderlysshoe.png",
+    killer: "The Slasher",
+  },
+  "Bloody Smile": {
+    zh: "血腥笑容",
+    score: 4,
+    aliases: ["跳嚇", "無處不在的邪惡", "偵測距離", "4公尺", "4米", "綠配"],
+    img: "./images/addons/bloodysmile.png",
+    killer: "The Slasher",
+  },
+  "Coroner's Coffee": {
+    zh: "驗屍官的咖啡",
+    score: 5,
+    aliases: ["投擲刺", "推力", "25%", "迅捷", "加速", "8%", "3秒", "綠配"],
+    img: "./images/addons/coronerscoffee.png",
+    killer: "The Slasher",
+  },
+  "Party Noisemaker": {
+    zh: "派對噪音製造器",
+    score: 3,
+    aliases: ["跳嚇", "破壞", "木板", "板子", "牆壁", "32公尺", "32米", "氣場", "6秒", "綠配"],
+    img: "./images/addons/partynoisemaker.png",
+    killer: "The Slasher",
+  },
+  "Sleeping Bag": {
+    zh: "睡袋",
+    score: 3,
+    aliases: ["鉤刺", "鉤子", "位置", "8公尺", "8米", "5秒", "綠配"],
+    img: "./images/addons/sleepingbag.png",
+    killer: "The Slasher",
+  },
+  "Toxic Waste": {
+    zh: "毒性廢料",
+    score: 3,
+    aliases: ["跳嚇", "鉤子", "廢料堆", "遲鈍", "8公尺", "8米", "13秒", "綠配"],
+    img: "./images/addons/toxicwaste.png",
+    killer: "The Slasher",
+  },
+  "Eye Goop": {
+    zh: "眼睛黏液",
+    score: 3,
+    aliases: ["鉤刺", "隱跡", "無法偵測", "13秒", "藍配"],
+    img: "./images/addons/eyegoop.png",
+    killer: "The Slasher",
+  },
+  "Imprinted Aluminum": {
+    zh: "印鋁",
+    score: 4,
+    aliases: ["投擲刺", "重傷", "斷骨", "出血", "流血", "70秒", "藍配"],
+    img: "./images/addons/imprintedaluminum.png",
+    killer: "The Slasher",
+  },
+  "Mirror Shards": {
+    zh: "鏡片碎片",
+    score: 4,
+    aliases: ["鉤刺", "拔刺", "破裂", "30秒", "藍配"],
+    img: "./images/addons/mirrorshards_jason.png",
+    killer: "The Slasher",
+  },
+  "Sauna Rock": {
+    zh: "桑拿石",
+    score: 4,
+    aliases: ["跳嚇", "殺手本能", "疲憊", "疲勞", "13秒", "藍配"],
+    img: "./images/addons/saunarock.png",
+    killer: "The Slasher",
+  },
+  "Two Nails": {
+    zh: "兩根釘子",
+    score: 3,
+    aliases: ["投擲刺", "氣場", "1公尺", "1米", "6秒", "藍配"],
+    img: "./images/addons/twonails.png",
+    killer: "The Slasher",
+  },
+  "Bloody Magazine": {
+    zh: "血腥雜誌",
+    score: 3,
+    aliases: ["鉤刺", "失手", "尖叫", "大叫", "氣場", "8公尺", "8米", "3秒", "紫配"],
+    img: "./images/addons/bloodymagazine.png",
+    killer: "The Slasher",
+  },
+  "Burnt Fuse": {
+    zh: "疲乏",
+    score: 2,
+    aliases: ["鉤刺", "大門", "封鎖", "13公尺", "13米", "5秒", "紫配"],
+    img: "./images/addons/burntfuse.png",
+    killer: "The Slasher",
+  },
+  "Deputy's Badge": {
+    zh: "副警長徽章",
+    score: 4,
+    aliases: ["無處不在的邪惡", "發電機", "爆炸", "退修", "5%", "10%", "技能檢定", "紫配"],
+    img: "./images/addons/deputysbadge.png",
+    killer: "The Slasher",
+  },
+  "Missing Corkscrew": {
+    zh: "消失的開瓶器",
+    score: 4,
+    aliases: ["鉤刺", "恐懼範圍", "32公尺", "32米", "隱跡", "無法偵測", "13秒", "紫配"],
+    img: "./images/addons/missingcorkscrew.png",
+    killer: "The Slasher",
+  },
+  "Dirty Money": {
+    zh: "髒錢",
+    score: 3,
+    aliases: ["發電機", "代幣", "跨窗", "翻窗", "破壞", "木板", "板子", "普通刺", "紅配"],
+    img: "./images/addons/dirtymoney.png",
+    killer: "The Slasher",
+  },
+  "Iridescent Boat Motor": {
+    zh: "螢虹船馬達",
+    score: 4,
+    aliases: ["虹彩", "無處不在的邪惡", "窗戶", "封鎖", "13秒", "紅配"],
+    img: "./images/addons/iridescentboatmotor.png",
+    killer: "The Slasher",
   },
 };

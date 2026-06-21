@@ -251,5 +251,11 @@ window.KILLERS = {
     aliases: ["一號", "1", "威可那", "威可拿", "威可納", "威", "herny creel", "亨利克里爾"],
     img: "./images/killers/henrycreel.png"
   },
+    "The Slasher": {
+    zh: "殺人魔",
+    limit: 15,
+    aliases: ["傑森沃爾斯", "Jason Voorhees","十三號星期五"],
+    img: "./images/killers/jason.png"
+  },
 };
 
