@@ -444,7 +444,7 @@
       effect: { type: 'card40_ceba_combo', data: {} }
     },
 
-    // 41. 神之一手：六個非殺手欄位依序抽取同分候選，由擲筊決定是否換上
+    // 41. 神之一手：六個非殺手欄位依序抽取不低於原分數的候選，由擲筊決定是否換上
     {
       id: 'card41',
       zh: '神之一手',
@@ -3188,7 +3188,7 @@ D.騎士
   }
 
   // 41 號：神之一手
-    // 六個非殺手欄位依序抽出「同類型、同分、不重複」候選。
+    // 六個非殺手欄位依序抽出「同類型、不低於原分數、不重複」候選。
     // 聖筊遵照玩家選擇；陰筊反轉玩家選擇；笑筊換候選後重問，每格最多三次。
     function doCard41AskDeity(card) {
       if (!currentState || !currentState.killerKey ||
@@ -3222,16 +3222,20 @@ D.騎士
         if (slot.type === 'addon') {
           const score = getAddonScore(currentName);
           if (typeof score !== 'number') return null;
+          const allowedScores = [];
+          for (let s = score; s <= 5; s++) allowedScores.push(s);
           const used = new Set(currentState.addons || []);
-          const pool = getAddonNamesByScoresForKiller(currentState.killerKey, [score])
+          const pool = getAddonNamesByScoresForKiller(currentState.killerKey, allowedScores)
             .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
           return getRandomItem(pool);
         }
 
         const score = getPerkScore(currentName);
         if (typeof score !== 'number') return null;
+        const allowedScores = [];
+        for (let s = score; s <= 5; s++) allowedScores.push(s);
         const used = new Set(currentState.perks || []);
-        const pool = getPerkNamesByScores([score])
+        const pool = getPerkNamesByScores(allowedScores)
           .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
         return getRandomItem(pool);
       }
