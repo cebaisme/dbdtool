@@ -444,13 +444,23 @@
       effect: { type: 'card40_ceba_combo', data: {} }
     },
 
+    // 41. 神之一手：六個非殺手欄位依序抽取同分候選，由擲筊決定是否換上
+    {
+      id: 'card41',
+      zh: '神之一手',
+      target: 'any',
+      colorType: "deity",
+      summary: '請示神明幫你換技能。',
+      effect: { type: 'card41_ask_deity', data: { maxLaughsPerSlot: 3 } }
+    },
+
 
   ];
 
   const CEBA_COMBOS = [
     { name: '與心愛的你行至世界盡頭', perks: ['牢牢緊握', '欣喜若狂'] },
     { name: '滾雪球', perks: ['超級死黨', '鬼祟追逐'] },
-    { name: '強到靠杯', perks: ['死者開關', '禍害之鉤:痛苦迴響'] },
+    { name: '歷久不衰', perks: ['死者開關', '禍害之鉤:痛苦迴響'] },
     { name: '可能有點過期的', perks: ['爆發', '海之喚'] },
     { name: '查無此人', perks: ['感染碰觸', '遊蕩之眼'] },
     { name: '金剛腿', perks: ['所向無敵', '怒火中燒'] },
@@ -462,7 +472,7 @@
     { name: '40米長刀', perks: ['恩賜解脫', '震撼雷霆'] },
     { name: '舉重選手', perks: ['永世糾纏', '怒火中燒'] },
     { name: 'Party Walk', perks: ['疾速殘暴', '把最好的留在最後'] },
-    { name: '我鎖定你了', perks: ['急狩迅獵', '怨氣衝天'] },
+    { name: '氣場滿天飛', perks: ['宿敵', '星辰證人'] },
     { name: '懶得踹機', perks: ['突爆', '逆轉時光'] },
     { name: '再給我兩分鐘', perks: ['無路可逃', '勿忘我'] },
     { name: '拆圖騰模擬器', perks: ['厄咒:玩物', '厄咒:修飾痕'] },
@@ -616,7 +626,7 @@
       .map(([name]) => name);
   }
 
-const CARD39_QUIZ_RAW = String.raw`題目
+  const CARD39_QUIZ_RAW = String.raw`題目
 DBD中所有版權角色都可以用暗金細胞購買
 答 否 註釋:比爾
 
@@ -669,7 +679,8 @@ C.24
 D.36
 答 A 註釋:跟蹤模式下隱身
 
-若是我今天想要到陰屍路的專屬地圖，我在燒祭品的情況下機率為多少？
+若是我今天想要到陰屍路的專屬地圖，我在燒祭品的情況下機率為多少？(假設所有玩家上一場都不是這張圖)
+)
 A.0%
 B.2.33%
 C.6.81%
@@ -704,71 +715,71 @@ C.劊子手
 D.騎士
 答 D 註釋:貞子迷咒7層可以特殊斬殺、三角頭二掛+折磨狀態可以特殊斬殺、原初者二掛+標記四層可以特殊斬殺`;
 
-function parseCard39QuizRaw(raw) {
-  const blocks = String(raw || '')
-    .replace(/^\uFEFF/, '')
-    .split(/\n\s*\n+/)
-    .map(s => s.trim())
-    .filter(Boolean);
+  function parseCard39QuizRaw(raw) {
+    const blocks = String(raw || '')
+      .replace(/^\uFEFF/, '')
+      .split(/\n\s*\n+/)
+      .map(s => s.trim())
+      .filter(Boolean);
 
-  return blocks.map(block => {
-    let lines = block.split(/\n+/).map(s => s.trim()).filter(Boolean);
-    if (!lines.length) return null;
+    return blocks.map(block => {
+      let lines = block.split(/\n+/).map(s => s.trim()).filter(Boolean);
+      if (!lines.length) return null;
 
-    // 第一段題庫前面會有一個標題「題目」，不要把它當成真正題目
-    if (lines[0] === '題目') {
-      lines = lines.slice(1);
-    }
-    if (!lines.length) return null;
-
-    const question = lines[0];
-    const options = [];
-    let answer = '';
-    let note = '';
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (/^[A-D]\./.test(line)) {
-        options.push({
-          label: line.slice(0, 1),
-          text: line.slice(2).trim()
-        });
-        continue;
+      // 第一段題庫前面會有一個標題「題目」，不要把它當成真正題目
+      if (lines[0] === '題目') {
+        lines = lines.slice(1);
       }
-      if (line.startsWith('答 ')) {
-        const rest = line.slice(2).trim();
-        const parts = rest.split(/\s+註釋:/);
-        answer = (parts[0] || '').trim();
-        note = (parts[1] || '').trim();
+      if (!lines.length) return null;
+
+      const question = lines[0];
+      const options = [];
+      let answer = '';
+      let note = '';
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (/^[A-D]\./.test(line)) {
+          options.push({
+            label: line.slice(0, 1),
+            text: line.slice(2).trim()
+          });
+          continue;
+        }
+        if (line.startsWith('答 ')) {
+          const rest = line.slice(2).trim();
+          const parts = rest.split(/\s+註釋:/);
+          answer = (parts[0] || '').trim();
+          note = (parts[1] || '').trim();
+        }
       }
-    }
 
-    if (!question) return null;
-    return { question, options, answer, note };
-  }).filter(Boolean);
-}
+      if (!question) return null;
+      return { question, options, answer, note };
+    }).filter(Boolean);
+  }
 
-const CARD39_QUIZ_DATA = Array.isArray(window.CARD39_QUIZ_DATA) && window.CARD39_QUIZ_DATA.length
-  ? window.CARD39_QUIZ_DATA
-  : parseCard39QuizRaw(CARD39_QUIZ_RAW);
+  const CARD39_QUIZ_DATA = Array.isArray(window.CARD39_QUIZ_DATA) && window.CARD39_QUIZ_DATA.length
+    ? window.CARD39_QUIZ_DATA
+    : parseCard39QuizRaw(CARD39_QUIZ_RAW);
 
-function normalizeCard39AnswerToken(value) {
-  return String(value || '')
-    .trim()
-    .replace(/[．。]/g, '.')
-    .replace(/^([A-D])\.$/, '$1')
-    .replace(/\s+/g, '')
-    .toUpperCase();
-}
+  function normalizeCard39AnswerToken(value) {
+    return String(value || '')
+      .trim()
+      .replace(/[．。]/g, '.')
+      .replace(/^([A-D])\.$/, '$1')
+      .replace(/\s+/g, '')
+      .toUpperCase();
+  }
 
 
   // ==========================
-  // 2.x 測試用：強制抽中卡片
+  // 2.x 測試用：強制抽中卡片 test
   // 可填入：2、'2'、'02'、'card02' 皆可
   // 例：const FORCE_DRAW_CARD_IDS = [17];
   // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
   // ==========================
-  const FORCE_DRAW_CARD_IDS = [];
+  const FORCE_DRAW_CARD_IDS = [41];
 
   function normalizeForcedCardId(value) {
     if (value == null) return null;
@@ -1047,6 +1058,42 @@ function normalizeCard39AnswerToken(value) {
         cursor: grabbing;
       }
 
+      .slot-card.card41-hover-note {
+        position: relative;
+        overflow: visible;
+      }
+
+      .slot-card.card41-hover-note::after {
+        content: attr(data-hover-note);
+        position: absolute;
+        left: 50%;
+        bottom: calc(100% + 10px);
+        transform: translate(-50%, 6px);
+        min-width: max-content;
+        max-width: 260px;
+        padding: 9px 13px;
+        border: 1px solid rgba(143, 128, 255, 0.75);
+        border-radius: 10px;
+        background: rgba(18, 12, 52, 0.97);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.35;
+        text-align: center;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), 0 0 16px rgba(143, 128, 255, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+        z-index: 30;
+      }
+
+      .slot-card.card41-hover-note:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, 0);
+      }
+
       .slot-card-header {
         font-size: 22px;        
         font-weight: 800;       
@@ -1082,6 +1129,14 @@ function normalizeCard39AnswerToken(value) {
       .slot-card.color-addon {
         background: linear-gradient(135deg, #b34fd1ff, #612b72ff);
       }
+        .slot-card.color-deity {
+  background: linear-gradient(
+    135deg,
+    #8f80ff 0%,
+    #3f2cc2 55%,
+    #1b126e 100%
+  );
+}
       .slot-card.color-perk {
         background: linear-gradient(135deg, #4494bb, #a5a7cd);
       }
@@ -1533,71 +1588,71 @@ function normalizeCard39AnswerToken(value) {
   }
 
 
-function showCard17ScoreChoiceOverlay(options) {
-  const overlay = document.createElement('div');
-  overlay.id = 'cardBinaryChoiceOverlay';
+  function showCard17ScoreChoiceOverlay(options) {
+    const overlay = document.createElement('div');
+    overlay.id = 'cardBinaryChoiceOverlay';
 
-  const panel = document.createElement('div');
-  panel.className = 'card-binary-panel';
+    const panel = document.createElement('div');
+    panel.className = 'card-binary-panel';
 
-  const titleEl = document.createElement('div');
-  titleEl.className = 'card-binary-title';
-  titleEl.textContent = options.title || '選擇一個分數';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'card-binary-title';
+    titleEl.textContent = options.title || '選擇一個分數';
 
-  panel.appendChild(titleEl);
+    panel.appendChild(titleEl);
 
-  const ruleLines = Array.isArray(options.ruleLines) ? options.ruleLines.filter(Boolean) : [];
-  if (ruleLines.length) {
-    const rules = document.createElement('div');
-    rules.className = 'card17-choice-rules';
-    rules.style.margin = '10px 0 14px';
-    rules.style.padding = '10px 12px';
-    rules.style.borderRadius = '10px';
-    rules.style.background = 'rgba(255,255,255,0.05)';
-    rules.style.border = '1px solid rgba(255,255,255,0.08)';
-    rules.style.textAlign = 'left';
-    rules.style.lineHeight = '1.65';
+    const ruleLines = Array.isArray(options.ruleLines) ? options.ruleLines.filter(Boolean) : [];
+    if (ruleLines.length) {
+      const rules = document.createElement('div');
+      rules.className = 'card17-choice-rules';
+      rules.style.margin = '10px 0 14px';
+      rules.style.padding = '10px 12px';
+      rules.style.borderRadius = '10px';
+      rules.style.background = 'rgba(255,255,255,0.05)';
+      rules.style.border = '1px solid rgba(255,255,255,0.08)';
+      rules.style.textAlign = 'left';
+      rules.style.lineHeight = '1.65';
 
-    ruleLines.forEach((line, idx) => {
-      const row = document.createElement('div');
-      row.className = 'card17-choice-rule-line';
-      row.textContent = line;
-      row.style.fontSize = '13px';
-      row.style.color = idx === 0 ? '#7CFFB2' : (idx === 1 ? '#FF8E8E' : '#FFD36E');
-      rules.appendChild(row);
+      ruleLines.forEach((line, idx) => {
+        const row = document.createElement('div');
+        row.className = 'card17-choice-rule-line';
+        row.textContent = line;
+        row.style.fontSize = '13px';
+        row.style.color = idx === 0 ? '#7CFFB2' : (idx === 1 ? '#FF8E8E' : '#FFD36E');
+        rules.appendChild(row);
+      });
+
+      panel.appendChild(rules);
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'card-binary-actions';
+    actions.style.gridTemplateColumns = 'repeat(6, 1fr)';
+
+    (options.values || []).forEach((value) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'card-binary-btn';
+      btn.style.textAlign = 'center';
+
+      const label = document.createElement('div');
+      label.className = 'card-binary-label';
+      label.textContent = String(value);
+      label.style.fontSize = '26px';
+      label.style.textAlign = 'center';
+
+      btn.appendChild(label);
+      btn.addEventListener('click', () => {
+        if (overlay.parentNode) document.body.removeChild(overlay);
+        if (typeof options.onPick === 'function') options.onPick(value);
+      });
+      actions.appendChild(btn);
     });
 
-    panel.appendChild(rules);
+    panel.appendChild(actions);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
   }
-
-  const actions = document.createElement('div');
-  actions.className = 'card-binary-actions';
-  actions.style.gridTemplateColumns = 'repeat(6, 1fr)';
-
-  (options.values || []).forEach((value) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'card-binary-btn';
-    btn.style.textAlign = 'center';
-
-    const label = document.createElement('div');
-    label.className = 'card-binary-label';
-    label.textContent = String(value);
-    label.style.fontSize = '26px';
-    label.style.textAlign = 'center';
-
-    btn.appendChild(label);
-    btn.addEventListener('click', () => {
-      if (overlay.parentNode) document.body.removeChild(overlay);
-      if (typeof options.onPick === 'function') options.onPick(value);
-    });
-    actions.appendChild(btn);
-  });
-
-  panel.appendChild(actions);
-  overlay.appendChild(panel);
-  document.body.appendChild(overlay);
-}
 
   function showInfoPopup(title, body, onClose) {
     const overlay = document.createElement('div');
@@ -1984,6 +2039,10 @@ function showCard17ScoreChoiceOverlay(options) {
       cardEl.classList.add('color-' + card.colorType.replace(/_/g, '-'));
       cardEl.setAttribute('draggable', 'true');
       cardEl.dataset.cardId = card.id;
+      if (card.id === 'card41') {
+        cardEl.classList.add('card41-hover-note');
+        cardEl.dataset.hoverNote = '不可以細節反問喔';
+      }
 
       const header = document.createElement('div');
       header.className = 'slot-card-header';
@@ -2290,6 +2349,9 @@ function showCard17ScoreChoiceOverlay(options) {
       case 'card40_ceba_combo':
         doCard40CebaCombo();
         return;
+      case 'card41_ask_deity':
+        doCard41AskDeity(card);
+        return;
       case 'card17_extreme_redistribute':
         ok = doCard17ExtremeRedistribute();
         break;
@@ -2517,7 +2579,7 @@ function showCard17ScoreChoiceOverlay(options) {
       showInfoPopup(
         messageTitle || '起床重睡',
         messageBody || '請再次選擇使用一張卡片。',
-        () => {}
+        () => { }
       );
       return;
     }
@@ -2912,19 +2974,19 @@ function showCard17ScoreChoiceOverlay(options) {
 
         // 第一優先：兩個配件都各 -1 分
         if ((sa === oldScores[0] - 1 && sb === oldScores[1] - 1) ||
-            (sa === oldScores[1] - 1 && sb === oldScores[0] - 1)) {
+          (sa === oldScores[1] - 1 && sb === oldScores[0] - 1)) {
           minusPairs.push([a, b]);
         }
 
         // 第二優先：兩個配件都同分重抽
         if ((sa === oldScores[0] && sb === oldScores[1]) ||
-            (sa === oldScores[1] && sb === oldScores[0])) {
+          (sa === oldScores[1] && sb === oldScores[0])) {
           samePairs.push([a, b]);
         }
 
         // 第三優先：兩個配件都各 +1 分
         if ((sa === oldScores[0] + 1 && sb === oldScores[1] + 1) ||
-            (sa === oldScores[1] + 1 && sb === oldScores[0] + 1)) {
+          (sa === oldScores[1] + 1 && sb === oldScores[0] + 1)) {
           plusPairs.push([a, b]);
         }
       }
@@ -3124,6 +3186,352 @@ function showCard17ScoreChoiceOverlay(options) {
       showCard40ComboResult(picked.combo, () => finishCardPhase());
     });
   }
+
+  // 41 號：神之一手
+    // 六個非殺手欄位依序抽出「同類型、同分、不重複」候選。
+    // 聖筊遵照玩家選擇；陰筊反轉玩家選擇；笑筊換候選後重問，每格最多三次。
+    function doCard41AskDeity(card) {
+      if (!currentState || !currentState.killerKey ||
+        !Array.isArray(currentState.addons) || currentState.addons.length < 2 ||
+        !Array.isArray(currentState.perks) || currentState.perks.length < 4) {
+        showInfoPopup('神之一手', '目前沒有完整的兩個配件與四個技能，無法請示。', () => finishCardPhase());
+        return;
+      }
+
+      const data = card && card.effect && card.effect.data ? card.effect.data : {};
+      const maxLaughs = Math.max(0, Number(data.maxLaughsPerSlot) || 3);
+      const slots = [
+        { type: 'addon', index: 0, label: '配件 1' },
+        { type: 'addon', index: 1, label: '配件 2' },
+        { type: 'perk', index: 0, label: '技能 1' },
+        { type: 'perk', index: 1, label: '技能 2' },
+        { type: 'perk', index: 2, label: '技能 3' },
+        { type: 'perk', index: 3, label: '技能 4' }
+      ];
+
+      function getCurrentName(slot) {
+        return slot.type === 'addon'
+          ? currentState.addons[slot.index]
+          : currentState.perks[slot.index];
+      }
+
+      function getCandidate(slot, alreadyShown) {
+        const currentName = getCurrentName(slot);
+        const shown = alreadyShown || new Set();
+
+        if (slot.type === 'addon') {
+          const score = getAddonScore(currentName);
+          if (typeof score !== 'number') return null;
+          const used = new Set(currentState.addons || []);
+          const pool = getAddonNamesByScoresForKiller(currentState.killerKey, [score])
+            .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
+          return getRandomItem(pool);
+        }
+
+        const score = getPerkScore(currentName);
+        if (typeof score !== 'number') return null;
+        const used = new Set(currentState.perks || []);
+        const pool = getPerkNamesByScores([score])
+          .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
+        return getRandomItem(pool);
+      }
+
+      function applyCandidate(slot, candidate) {
+        if (!candidate) return;
+        if (slot.type === 'addon') {
+          const next = currentState.addons.slice();
+          next[slot.index] = candidate;
+          currentState.addons = next;
+        } else {
+          const next = currentState.perks.slice();
+          next[slot.index] = candidate;
+          currentState.perks = next;
+        }
+      }
+
+      function getCandidateMeta(slot, candidate) {
+        const isAddon = slot.type === 'addon';
+        return {
+          zh: isAddon ? (getAddonZh(candidate) || candidate) : (getPerkZh(candidate) || candidate),
+          en: candidate,
+          img: isAddon ? getAddonImg(candidate) : getPerkImg(candidate),
+          score: isAddon ? getAddonScore(candidate) : getPerkScore(candidate)
+        };
+      }
+
+      function playCard41Audio(fileName, onEnded) {
+        try {
+          const audio = new Audio(`./images/other/${fileName}`);
+          audio.volume = 0.7;
+          if (typeof onEnded === 'function') {
+            audio.addEventListener('ended', onEnded, { once: true });
+          }
+          const p = audio.play();
+          if (p && typeof p.catch === 'function') {
+            p.catch(() => {
+              if (typeof onEnded === 'function') onEnded();
+            });
+          }
+        } catch (e) {
+          if (typeof onEnded === 'function') onEnded();
+        }
+      }
+
+      // 沿用 LichTool 預設的「結果 + 解釋」語音模式。
+      function playCard41VoiceSequence(resultAudio, explainAudio) {
+        playCard41Audio(resultAudio, () => {
+          if (explainAudio) playCard41Audio(explainAudio);
+        });
+      }
+
+      function rollJiaobei(noLaugh) {
+        const r = Math.random();
+        if (noLaugh) return r < (2 / 3) ? 'success' : 'fail';
+        if (r < 0.5) return 'success';
+        if (r < 0.75) return 'laugh';
+        return 'fail';
+      }
+
+      function removeOverlay(overlay) {
+        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }
+
+      function showQuestion(slot, slotNumber, candidate, laughCount, shownCandidates, questionText) {
+        const meta = getCandidateMeta(slot, candidate);
+        const noLaugh = laughCount >= maxLaughs;
+        const overlay = document.createElement('div');
+        overlay.id = 'card41DeityOverlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(0,0,0,.84);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;color:#fff;';
+
+        const shell = document.createElement('div');
+        shell.style.cssText = 'width:min(1040px,96vw);max-height:96vh;display:flex;flex-direction:column;gap:10px;';
+
+        const panel = document.createElement('div');
+        panel.style.cssText = 'width:100%;min-height:560px;background:radial-gradient(circle at 72% 42%,rgba(92,52,146,.28),transparent 38%),linear-gradient(145deg,#17131f,#08080c);border:1px solid rgba(223,196,255,.3);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.82),0 0 38px rgba(119,72,178,.2);display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.92fr);overflow:hidden;box-sizing:border-box;';
+
+        const left = document.createElement('div');
+        left.style.cssText = 'padding:42px 28px 34px 42px;display:flex;flex-direction:column;justify-content:center;';
+
+        const progress = document.createElement('div');
+        progress.textContent = `神之一手　${slotNumber + 1} / 6　目前詢問：${slot.label}`;
+        progress.style.cssText = 'font-size:15px;font-weight:800;letter-spacing:.08em;color:#c9a8f4;margin-bottom:28px;';
+
+        const question = document.createElement('div');
+        question.textContent = questionText || '你要這個嗎？';
+        question.style.cssText = 'width:7em;max-width:100%;font-size:clamp(36px,5vw,70px);font-weight:1000;line-height:1.16;letter-spacing:.01em;white-space:pre-line;word-break:break-all;text-shadow:0 8px 28px rgba(0,0,0,.65);margin-bottom:28px;';
+
+        const candidateName = document.createElement('div');
+        candidateName.textContent = meta.zh || meta.en;
+        candidateName.style.cssText = 'font-size:25px;font-weight:900;color:#f0e7ff;margin-bottom:5px;';
+
+        const candidateSub = document.createElement('div');
+        candidateSub.textContent = `${meta.en}${typeof meta.score === 'number' ? `　分數：${meta.score}` : ''}`;
+        candidateSub.style.cssText = 'font-size:13px;color:rgba(255,255,255,.52);margin-bottom:30px;';
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:14px;flex-wrap:wrap;';
+
+        const wantBtn = document.createElement('button');
+        wantBtn.type = 'button';
+        wantBtn.textContent = '要';
+        wantBtn.style.cssText = 'min-width:145px;padding:15px 26px;border:1px solid rgba(132,225,167,.55);border-radius:13px;background:#17633a;color:#fff;font-size:23px;font-weight:1000;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);';
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.type = 'button';
+        rejectBtn.textContent = '不要';
+        rejectBtn.style.cssText = 'min-width:145px;padding:15px 26px;border:1px solid rgba(239,132,144,.5);border-radius:13px;background:#742532;color:#fff;font-size:23px;font-weight:1000;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);';
+
+        actions.appendChild(wantBtn);
+        actions.appendChild(rejectBtn);
+        left.appendChild(progress);
+        left.appendChild(question);
+        left.appendChild(candidateName);
+        left.appendChild(candidateSub);
+        left.appendChild(actions);
+
+        const right = document.createElement('div');
+        right.style.cssText = 'position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(125,75,191,.2),transparent 58%);overflow:hidden;';
+
+        const hand = document.createElement('img');
+        hand.src = './images/other/hand.png';
+        hand.alt = 'hand';
+        hand.style.cssText = 'position:absolute;width:min(430px,92%);height:auto;object-fit:contain;filter:drop-shadow(0 22px 24px rgba(0,0,0,.62));user-select:none;pointer-events:none;';
+
+        const heldIcon = document.createElement('img');
+        heldIcon.src = meta.img || '';
+        heldIcon.alt = meta.zh || meta.en;
+        heldIcon.style.cssText = 'position:absolute;width:118px;height:118px;object-fit:contain;left:50%;top:49%;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 15px rgba(0,0,0,.8));border-radius:12px;user-select:none;pointer-events:none;';
+
+        right.appendChild(hand);
+        right.appendChild(heldIcon);
+        panel.appendChild(left);
+        panel.appendChild(right);
+
+        const currentStrip = document.createElement('div');
+        currentStrip.style.cssText = 'width:100%;display:grid;grid-template-columns:2fr 4fr;gap:10px;padding:8px 10px;background:rgba(13,11,19,.96);border:1px solid rgba(223,196,255,.22);border-radius:15px;box-shadow:0 12px 28px rgba(0,0,0,.5);box-sizing:border-box;';
+
+        function makeCurrentGroup(titleText, type, names) {
+          const group = document.createElement('div');
+          group.style.cssText = 'min-width:0;display:flex;align-items:center;gap:7px;';
+
+          const title = document.createElement('div');
+          title.textContent = titleText;
+          title.style.cssText = 'flex:0 0 auto;font-size:11px;font-weight:900;line-height:1.2;letter-spacing:.05em;color:#c9a8f4;writing-mode:vertical-rl;';
+          group.appendChild(title);
+
+          const items = document.createElement('div');
+          items.style.cssText = `min-width:0;flex:1;display:grid;grid-template-columns:repeat(${names.length},minmax(0,1fr));gap:6px;`;
+
+          names.forEach((name, index) => {
+            const itemSlot = { type, index };
+            const itemMeta = getCandidateMeta(itemSlot, name);
+            const active = slot.type === type && slot.index === index;
+
+            const item = document.createElement('div');
+            item.style.cssText = `min-width:0;height:54px;display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:9px;border:${active ? '2px solid #8f80ff' : '1px solid rgba(255,255,255,.12)'};background:${active ? 'rgba(63,44,194,.3)' : 'rgba(255,255,255,.045)'};box-sizing:border-box;box-shadow:${active ? '0 0 14px rgba(143,128,255,.34)' : 'none'};`;
+
+            const icon = document.createElement('div');
+            icon.style.cssText = 'width:42px;height:42px;flex:0 0 42px;border-radius:7px;background:#050505;overflow:hidden;display:flex;align-items:center;justify-content:center;';
+            if (itemMeta.img) {
+              const img = document.createElement('img');
+              img.src = itemMeta.img;
+              img.alt = itemMeta.zh || itemMeta.en;
+              img.style.cssText = 'width:42px;height:42px;object-fit:contain;display:block;';
+              icon.appendChild(img);
+            }
+
+            const text = document.createElement('div');
+            text.style.cssText = 'min-width:0;display:flex;flex-direction:column;gap:2px;';
+
+            const nameLine = document.createElement('div');
+            nameLine.textContent = itemMeta.zh || itemMeta.en || '未知';
+            nameLine.style.cssText = 'font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+
+            const scoreLine = document.createElement('div');
+            scoreLine.textContent = typeof itemMeta.score === 'number' ? `${itemMeta.score} 分` : '';
+            scoreLine.style.cssText = 'font-size:10px;color:rgba(255,255,255,.5);';
+
+            text.appendChild(nameLine);
+            text.appendChild(scoreLine);
+            item.appendChild(icon);
+            item.appendChild(text);
+            items.appendChild(item);
+          });
+
+          group.appendChild(items);
+          return group;
+        }
+
+        currentStrip.appendChild(makeCurrentGroup('目前配件', 'addon', currentState.addons.slice(0, 2)));
+        currentStrip.appendChild(makeCurrentGroup('目前技能', 'perk', currentState.perks.slice(0, 4)));
+
+        shell.appendChild(panel);
+        shell.appendChild(currentStrip);
+        overlay.appendChild(shell);
+        document.body.appendChild(overlay);
+
+        function resolveChoice(wantsIt) {
+          wantBtn.disabled = true;
+          rejectBtn.disabled = true;
+          wantBtn.style.opacity = '.45';
+          rejectBtn.style.opacity = '.45';
+          question.textContent = '擲筊中……';
+          heldIcon.style.display = 'none';
+          hand.src = './images/other/擲筊.png';
+          if (hand.animate) {
+            hand.animate([
+              { transform: 'rotate(-7deg) scale(.92)' },
+              { transform: 'rotate(8deg) scale(1.05)' },
+              { transform: 'rotate(-5deg) scale(.97)' },
+              { transform: 'rotate(0) scale(1)' }
+            ], { duration: 400, iterations: 1, easing: 'ease-in-out' });
+          }
+
+          setTimeout(() => {
+            const result = rollJiaobei(noLaugh);
+            if (result === 'success') {
+              hand.src = './images/other/聖杯.png';
+              question.textContent = '聖筊';
+              candidateName.textContent = wantsIt ? '照你的意思，換上去。' : '照你的意思，保留原本的。';
+              candidateSub.textContent = '';
+              const explainAudio = Math.random() < 0.5 ? 'ok.mp3' : '可以.mp3';
+              playCard41VoiceSequence('聖杯.mp3', explainAudio);
+            } else if (result === 'fail') {
+              hand.src = './images/other/無杯.png';
+              question.textContent = '陰筊';
+              candidateName.textContent = wantsIt ? '不給你，保留原本的。' : '偏要給你，換上去。';
+              candidateSub.textContent = '';
+              playCard41VoiceSequence('無杯.mp3', 'dame.mp3');
+            } else {
+            hand.src = './images/other/笑杯.png';
+            question.textContent = '笑筊';
+            candidateName.textContent = '聽不懂';
+              candidateSub.textContent = '';
+              const explainAudio = Math.random() < 0.25 ? '工三小.mp3' : 'wakaranai.mp3';
+              playCard41VoiceSequence('笑杯.mp3', explainAudio);
+            }
+
+            setTimeout(() => {
+              removeOverlay(overlay);
+
+              if (result === 'laugh') {
+                const nextLaughCount = laughCount + 1;
+                shownCandidates.add(candidate);
+                let nextCandidate = getCandidate(slot, shownCandidates);
+                // 同分候選已被笑完時，允許本格先前出現過的候選再次出現，仍不碰目前配置。
+                if (!nextCandidate) {
+                  shownCandidates.clear();
+                  shownCandidates.add(candidate);
+                  nextCandidate = getCandidate(slot, shownCandidates);
+                }
+                if (!nextCandidate) {
+                  processSlot(slotNumber + 1);
+                  return;
+                }
+                showQuestion(
+                  slot,
+                  slotNumber,
+                  nextCandidate,
+                nextLaughCount,
+                shownCandidates,
+                nextLaughCount >= maxLaughs
+                  ? '你到底還要不要？'
+                  : '聽不懂\n那你要這個嗎？'
+              );
+                return;
+              }
+
+              const shouldApply = result === 'success' ? wantsIt : !wantsIt;
+              if (shouldApply) applyCandidate(slot, candidate);
+              processSlot(slotNumber + 1);
+            }, 2500);
+          }, 400);
+        }
+
+        wantBtn.addEventListener('click', () => resolveChoice(true), { once: true });
+        rejectBtn.addEventListener('click', () => resolveChoice(false), { once: true });
+      }
+
+      function processSlot(slotNumber) {
+        if (slotNumber >= slots.length) {
+          playCard40CompleteSound();
+          finishCardPhase();
+          return;
+        }
+
+        const slot = slots[slotNumber];
+        const shownCandidates = new Set();
+        const candidate = getCandidate(slot, shownCandidates);
+        if (!candidate) {
+          // 沒有同分且不重複的候選時，維持原樣並繼續下一格。
+          processSlot(slotNumber + 1);
+          return;
+        }
+        showQuestion(slot, slotNumber, candidate, 0, shownCandidates, '你要這個嗎？');
+      }
+
+      processSlot(0);
+    }
 
   function doCard37RestartSlot(card) {
     isActive = false;
@@ -3751,94 +4159,94 @@ function showCard17ScoreChoiceOverlay(options) {
     return true;
   }
 
-function applyScoreToRandomNonKillerSlots(score, count, options) {
-  if (!currentState || !currentState.killerKey) return false;
-  const opts = options || {};
-  const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
-  let applied = 0;
+  function applyScoreToRandomNonKillerSlots(score, count, options) {
+    if (!currentState || !currentState.killerKey) return false;
+    const opts = options || {};
+    const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
+    let applied = 0;
 
-  for (const slot of slotOrder) {
-    let ok = false;
-    if (slot === 1 || slot === 2) {
-      ok = rerollAddonSlotByScore(slot - 1, getFallbackScoreSequence(score, {
-        addOneFirst: opts.addOneFirst !== false
-      }), {
+    for (const slot of slotOrder) {
+      let ok = false;
+      if (slot === 1 || slot === 2) {
+        ok = rerollAddonSlotByScore(slot - 1, getFallbackScoreSequence(score, {
+          addOneFirst: opts.addOneFirst !== false
+        }), {
+          allowDuplicateFallback: false,
+          allowKeepSameName: true
+        });
+      } else {
+        ok = rerollPerkSlotByScore(slot - 3, getFallbackScoreSequence(score, {
+          addOneFirst: opts.addOneFirst !== false
+        }), {
+          allowDuplicateFallback: true,
+          allowKeepSameName: true
+        });
+      }
+
+      if (ok) {
+        applied += 1;
+        if (applied >= count) return true;
+      }
+    }
+
+    return applied > 0;
+  }
+
+  function applyCard17WinReward(score) {
+    if (!currentState || !currentState.killerKey) return false;
+
+    const addonSequence = [];
+    if (typeof score === 'number' && score >= 0 && score <= 5) addonSequence.push(score);
+    if (!addonSequence.includes(1)) addonSequence.push(1);
+    if (!addonSequence.includes(2)) addonSequence.push(2);
+    for (const s of getFallbackScoreSequence(score, { addOneFirst: true })) {
+      if (!addonSequence.includes(s)) addonSequence.push(s);
+    }
+
+    const perkSequence = getFallbackScoreSequence(score, { addOneFirst: true });
+
+    let applied = 0;
+
+    for (let i = 0; i < 2; i++) {
+      const ok = rerollAddonSlotByScore(i, addonSequence, {
         allowDuplicateFallback: false,
         allowKeepSameName: true
       });
-    } else {
-      ok = rerollPerkSlotByScore(slot - 3, getFallbackScoreSequence(score, {
-        addOneFirst: opts.addOneFirst !== false
-      }), {
+      if (!ok) return false;
+      applied += 1;
+    }
+
+    for (let i = 0; i < 4; i++) {
+      const ok = rerollPerkSlotByScore(i, perkSequence, {
         allowDuplicateFallback: true,
         allowKeepSameName: true
       });
-    }
-
-    if (ok) {
+      if (!ok) return false;
       applied += 1;
-      if (applied >= count) return true;
     }
+
+    return applied === 6;
   }
 
-  return applied > 0;
-}
-
-function applyCard17WinReward(score) {
-  if (!currentState || !currentState.killerKey) return false;
-
-  const addonSequence = [];
-  if (typeof score === 'number' && score >= 0 && score <= 5) addonSequence.push(score);
-  if (!addonSequence.includes(1)) addonSequence.push(1);
-  if (!addonSequence.includes(2)) addonSequence.push(2);
-  for (const s of getFallbackScoreSequence(score, { addOneFirst: true })) {
-    if (!addonSequence.includes(s)) addonSequence.push(s);
+  function clampCard39Score(isAddon, score) {
+    if (typeof score !== 'number') return isAddon ? 1 : 0;
+    if (isAddon) return Math.max(1, Math.min(5, score));
+    return Math.max(0, Math.min(5, score));
   }
 
-  const perkSequence = getFallbackScoreSequence(score, { addOneFirst: true });
 
-  let applied = 0;
-
-  for (let i = 0; i < 2; i++) {
-    const ok = rerollAddonSlotByScore(i, addonSequence, {
-      allowDuplicateFallback: false,
-      allowKeepSameName: true
-    });
-    if (!ok) return false;
-    applied += 1;
+  function getCard39SlotElement(slotIndex) {
+    const cells = Array.from(document.querySelectorAll('.slot-cell'));
+    if (!cells.length) return null;
+    return cells[slotIndex] || null;
   }
 
-  for (let i = 0; i < 4; i++) {
-    const ok = rerollPerkSlotByScore(i, perkSequence, {
-      allowDuplicateFallback: true,
-      allowKeepSameName: true
-    });
-    if (!ok) return false;
-    applied += 1;
-  }
-
-  return applied === 6;
-}
-
-function clampCard39Score(isAddon, score) {
-  if (typeof score !== 'number') return isAddon ? 1 : 0;
-  if (isAddon) return Math.max(1, Math.min(5, score));
-  return Math.max(0, Math.min(5, score));
-}
-
-
-function getCard39SlotElement(slotIndex) {
-  const cells = Array.from(document.querySelectorAll('.slot-cell'));
-  if (!cells.length) return null;
-  return cells[slotIndex] || null;
-}
-
-function showCard39BigText(text, color) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100020;pointer-events:none;';
-  const el = document.createElement('div');
-  el.textContent = text;
-  el.style.cssText = `
+  function showCard39BigText(text, color) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100020;pointer-events:none;';
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.cssText = `
     color:${color || '#fff'};
     font-size:min(72px,14vw);
     font-weight:900;
@@ -3848,29 +4256,29 @@ function showCard39BigText(text, color) {
     transform:scale(0.82);
     transition:all 0.22s ease-out;
   `;
-  overlay.appendChild(el);
-  document.body.appendChild(overlay);
-  requestAnimationFrame(() => {
-    el.style.opacity = '1';
-    el.style.transform = 'scale(1)';
-  });
-  setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transform = 'scale(1.18)';
-  }, 560);
-  setTimeout(() => {
-    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-  }, 860);
-}
+    overlay.appendChild(el);
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => {
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+    });
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(1.18)';
+    }, 560);
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }, 860);
+  }
 
-function showCard39FloatingDelta(slotIndex, delta) {
-  const host = getCard39SlotElement(slotIndex);
-  if (!host) return;
-  if (!host.style.position) host.style.position = 'relative';
+  function showCard39FloatingDelta(slotIndex, delta) {
+    const host = getCard39SlotElement(slotIndex);
+    if (!host) return;
+    if (!host.style.position) host.style.position = 'relative';
 
-  const float = document.createElement('div');
-  float.textContent = delta > 0 ? `+${delta}` : `${delta}`;
-  float.style.cssText = `
+    const float = document.createElement('div');
+    float.textContent = delta > 0 ? `+${delta}` : `${delta}`;
+    float.style.cssText = `
     position:absolute;
     left:50%;
     top:50%;
@@ -3884,364 +4292,170 @@ function showCard39FloatingDelta(slotIndex, delta) {
     opacity:1;
     transition:transform 0.62s ease, opacity 0.62s ease;
   `;
-  host.appendChild(float);
-  requestAnimationFrame(() => {
-    float.style.transform = 'translate(-50%, -110%)';
-    float.style.opacity = '0';
-  });
-  setTimeout(() => {
-    if (float.parentNode) float.parentNode.removeChild(float);
-  }, 700);
-}
-
-function showCard39AnswerReveal(question, result, onClose) {
-  const title = result && result.correct ? '✔ 正確！' : (result && result.timedOut ? 'TIME UP' : '✖ 錯誤！');
-  const lines = [
-    question && question.question ? question.question : '題目讀取失敗',
-    '',
-    `正解：${question && question.answer ? question.answer : '未知'}`
-  ];
-  if (question && question.note) lines.push(`註釋：${question.note}`);
-  showInfoPopup(title, lines.join('\n'), onClose);
-}
-
-function getCard39SlotMeta(slotIndex) {
-  if (slotIndex === 1 || slotIndex === 2) {
-    const addonIdx = slotIndex - 1;
-    const addonName = currentState && currentState.addons ? currentState.addons[addonIdx] : null;
-    return {
-      slotIndex,
-      isAddon: true,
-      label: `配件 ${addonIdx + 1}`,
-      name: addonName,
-      zh: addonName ? (getAddonZh(addonName) || addonName) : '未知配件',
-      score: addonName ? getAddonScore(addonName) : null
-    };
+    host.appendChild(float);
+    requestAnimationFrame(() => {
+      float.style.transform = 'translate(-50%, -110%)';
+      float.style.opacity = '0';
+    });
+    setTimeout(() => {
+      if (float.parentNode) float.parentNode.removeChild(float);
+    }, 700);
   }
-  if (slotIndex >= 3 && slotIndex <= 6) {
-    const perkIdx = slotIndex - 3;
-    const perkName = currentState && currentState.perks ? currentState.perks[perkIdx] : null;
-    return {
-      slotIndex,
-      isAddon: false,
-      label: `技能 ${perkIdx + 1}`,
-      name: perkName,
-      zh: perkName ? (getPerkZh(perkName) || perkName) : '未知技能',
-      score: perkName ? getPerkScore(perkName) : null
-    };
+
+  function showCard39AnswerReveal(question, result, onClose) {
+    const title = result && result.correct ? '✔ 正確！' : (result && result.timedOut ? 'TIME UP' : '✖ 錯誤！');
+    const lines = [
+      question && question.question ? question.question : '題目讀取失敗',
+      '',
+      `正解：${question && question.answer ? question.answer : '未知'}`
+    ];
+    if (question && question.note) lines.push(`註釋：${question.note}`);
+    showInfoPopup(title, lines.join('\n'), onClose);
   }
-  return null;
-}
 
-function applyCard39DeltaToSlot(slotIndex, delta) {
-  const meta = getCard39SlotMeta(slotIndex);
-  if (!meta || typeof meta.score !== 'number') return false;
+  function getCard39SlotMeta(slotIndex) {
+    if (slotIndex === 1 || slotIndex === 2) {
+      const addonIdx = slotIndex - 1;
+      const addonName = currentState && currentState.addons ? currentState.addons[addonIdx] : null;
+      return {
+        slotIndex,
+        isAddon: true,
+        label: `配件 ${addonIdx + 1}`,
+        name: addonName,
+        zh: addonName ? (getAddonZh(addonName) || addonName) : '未知配件',
+        score: addonName ? getAddonScore(addonName) : null
+      };
+    }
+    if (slotIndex >= 3 && slotIndex <= 6) {
+      const perkIdx = slotIndex - 3;
+      const perkName = currentState && currentState.perks ? currentState.perks[perkIdx] : null;
+      return {
+        slotIndex,
+        isAddon: false,
+        label: `技能 ${perkIdx + 1}`,
+        name: perkName,
+        zh: perkName ? (getPerkZh(perkName) || perkName) : '未知技能',
+        score: perkName ? getPerkScore(perkName) : null
+      };
+    }
+    return null;
+  }
 
-  const targetScore = clampCard39Score(meta.isAddon, meta.score + delta);
+  function applyCard39DeltaToSlot(slotIndex, delta) {
+    const meta = getCard39SlotMeta(slotIndex);
+    if (!meta || typeof meta.score !== 'number') return false;
 
-  if (meta.isAddon) {
-    let scoreSequence = [targetScore];
+    const targetScore = clampCard39Score(meta.isAddon, meta.score + delta);
 
-    // 39 號卡的簡單保護：
-    // 若配件扣到 1 分，但該殺手沒有 1 分配件，就直接改試 2 分
-    if (targetScore === 1) {
-      const hasScore1 = getAddonNamesByScoresForKiller(currentState && currentState.killerKey, [1]).length > 0;
-      if (!hasScore1) scoreSequence = [2];
+    if (meta.isAddon) {
+      let scoreSequence = [targetScore];
+
+      // 39 號卡的簡單保護：
+      // 若配件扣到 1 分，但該殺手沒有 1 分配件，就直接改試 2 分
+      if (targetScore === 1) {
+        const hasScore1 = getAddonNamesByScoresForKiller(currentState && currentState.killerKey, [1]).length > 0;
+        if (!hasScore1) scoreSequence = [2];
+      }
+
+      return rerollAddonSlotByScore(slotIndex - 1, scoreSequence, {
+        allowDuplicateFallback: false,
+        allowKeepSameName: true
+      });
     }
 
-    return rerollAddonSlotByScore(slotIndex - 1, scoreSequence, {
-      allowDuplicateFallback: false,
+    return rerollPerkSlotByScore(slotIndex - 3, [targetScore], {
+      allowDuplicateFallback: true,
       allowKeepSameName: true
     });
   }
 
-  return rerollPerkSlotByScore(slotIndex - 3, [targetScore], {
-    allowDuplicateFallback: true,
-    allowKeepSameName: true
-  });
-}
+  function showCard39SlotPicker(onDone) {
+    const slots = [1, 2, 3, 4, 5, 6].map(getCard39SlotMeta).filter(Boolean);
+    const selected = [];
 
-function showCard39SlotPicker(onDone) {
-  const slots = [1, 2, 3, 4, 5, 6].map(getCard39SlotMeta).filter(Boolean);
-  const selected = [];
+    const overlay = document.createElement('div');
+    overlay.id = 'card39SlotPickerOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:100004;';
 
-  const overlay = document.createElement('div');
-  overlay.id = 'card39SlotPickerOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:100004;';
+    const panel = document.createElement('div');
+    panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
 
-  const panel = document.createElement('div');
-  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+    const title = document.createElement('div');
+    title.textContent = '選擇兩個欄位';
+    title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
 
-  const title = document.createElement('div');
-  title.textContent = '選擇兩個欄位';
-  title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
+    const sub = document.createElement('div');
+    sub.textContent = '請選兩個非殺手欄位，再按同一格可取消。';
+    sub.style.cssText = 'font-size:13px;color:#bfc7da;margin-bottom:14px;';
 
-  const sub = document.createElement('div');
-  sub.textContent = '請選兩個非殺手欄位，再按同一格可取消。';
-  sub.style.cssText = 'font-size:13px;color:#bfc7da;margin-bottom:14px;';
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;';
 
-  const grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;';
+    function setSelectedStyle(btn, on) {
+      btn.style.borderColor = on ? '#ffd36e' : 'rgba(255,255,255,0.1)';
+      btn.style.boxShadow = on ? '0 0 0 1px rgba(255,211,110,0.55)' : 'none';
+      btn.style.background = on ? '#2b3344' : '#202633';
+    }
 
-  function setSelectedStyle(btn, on) {
-    btn.style.borderColor = on ? '#ffd36e' : 'rgba(255,255,255,0.1)';
-    btn.style.boxShadow = on ? '0 0 0 1px rgba(255,211,110,0.55)' : 'none';
-    btn.style.background = on ? '#2b3344' : '#202633';
-  }
-
-  slots.forEach((meta) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:96px;';
-    btn.innerHTML = `
+    slots.forEach((meta) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:96px;';
+      btn.innerHTML = `
       <div style="font-size:13px;color:#9fb0d6;margin-bottom:6px;">${meta.label}</div>
       <div style="font-size:15px;font-weight:700;line-height:1.45;">${meta.zh || meta.name || '未知'}</div>
       <div style="font-size:12px;color:#c8d0e5;margin-top:6px;">目前分數：${meta.score ?? '?'}</div>
     `;
-    setSelectedStyle(btn, false);
+      setSelectedStyle(btn, false);
 
-    btn.addEventListener('click', () => {
-      const idx = selected.indexOf(meta.slotIndex);
-      if (idx !== -1) {
-        selected.splice(idx, 1);
-        setSelectedStyle(btn, false);
-        return;
-      }
-      if (selected.length >= 2) return;
-      selected.push(meta.slotIndex);
-      setSelectedStyle(btn, true);
+      btn.addEventListener('click', () => {
+        const idx = selected.indexOf(meta.slotIndex);
+        if (idx !== -1) {
+          selected.splice(idx, 1);
+          setSelectedStyle(btn, false);
+          return;
+        }
+        if (selected.length >= 2) return;
+        selected.push(meta.slotIndex);
+        setSelectedStyle(btn, true);
 
-      if (selected.length >= 2) {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-        if (typeof onDone === 'function') onDone(selected.slice(0, 2));
-      }
-    });
-
-    grid.appendChild(btn);
-  });
-
-  panel.appendChild(title);
-  panel.appendChild(sub);
-  panel.appendChild(grid);
-  overlay.appendChild(panel);
-  document.body.appendChild(overlay);
-  return true;
-}
-
-function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
-  const q = questionData || {};
-  const limitMs = typeof timeoutMs === 'number' ? timeoutMs : 5000;
-  let done = false;
-  let remain = Math.ceil(limitMs / 1000);
-
-  const overlay = document.createElement('div');
-  overlay.id = 'card39QuizOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100005;';
-
-  const panel = document.createElement('div');
-  panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
-
-  const title = document.createElement('div');
-  title.textContent = '快問快答';
-  title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
-
-  const timerEl = document.createElement('div');
-  timerEl.textContent = `剩餘時間：${remain} 秒`;
-  timerEl.style.cssText = 'font-size:13px;color:#ffd36e;margin-bottom:8px;';
-
-  const barWrap = document.createElement('div');
-  barWrap.style.cssText = 'width:100%;height:10px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin:0 0 14px 0;border:1px solid rgba(255,255,255,0.06);';
-
-  const bar = document.createElement('div');
-  bar.style.cssText = 'height:100%;width:100%;background:linear-gradient(90deg,#6effa2,#ffd36e);transition:width 0.08s linear;';
-  barWrap.appendChild(bar);
-
-  const questionEl = document.createElement('div');
-  questionEl.textContent = q.question || '題目讀取失敗';
-  questionEl.style.cssText = 'font-size:16px;font-weight:700;line-height:1.6;color:#fff;margin-bottom:14px;white-space:pre-wrap;';
-
-  const actions = document.createElement('div');
-  actions.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;';
-
-  const startAt = Date.now();
-
-  function finish(payload) {
-    if (done) return;
-    done = true;
-    clearInterval(secondTimerId);
-    clearInterval(progressTimerId);
-    clearTimeout(timeoutId);
-    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    if (typeof onAnswer === 'function') onAnswer(payload);
-  }
-
-  const choices = Array.isArray(q.options) && q.options.length
-    ? q.options.map(opt => ({
-        value: opt.label,
-        label: `${opt.label}. ${opt.text}`,
-        raw: opt
-      }))
-    : [
-        { value: '是', label: '是' },
-        { value: '否', label: '否' }
-      ];
-
-  choices.forEach((choice) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;font-size:14px;line-height:1.5;';
-    btn.textContent = choice.label;
-    btn.addEventListener('click', () => {
-      const normalizedUser = normalizeCard39AnswerToken(choice.value);
-      const normalizedAnswer = normalizeCard39AnswerToken(q.answer);
-      const correctByLabel = normalizedUser === normalizedAnswer;
-      const correctByText = choice.raw && normalizeCard39AnswerToken(choice.raw.text) === normalizedAnswer;
-      finish({
-        correct: !!(correctByLabel || correctByText),
-        timedOut: false,
-        question: q
+        if (selected.length >= 2) {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          if (typeof onDone === 'function') onDone(selected.slice(0, 2));
+        }
       });
+
+      grid.appendChild(btn);
     });
-    actions.appendChild(btn);
-  });
 
-  const timeoutId = setTimeout(() => {
-    timerEl.textContent = 'TIME UP';
-    timerEl.style.color = '#ff6d6d';
-    bar.style.width = '0%';
-    bar.style.background = 'linear-gradient(90deg,#ff7b7b,#ff3b3b)';
-    setTimeout(() => finish({ correct: false, timedOut: true, question: q }), 260);
-  }, limitMs);
-
-  const secondTimerId = setInterval(() => {
-    remain -= 1;
-    if (remain < 0) remain = 0;
-    timerEl.textContent = `剩餘時間：${remain} 秒`;
-    if (remain <= 1) timerEl.style.color = '#ff6d6d';
-  }, 1000);
-
-  const progressTimerId = setInterval(() => {
-    const elapsed = Date.now() - startAt;
-    const ratio = Math.max(0, 1 - (elapsed / limitMs));
-    bar.style.width = `${ratio * 100}%`;
-    if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
-    if (ratio <= 0) clearInterval(progressTimerId);
-  }, 50);
-
-  panel.appendChild(title);
-  panel.appendChild(timerEl);
-  panel.appendChild(barWrap);
-  panel.appendChild(questionEl);
-  panel.appendChild(actions);
-  overlay.appendChild(panel);
-  document.body.appendChild(overlay);
-  return true;
-}
-
-function doCard39Quiz() {
-  if (!currentState) return;
-
-  showCard39SlotPicker((selectedSlots) => {
-    const question = getRandomItem(CARD39_QUIZ_DATA);
-    if (!question) {
-      showInfoPopup('快問快答', '題庫是空的。', () => finishCardPhase());
-      return;
-    }
-
-    showCard39QuizOverlay(question, (result) => {
-      const delta = result && result.correct ? 2 : -1;
-
-      if (result && result.correct) {
-        showCard39BigText('CORRECT', '#5bff9b');
-      } else if (result && result.timedOut) {
-        showCard39BigText('TIME UP', '#ff5e5e');
-      } else {
-        showCard39BigText('WRONG', '#ff5e5e');
-      }
-
-      setTimeout(() => {
-        showCard39AnswerReveal(question, result, () => {
-          selectedSlots.forEach((slotIndex) => {
-            applyCard39DeltaToSlot(slotIndex, delta);
-            showCard39FloatingDelta(slotIndex, delta);
-          });
-          setTimeout(() => finishCardPhase(), 720);
-        });
-      }, 650);
-    }, 5000);
-  });
-}
-
-function doCard38SpeedChoice(slotIndex) {
-  const isPerk = slotIndex >= 3 && slotIndex <= 6;
-  if (!isPerk || !currentState || !Array.isArray(currentState.perks)) return false;
-
-  const preferredPerkIdx = slotIndex - 3;
-  const allPerkIdxs = [0, 1, 2, 3];
-  const roundOrder = [preferredPerkIdx].concat(allPerkIdxs.filter(i => i !== preferredPerkIdx));
-
-  function autoFillRemainingLowScore(startRoundIdx) {
-    for (let i = startRoundIdx; i < roundOrder.length; i++) {
-      const perkIdx = roundOrder[i];
-      const currentName = currentState.perks[perkIdx] || null;
-      const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
-      const pool = getPerkNamesByScores([0, 1, 2]).filter(name =>
-        name !== currentName && !lockedPerks.includes(name)
-      );
-      const chosen = getRandomItem(pool);
-      if (chosen) currentState.perks[perkIdx] = chosen;
-    }
-    finishCardPhase();
-  }
-
-  function showTimeoutConfirm(startRoundIdx) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:100010;';
-    const box = document.createElement('div');
-    box.style.cssText = 'padding:20px 24px;border-radius:18px;background:rgba(22,14,18,0.96);border:1px solid rgba(255,80,80,0.25);box-shadow:0 24px 60px rgba(0,0,0,0.55);';
-    box.innerHTML = '<div style="font-size:min(64px,13vw);font-weight:900;color:#ff4d4d;letter-spacing:0.08em;text-shadow:0 0 20px rgba(255,0,0,0.35);">已超時</div><div style="text-align:center;color:#ffb0b0;margin-top:10px;font-size:14px;">點擊任意位置後，剩餘未選技能將自動補成 0–2 分</div>';
-    overlay.appendChild(box);
-    overlay.addEventListener('click', () => {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      autoFillRemainingLowScore(startRoundIdx);
-    }, { once: true });
+    panel.appendChild(title);
+    panel.appendChild(sub);
+    panel.appendChild(grid);
+    overlay.appendChild(panel);
     document.body.appendChild(overlay);
+    return true;
   }
 
-  function runRound(roundIdx) {
-    if (roundIdx >= roundOrder.length) {
-      finishCardPhase();
-      return;
-    }
-
-    const perkIdx = roundOrder[roundIdx];
-    const currentName = currentState.perks[perkIdx] || null;
-    const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
-
-    const highPoolBase = getPerkNamesByScores([3, 4, 5]).filter(name =>
-      name !== currentName && !lockedPerks.includes(name)
-    );
-
-    const currentChoices = pickDistinctRandom(highPoolBase, 4);
-    if (!currentChoices.length) {
-      runRound(roundIdx + 1);
-      return;
-    }
+  function showCard39QuizOverlay(questionData, onAnswer, timeoutMs) {
+    const q = questionData || {};
+    const limitMs = typeof timeoutMs === 'number' ? timeoutMs : 5000;
+    let done = false;
+    let remain = Math.ceil(limitMs / 1000);
 
     const overlay = document.createElement('div');
-    overlay.id = 'card38SpeedChoiceOverlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100003;';
+    overlay.id = 'card39QuizOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100005;';
 
     const panel = document.createElement('div');
-    panel.style.cssText = 'width:min(920px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+    panel.style.cssText = 'width:min(760px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
 
     const title = document.createElement('div');
-    title.textContent = `第 ${roundIdx + 1} / 4 輪：3 秒內選 1 個技能`;
+    title.textContent = '快問快答';
     title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
 
     const timerEl = document.createElement('div');
+    timerEl.textContent = `剩餘時間：${remain} 秒`;
     timerEl.style.cssText = 'font-size:13px;color:#ffd36e;margin-bottom:8px;';
-    timerEl.textContent = '剩餘時間：3 秒';
 
     const barWrap = document.createElement('div');
     barWrap.style.cssText = 'width:100%;height:10px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin:0 0 14px 0;border:1px solid rgba(255,255,255,0.06);';
@@ -4250,46 +4464,240 @@ function doCard38SpeedChoice(slotIndex) {
     bar.style.cssText = 'height:100%;width:100%;background:linear-gradient(90deg,#6effa2,#ffd36e);transition:width 0.08s linear;';
     barWrap.appendChild(bar);
 
-    const hint = document.createElement('div');
-    hint.style.cssText = 'font-size:13px;color:#c8d0e5;margin-bottom:14px;';
-    hint.textContent = '3 秒內從 3–5 分技能中選 1 個；超時則剩下未選欄位會由系統補成 0–2 分。';
+    const questionEl = document.createElement('div');
+    questionEl.textContent = q.question || '題目讀取失敗';
+    questionEl.style.cssText = 'font-size:16px;font-weight:700;line-height:1.6;color:#fff;margin-bottom:14px;white-space:pre-wrap;';
 
-    const slotHint = document.createElement('div');
-    slotHint.style.cssText = 'font-size:12px;color:#8fa3cf;margin-bottom:14px;';
-    slotHint.textContent = `本輪替換技能欄位：${perkIdx + 1}`;
+    const actions = document.createElement('div');
+    actions.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;';
 
-    const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;';
+    const startAt = Date.now();
 
-    let done = false;
-    let remain = 3;
-    let progressTimerId = null;
-    let secondTimerId = null;
-    let timeoutId = null;
-
-    function cleanup() {
-      if (progressTimerId) clearInterval(progressTimerId);
-      if (secondTimerId) clearInterval(secondTimerId);
-      if (timeoutId) clearTimeout(timeoutId);
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    }
-
-    function applyChoice(name) {
+    function finish(payload) {
       if (done) return;
       done = true;
-      cleanup();
-      currentState.perks[perkIdx] = name;
-      runRound(roundIdx + 1);
+      clearInterval(secondTimerId);
+      clearInterval(progressTimerId);
+      clearTimeout(timeoutId);
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof onAnswer === 'function') onAnswer(payload);
     }
 
-    currentChoices.forEach((name) => {
+    const choices = Array.isArray(q.options) && q.options.length
+      ? q.options.map(opt => ({
+        value: opt.label,
+        label: `${opt.label}. ${opt.text}`,
+        raw: opt
+      }))
+      : [
+        { value: '是', label: '是' },
+        { value: '否', label: '否' }
+      ];
+
+    choices.forEach((choice) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.style.cssText = 'padding:10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:132px;';
-      const zh = getPerkZh(name) || name;
-      const score = getPerkScore(name);
-      const img = getPerkImg(name);
-      btn.innerHTML = `
+      btn.style.cssText = 'padding:12px 10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;font-size:14px;line-height:1.5;';
+      btn.textContent = choice.label;
+      btn.addEventListener('click', () => {
+        const normalizedUser = normalizeCard39AnswerToken(choice.value);
+        const normalizedAnswer = normalizeCard39AnswerToken(q.answer);
+        const correctByLabel = normalizedUser === normalizedAnswer;
+        const correctByText = choice.raw && normalizeCard39AnswerToken(choice.raw.text) === normalizedAnswer;
+        finish({
+          correct: !!(correctByLabel || correctByText),
+          timedOut: false,
+          question: q
+        });
+      });
+      actions.appendChild(btn);
+    });
+
+    const timeoutId = setTimeout(() => {
+      timerEl.textContent = 'TIME UP';
+      timerEl.style.color = '#ff6d6d';
+      bar.style.width = '0%';
+      bar.style.background = 'linear-gradient(90deg,#ff7b7b,#ff3b3b)';
+      setTimeout(() => finish({ correct: false, timedOut: true, question: q }), 260);
+    }, limitMs);
+
+    const secondTimerId = setInterval(() => {
+      remain -= 1;
+      if (remain < 0) remain = 0;
+      timerEl.textContent = `剩餘時間：${remain} 秒`;
+      if (remain <= 1) timerEl.style.color = '#ff6d6d';
+    }, 1000);
+
+    const progressTimerId = setInterval(() => {
+      const elapsed = Date.now() - startAt;
+      const ratio = Math.max(0, 1 - (elapsed / limitMs));
+      bar.style.width = `${ratio * 100}%`;
+      if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
+      if (ratio <= 0) clearInterval(progressTimerId);
+    }, 50);
+
+    panel.appendChild(title);
+    panel.appendChild(timerEl);
+    panel.appendChild(barWrap);
+    panel.appendChild(questionEl);
+    panel.appendChild(actions);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    return true;
+  }
+
+  function doCard39Quiz() {
+    if (!currentState) return;
+
+    showCard39SlotPicker((selectedSlots) => {
+      const question = getRandomItem(CARD39_QUIZ_DATA);
+      if (!question) {
+        showInfoPopup('快問快答', '題庫是空的。', () => finishCardPhase());
+        return;
+      }
+
+      showCard39QuizOverlay(question, (result) => {
+        const delta = result && result.correct ? 2 : -1;
+
+        if (result && result.correct) {
+          showCard39BigText('CORRECT', '#5bff9b');
+        } else if (result && result.timedOut) {
+          showCard39BigText('TIME UP', '#ff5e5e');
+        } else {
+          showCard39BigText('WRONG', '#ff5e5e');
+        }
+
+        setTimeout(() => {
+          showCard39AnswerReveal(question, result, () => {
+            selectedSlots.forEach((slotIndex) => {
+              applyCard39DeltaToSlot(slotIndex, delta);
+              showCard39FloatingDelta(slotIndex, delta);
+            });
+            setTimeout(() => finishCardPhase(), 720);
+          });
+        }, 650);
+      }, 5000);
+    });
+  }
+
+  function doCard38SpeedChoice(slotIndex) {
+    const isPerk = slotIndex >= 3 && slotIndex <= 6;
+    if (!isPerk || !currentState || !Array.isArray(currentState.perks)) return false;
+
+    const preferredPerkIdx = slotIndex - 3;
+    const allPerkIdxs = [0, 1, 2, 3];
+    const roundOrder = [preferredPerkIdx].concat(allPerkIdxs.filter(i => i !== preferredPerkIdx));
+
+    function autoFillRemainingLowScore(startRoundIdx) {
+      for (let i = startRoundIdx; i < roundOrder.length; i++) {
+        const perkIdx = roundOrder[i];
+        const currentName = currentState.perks[perkIdx] || null;
+        const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
+        const pool = getPerkNamesByScores([0, 1, 2]).filter(name =>
+          name !== currentName && !lockedPerks.includes(name)
+        );
+        const chosen = getRandomItem(pool);
+        if (chosen) currentState.perks[perkIdx] = chosen;
+      }
+      finishCardPhase();
+    }
+
+    function showTimeoutConfirm(startRoundIdx) {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:100010;';
+      const box = document.createElement('div');
+      box.style.cssText = 'padding:20px 24px;border-radius:18px;background:rgba(22,14,18,0.96);border:1px solid rgba(255,80,80,0.25);box-shadow:0 24px 60px rgba(0,0,0,0.55);';
+      box.innerHTML = '<div style="font-size:min(64px,13vw);font-weight:900;color:#ff4d4d;letter-spacing:0.08em;text-shadow:0 0 20px rgba(255,0,0,0.35);">已超時</div><div style="text-align:center;color:#ffb0b0;margin-top:10px;font-size:14px;">點擊任意位置後，剩餘未選技能將自動補成 0–2 分</div>';
+      overlay.appendChild(box);
+      overlay.addEventListener('click', () => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        autoFillRemainingLowScore(startRoundIdx);
+      }, { once: true });
+      document.body.appendChild(overlay);
+    }
+
+    function runRound(roundIdx) {
+      if (roundIdx >= roundOrder.length) {
+        finishCardPhase();
+        return;
+      }
+
+      const perkIdx = roundOrder[roundIdx];
+      const currentName = currentState.perks[perkIdx] || null;
+      const lockedPerks = currentState.perks.filter((name, idx) => idx !== perkIdx && !!name);
+
+      const highPoolBase = getPerkNamesByScores([3, 4, 5]).filter(name =>
+        name !== currentName && !lockedPerks.includes(name)
+      );
+
+      const currentChoices = pickDistinctRandom(highPoolBase, 4);
+      if (!currentChoices.length) {
+        runRound(roundIdx + 1);
+        return;
+      }
+
+      const overlay = document.createElement('div');
+      overlay.id = 'card38SpeedChoiceOverlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:100003;';
+
+      const panel = document.createElement('div');
+      panel.style.cssText = 'width:min(920px,calc(100vw - 24px));background:linear-gradient(180deg,#1c202c,#141823);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,0.5);';
+
+      const title = document.createElement('div');
+      title.textContent = `第 ${roundIdx + 1} / 4 輪：3 秒內選 1 個技能`;
+      title.style.cssText = 'font-size:20px;font-weight:800;margin-bottom:6px;color:#fff;';
+
+      const timerEl = document.createElement('div');
+      timerEl.style.cssText = 'font-size:13px;color:#ffd36e;margin-bottom:8px;';
+      timerEl.textContent = '剩餘時間：3 秒';
+
+      const barWrap = document.createElement('div');
+      barWrap.style.cssText = 'width:100%;height:10px;background:rgba(255,255,255,0.10);border-radius:999px;overflow:hidden;margin:0 0 14px 0;border:1px solid rgba(255,255,255,0.06);';
+
+      const bar = document.createElement('div');
+      bar.style.cssText = 'height:100%;width:100%;background:linear-gradient(90deg,#6effa2,#ffd36e);transition:width 0.08s linear;';
+      barWrap.appendChild(bar);
+
+      const hint = document.createElement('div');
+      hint.style.cssText = 'font-size:13px;color:#c8d0e5;margin-bottom:14px;';
+      hint.textContent = '3 秒內從 3–5 分技能中選 1 個；超時則剩下未選欄位會由系統補成 0–2 分。';
+
+      const slotHint = document.createElement('div');
+      slotHint.style.cssText = 'font-size:12px;color:#8fa3cf;margin-bottom:14px;';
+      slotHint.textContent = `本輪替換技能欄位：${perkIdx + 1}`;
+
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;';
+
+      let done = false;
+      let remain = 3;
+      let progressTimerId = null;
+      let secondTimerId = null;
+      let timeoutId = null;
+
+      function cleanup() {
+        if (progressTimerId) clearInterval(progressTimerId);
+        if (secondTimerId) clearInterval(secondTimerId);
+        if (timeoutId) clearTimeout(timeoutId);
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }
+
+      function applyChoice(name) {
+        if (done) return;
+        done = true;
+        cleanup();
+        currentState.perks[perkIdx] = name;
+        runRound(roundIdx + 1);
+      }
+
+      currentChoices.forEach((name) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'padding:10px;border-radius:12px;background:#202633;border:1px solid rgba(255,255,255,0.1);color:#fff;text-align:left;min-height:132px;';
+        const zh = getPerkZh(name) || name;
+        const score = getPerkScore(name);
+        const img = getPerkImg(name);
+        btn.innerHTML = `
         <div style="display:flex;gap:10px;align-items:center;">
           <div style="width:54px;height:54px;border-radius:10px;background:#0e121d;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
             ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:contain;">` : ''}
@@ -4300,76 +4708,76 @@ function doCard38SpeedChoice(slotIndex) {
           </div>
         </div>
       `;
-      btn.addEventListener('click', () => applyChoice(name));
-      grid.appendChild(btn);
-    });
-
-    const startedAt = Date.now();
-    secondTimerId = setInterval(() => {
-      remain -= 1;
-      if (remain < 0) remain = 0;
-      timerEl.textContent = `剩餘時間：${remain} 秒`;
-      if (remain <= 1) timerEl.style.color = '#ff6d6d';
-    }, 1000);
-
-    progressTimerId = setInterval(() => {
-      const elapsed = Date.now() - startedAt;
-      const ratio = Math.max(0, 1 - (elapsed / 3000));
-      bar.style.width = `${ratio * 100}%`;
-      if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
-      if (ratio <= 0) clearInterval(progressTimerId);
-    }, 50);
-
-    timeoutId = setTimeout(() => {
-      if (done) return;
-      done = true;
-      cleanup();
-      showTimeoutConfirm(roundIdx);
-    }, 3000);
-
-    panel.appendChild(title);
-    panel.appendChild(timerEl);
-    panel.appendChild(barWrap);
-    panel.appendChild(hint);
-    panel.appendChild(slotHint);
-    panel.appendChild(grid);
-    overlay.appendChild(panel);
-    document.body.appendChild(overlay);
-  }
-
-  runRound(0);
-  return true;
-}
-
-function doCard17LosePenalty() {
-  const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
-  let applied = 0;
-
-  for (const slot of slotOrder) {
-    let ok = false;
-
-    if (slot === 1 || slot === 2) {
-      const preferredScore = Math.random() < 0.5 ? 0 : 1;
-      const fallbackScore = preferredScore === 0 ? 1 : 0;
-      ok = rerollAddonSlotByScore(slot - 1, [preferredScore, fallbackScore], {
-        allowDuplicateFallback: false,
-        allowKeepSameName: true
+        btn.addEventListener('click', () => applyChoice(name));
+        grid.appendChild(btn);
       });
-    } else {
-      ok = rerollPerkSlotByScore(slot - 3, [0, 1], {
-        allowDuplicateFallback: true,
-        allowKeepSameName: true
-      });
+
+      const startedAt = Date.now();
+      secondTimerId = setInterval(() => {
+        remain -= 1;
+        if (remain < 0) remain = 0;
+        timerEl.textContent = `剩餘時間：${remain} 秒`;
+        if (remain <= 1) timerEl.style.color = '#ff6d6d';
+      }, 1000);
+
+      progressTimerId = setInterval(() => {
+        const elapsed = Date.now() - startedAt;
+        const ratio = Math.max(0, 1 - (elapsed / 3000));
+        bar.style.width = `${ratio * 100}%`;
+        if (ratio <= 0.2) bar.style.background = 'linear-gradient(90deg,#ffae66,#ff4d4d)';
+        if (ratio <= 0) clearInterval(progressTimerId);
+      }, 50);
+
+      timeoutId = setTimeout(() => {
+        if (done) return;
+        done = true;
+        cleanup();
+        showTimeoutConfirm(roundIdx);
+      }, 3000);
+
+      panel.appendChild(title);
+      panel.appendChild(timerEl);
+      panel.appendChild(barWrap);
+      panel.appendChild(hint);
+      panel.appendChild(slotHint);
+      panel.appendChild(grid);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
     }
 
-    if (ok) {
-      applied += 1;
-      if (applied >= 3) return true;
-    }
+    runRound(0);
+    return true;
   }
 
-  return applied > 0;
-}
+  function doCard17LosePenalty() {
+    const slotOrder = shuffle([1, 2, 3, 4, 5, 6]);
+    let applied = 0;
+
+    for (const slot of slotOrder) {
+      let ok = false;
+
+      if (slot === 1 || slot === 2) {
+        const preferredScore = Math.random() < 0.5 ? 0 : 1;
+        const fallbackScore = preferredScore === 0 ? 1 : 0;
+        ok = rerollAddonSlotByScore(slot - 1, [preferredScore, fallbackScore], {
+          allowDuplicateFallback: false,
+          allowKeepSameName: true
+        });
+      } else {
+        ok = rerollPerkSlotByScore(slot - 3, [0, 1], {
+          allowDuplicateFallback: true,
+          allowKeepSameName: true
+        });
+      }
+
+      if (ok) {
+        applied += 1;
+        if (applied >= 3) return true;
+      }
+    }
+
+    return applied > 0;
+  }
 
 
   let card17GuessStyleInjected = false;
