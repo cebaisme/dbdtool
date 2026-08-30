@@ -993,4 +993,25 @@ window.PERKS = {
     killer: "The Slasher",
     img: "./images/perks/silentshadow.png"
   },
+  "Celestial Witness": {
+    zh: "星辰證人",
+    score: "4",
+    aliases: ["神之明鑑", "天使眼", "蜘蛛眼", "血祭品", "追逐", "30秒", "40公尺", "40米", "氣場", "3秒"],
+    killer: "The Judgment",
+    img: "./images/perks/celestialwitness.png"
+  },
+  "Hex: Under Your Thumb": {
+    zh: "厄咒:掌控",
+    score: "1",
+    aliases: ["厄咒:股掌之中", "絆腳", "厄咒", "上鉤", "鉤子", "加速", "敏捷", "15%", "32公尺", "32米", "位置", "4秒"],
+    killer: "The Judgment",
+    img: "./images/perks/hexunderyourthumb.png"
+  },
+  "Lay Waste": {
+    zh: "破壞",
+    score: "4",
+    aliases: ["毀於一旦", "天使腳", "蜘蛛腳", "荒蕪", "發電機", "踢機", "退修", "倒退", "每charge", "2%", "冷卻45秒"],
+    killer: "The Judgment",
+    img: "./images/perks/laywaste.png"
+  },
 };

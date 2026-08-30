@@ -2,7 +2,7 @@ window.KILLERS = {
   "The Trapper": {
     zh: "陷阱殺手",
     limit: 23,
-    aliases: ["設陷者", "夾子", "夾哥", "邁克米倫", "頑皮熊", "traper"],
+    aliases: ["設陷者", "夾子", "夾哥", "邁克米倫", "頑皮熊", "艾倫葉卡", "Eren Yeager", "艾主席", "進擊的巨人", "traper"],
     img: "./images/killers/trapper.png"
   },
   "The Wraith": {
@@ -38,19 +38,19 @@ window.KILLERS = {
   "The Doctor": {
     zh: "醫生",
     limit: 20,
-    aliases: ["楊教授", "老楊", "閃電大帥哥", "赫曼", "doctor"],
+    aliases: ["楊教授", "老楊", "閃電大帥哥", "赫曼", "法老王", "eddie", "doctor"],
     img: "./images/killers/doctor.png"
   },
   "The Huntress": {
     zh: "女獵人",
     limit: 17,
-    aliases: ["女獵手", "兔女", "兔媽", "兔子", "huntress"],
+    aliases: ["女獵手", "兔女", "兔媽", "兔子", "鹿男", "人形巨鹿", "芭芭雅嘎", "巴巴雅嘎", "Baba Yaga", "融臉艾迪", "huntress"],
     img: "./images/killers/huntress.png"
   },
   "The Cannibal": {
     zh: "食人魔",
     limit: 20,
-    aliases: ["皮臉", "肚兜大男孩", "cannibal"],
+    aliases: ["皮臉", "肚兜大男孩", "leatherface", "cannibal"],
     img: "./images/killers/leatherface.png"
   },
   "The Nightmare": {
@@ -74,7 +74,7 @@ window.KILLERS = {
   "The Spirit": {
     zh: "怨靈",
     limit: 17,
-    aliases: ["凜", "凜妹", "富江", "spirit"],
+    aliases: ["凜", "凜妹", "富江", "戰槌巨人", "spirit"],
     img: "./images/killers/spirit.png"
   },
   "The Legion": {
@@ -104,13 +104,13 @@ window.KILLERS = {
   "The Oni": {
     zh: "鬼武士",
     limit: 17,
-    aliases: ["oni", "山崗火山", "歐尼醬"],
+    aliases: ["oni", "山崗火山", "殺人灰熊", "牛頭人", "米諾陶洛斯", "Minotaurus", "Minotaur", "武士", "eddie", "歐尼醬"],
     img: "./images/killers/oni.png"
   },
   "The Deathslinger": {
     zh: "死亡槍手",
     limit: 20,
-    aliases: ["槍爹", "slinger"],
+    aliases: ["槍爹", "異鄉人", "eddie", "slinger"],
     img: "./images/killers/deathslinger.png"
   },
   "The Executioner": {
@@ -121,7 +121,7 @@ window.KILLERS = {
   },
   "The Blight": {
     zh: "枯萎者",
-    limit: 12,
+    limit: 15,
     aliases: ["阿枯", "枯魔", "枯阿魔", "威廉柏金", "威廉博士", "威", "blight"],
     img: "./images/killers/blight.png"
   },
@@ -134,7 +134,7 @@ window.KILLERS = {
   "The Trickster": {
     zh: "騙術師",
     limit: 23,
-    aliases: ["歐爸", "河知雲", "trickster"],
+    aliases: ["歐爸", "河知雲", "米娜", "Mina", "trickster"],
     img: "./images/killers/trickster.png"
   },
   "The Nemesis": {
@@ -146,13 +146,13 @@ window.KILLERS = {
   "The Cenobite": {
     zh: "地獄修士",
     limit: 17,
-    aliases: ["釘子頭", "顫齒", "pinhead", "cenobite"],
+    aliases: ["釘子頭", "顫齒", "Chatterer", "pinhead", "cenobite"],
     img: "./images/killers/pinhead.png"
   },
   "The Artist": {
     zh: "藝術家",
     limit: 20,
-    aliases: ["烏鴉", "鳥人", "鳥姊", "鳥姐", "墨水罐", "巨大墨水罐", "artist"],
+    aliases: ["烏鴉", "鳥人", "鳥姊", "鳥姐", "墨水罐", "巨大墨水罐", "布雷特兄弟", "Boulet Brothers", "淵小姐", "森林精靈", "鹿首精", "暴怒炸脖龍", "artist"],
     img: "./images/killers/artist.png"
   },
   "The Onryo": {
@@ -187,14 +187,14 @@ window.KILLERS = {
   },
   "The Singularity": {
     zh: "奇點",
-    limit: 12,
+    limit: 15,
     aliases: ["HUX-A7-13", "奇異者", "singularity"],
     img: "./images/killers/singularity.png"
   },
   "The Xenomorph": {
     zh: "異形",
     limit: 23,
-    aliases: ["異形", "外星狗狗", "黑色流星", "alien"],
+    aliases: ["異形", "外星狗狗", "黑色流星", "異形女王", "alien"],
     img: "./images/killers/xenomorph.png"
   },
   "The Good Guy": {
@@ -205,7 +205,7 @@ window.KILLERS = {
   },
   "The Unknown": {
     zh: "神秘人",
-    limit: 17,
+    limit: 20,
     aliases: ["未知惡物", "偽人", "unknown"],
     img: "./images/killers/unknown.png"
   },
@@ -241,7 +241,7 @@ window.KILLERS = {
   },
   "The Krasue": {
     zh: "卡蘇",
-    limit: 15,
+    limit: 23,
     aliases: ["克拉蘇", "飛頭", "krasue"],
     img: "./images/killers/krasue.png"
   },
@@ -256,6 +256,12 @@ window.KILLERS = {
     limit: 15,
     aliases: ["傑森沃爾斯", "Jason Voorhees","十三號星期五"],
     img: "./images/killers/jason.png"
+  },
+    "The Judgment": {
+    zh: "審判殺手",
+    limit: 15,
+    aliases: ["天使", "蜘蛛", "大眼睛", "大頭", "judgment"],
+    img: "./images/killers/judgment.png"
   },
 };
 
