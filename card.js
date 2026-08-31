@@ -444,7 +444,7 @@
       effect: { type: 'card40_ceba_combo', data: {} }
     },
 
-    // 41. 神之一手：六個非殺手欄位依序抽取不低於原分數的候選，由擲筊決定是否換上
+    // 41. 神之一手：候選分數 40% 高於、40% 等於、20% 低於原分數
     {
       id: 'card41',
       zh: '神之一手',
@@ -3188,7 +3188,9 @@ D.騎士
   }
 
   // 41 號：神之一手
-    // 六個非殺手欄位依序抽出「同類型、不低於原分數、不重複」候選。
+    // 六個非殺手欄位依序抽出「同類型、不重複」候選。
+    // 分數先抽方向：40% 高於、40% 等於、20% 低於。
+    // 同一方向內的各分數等機率；該方向無可用候選時才改抽同分。
     // 聖筊遵照玩家選擇；陰筊反轉玩家選擇；笑筊換候選後重問，每格最多三次。
     function doCard41AskDeity(card) {
       if (!currentState || !currentState.killerKey ||
@@ -3219,25 +3221,46 @@ D.騎士
         const currentName = getCurrentName(slot);
         const shown = alreadyShown || new Set();
 
+        function getTargetScoreOrder(score, minScore) {
+          const roll = Math.random();
+          if (roll < 0.4) {
+            const higher = [];
+            for (let s = score + 1; s <= 5; s++) higher.push(s);
+            return higher.length ? shuffle(higher) : [score];
+          }
+          if (roll < 0.8) return [score];
+          const lower = [];
+          for (let s = minScore; s < score; s++) lower.push(s);
+          return lower.length ? shuffle(lower) : [score];
+        }
+
         if (slot.type === 'addon') {
           const score = getAddonScore(currentName);
           if (typeof score !== 'number') return null;
-          const allowedScores = [];
-          for (let s = score; s <= 5; s++) allowedScores.push(s);
           const used = new Set(currentState.addons || []);
-          const pool = getAddonNamesByScoresForKiller(currentState.killerKey, allowedScores)
+          const makePool = target => getAddonNamesByScoresForKiller(currentState.killerKey, [target])
             .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
-          return getRandomItem(pool);
+          const scoreOrder = getTargetScoreOrder(score, 1);
+          for (const targetScore of scoreOrder) {
+            const pool = makePool(targetScore);
+            if (pool.length) return getRandomItem(pool);
+          }
+          if (!scoreOrder.includes(score)) return getRandomItem(makePool(score));
+          return null;
         }
 
         const score = getPerkScore(currentName);
         if (typeof score !== 'number') return null;
-        const allowedScores = [];
-        for (let s = score; s <= 5; s++) allowedScores.push(s);
         const used = new Set(currentState.perks || []);
-        const pool = getPerkNamesByScores(allowedScores)
+        const makePool = target => getPerkNamesByScores([target])
           .filter(name => name !== currentName && !used.has(name) && !shown.has(name));
-        return getRandomItem(pool);
+        const scoreOrder = getTargetScoreOrder(score, 0);
+        for (const targetScore of scoreOrder) {
+          const pool = makePool(targetScore);
+          if (pool.length) return getRandomItem(pool);
+        }
+        if (!scoreOrder.includes(score)) return getRandomItem(makePool(score));
+        return null;
       }
 
       function applyCandidate(slot, candidate) {
