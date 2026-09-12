@@ -212,7 +212,7 @@ window.KILLERS = {
   "The Lich": {
     zh: "巫妖",
     limit: 12,
-    aliases: ["威可那", "威可拿", "威可納", "威", "紫色光頭", "lich"],
+    aliases: ["威可那", "威可拿", "威可納", "威", "紫色光頭", "終極魔法戰士隕石威加洛", "lich"],
     img: "./images/killers/vecna.png"
   },
   "The Dark Lord": {
