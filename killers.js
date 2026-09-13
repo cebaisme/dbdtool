@@ -182,7 +182,7 @@ window.KILLERS = {
   "The Skull Merchant": {
     zh: "顱骨販子",
     limit: 23,
-    aliases: ["白骨商人", "骨姐", "骨姊", "精美UI", "skull", "merchant", "xj6ej3z04y7", "196ej3g; bp6", "ej3ru,3"],
+    aliases: ["白骨商人", "骨姐", "骨姊", "精美UI", "U美", "精I", "skull", "merchant", "xj6ej3z04y7", "196ej3g; bp6", "ej3ru,3"],
     img: "./images/killers/skull merchant.png"
   },
   "The Singularity": {
