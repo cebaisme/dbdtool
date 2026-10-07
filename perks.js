@@ -912,7 +912,7 @@ window.PERKS = {
   "Haywire": {
     zh: "失控",
     score: 1,
-    aliases: ["設備故障", "開關毀滅", "終局", "出口大門"],
+    aliases: ["設備故障", "開關毀滅", "終局", "出口大門", "乾草電線"],
     killer: "The Animatronic",
     img: "./images/perks/haywire.png"
   },
