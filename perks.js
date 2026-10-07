@@ -37,7 +37,7 @@ window.PERKS = {
   "Insidious": {
     zh: "靜止隱身",
     score: 1,
-    aliases: ["靜隱", "2秒", "隱身", "隱形"],
+    aliases: ["靜隱", "2秒", "隱身", "隱形", "禁止隱身"],
     killer: "General",
     img: "./images/perks/insidious.png"
   },
