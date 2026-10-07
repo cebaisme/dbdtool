@@ -1,7 +1,7 @@
 window.PERKS = {
   "Bitter Murmur": {
     zh: "苦澀低語",
-    score: 2,
+    score: 3,
     aliases: ["bitter murmur", "惡靈低語"],
     killer: "General",
     img: "./images/perks/bittermurmur.png"
@@ -29,7 +29,7 @@ window.PERKS = {
   },
   "Hex: Thrill of the Hunt": {
     zh: "厄咒:獵殺戾氣",
-    score: 5,
+    score: 3,
     aliases: ["厄咒", "獵殺戾氣", "獵殺利器", "獵殺力氣"],
     killer: "General",
     img: "./images/perks/hexthrillofthehunt.png"
@@ -37,7 +37,7 @@ window.PERKS = {
   "Insidious": {
     zh: "靜止隱身",
     score: 1,
-    aliases: ["靜隱", "1秒", "隱身", "隱形"],
+    aliases: ["靜隱", "2秒", "隱身", "隱形"],
     killer: "General",
     img: "./images/perks/insidious.png"
   },
@@ -50,8 +50,8 @@ window.PERKS = {
   },
   "Scourge Hook: Monstrous Shrine": {
     zh: "禍害之鉤:鬼魔神龕",
-    score: 3,
-    aliases: ["天災鉤子:鬼魔神龕", "天災鉤", "鬼魔神龕"],
+    score: 4,
+    aliases: ["天災鉤子:鬼魔神龕", "天災鉤", "鬼魔神龕", "毀滅"],
     killer: "General",
     img: "./images/perks/scourgehookmonstrousshrine.png"
   },
@@ -78,14 +78,14 @@ window.PERKS = {
   },
   "Unrelenting": {
     zh: "不屈不饒",
-    score: 0,
+    score: 2,
     aliases: ["普通攻擊", "普攻"],
     killer: "General",
     img: "./images/perks/unrelenting.png"
   },
   "Whispers": {
     zh: "竊竊私語",
-    score: 0,
+    score: 1,
     aliases: ["切切私語", "惡靈低語"],
     killer: "General",
     img: "./images/perks/whispers.png"
@@ -289,7 +289,7 @@ window.PERKS = {
   "Fire Up": {
     zh: "怒火中燒",
     score: 4,
-    aliases: ["fire up", "賽亞人", "發電機", "破壞速度", "跨越速度", "互動速度"],
+    aliases: ["fire up", "賽亞人", "發電機", "破壞速度", "跨越速度", "互動速度", "8%"],
     killer: "The Nightmare",
     img: "./images/perks/fireup.png"
   },
@@ -723,7 +723,7 @@ window.PERKS = {
   "Game Afoot": {
     zh: "疾狩迅獵",
     score: 2,
-    aliases: ["好戲開場", "血祭品", "破壞", "破板", "破牆", "踹機", "發電機", "7%", "10秒", "追逐"],
+    aliases: ["好戲開場", "血祭品", "破壞", "破板", "破牆", "踹機", "發電機", "10%", "10秒", "追逐"],
     killer: "The Skull Merchant",
     img: "./images/perks/gameafoot.png"
   },
@@ -757,7 +757,7 @@ window.PERKS = {
   },
   "Machine Learning": {
     zh: "機械學習",
-    score: 2,
+    score: 3,
     aliases: ["機器學習", "劣化", "隱身", "隱形", "8%", "60秒"],
     killer: "The Singularity",
     img: "./images/perks/machinelearning.png"
@@ -770,9 +770,9 @@ window.PERKS = {
     img: "./images/perks/alieninstinct.png"
   },
   "Rapid Brutality": {
-    zh: "疾速殘暴",
+    zh: "迅猛暴虐",
     score: 5,
-    aliases: ["為殺而殺", "狂暴", "嗜血", "普通攻擊", "普攻", "5%", "10秒"],
+    aliases: ["疾速殘暴", "為殺而殺", "狂暴", "嗜血", "普通攻擊", "普攻", "5%", "10秒"],
     killer: "The Xenomorph",
     img: "./images/perks/rapidbrutality.png"
   },
@@ -807,13 +807,13 @@ window.PERKS = {
   "Unbound": {
     zh: "掙脫綁定",
     score: 1,
-    aliases: ["無束", "跨窗加速", "受傷", "跨越", "7%", "10秒"],
+    aliases: ["無束", "跨窗加速", "受傷", "跨越", "5%", "25秒"],
     killer: "The Unknown",
     img: "./images/perks/unbound.png"
   },
   "Undone": {
     zh: "再接再厲",
-    score: 1,
+    score: 4,
     aliases: ["無跡", "qte", "技能檢驗", "封鎖", "發電機", "60秒"],
     killer: "The Unknown",
     img: "./images/perks/undone.png"
@@ -918,7 +918,7 @@ window.PERKS = {
   },
   "Help Wanted": {
     zh: "招聘",
-    score: 1,
+    score: 3,
     aliases: ["招聘啟示", "劣化", "普通攻擊", "普攻", "25%", "60秒"],
     killer: "The Animatronic",
     img: "./images/perks/helpwanted.png"
@@ -939,7 +939,7 @@ window.PERKS = {
   },
   "Ravenous": {
     zh: "貪食",
-    score: 2,
+    score: 3,
     aliases: ["4層代幣", "尖叫", "大叫", "破綻", "危險", "一刀", "60秒"],
     killer: "The Krasue",
     img: "./images/perks/ravenous.png"
