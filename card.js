@@ -2253,8 +2253,8 @@ D.騎士
 /* dbdtool 7.0 — shared popup surfaces, spacing and interaction states. */
 :root
 {
-   --dbd-surface: #181d2e;
-   --dbd-raised: #222a3e;
+   --dbd-surface: #0d1320;
+   --dbd-raised: #2b3650;
    --dbd-line: rgba(172, 190, 225, .2);
    --dbd-text: #f2f5fc;
    --dbd-muted: #b4bed3;
@@ -2485,6 +2485,34 @@ D.騎士
 {
    min-width: 0;
    overflow-wrap: anywhere;
+}
+#card38ReadyOverlay
+{
+   position: fixed;
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 100003;
+}
+.card38-ready-panel
+{
+   width: 640px;
+   text-align: center;
+}
+.card38-ready-title
+{
+   font-size: clamp(32px, 5vw, 52px);
+   font-weight: 900;
+   margin: 12px 0;
+}
+.card38-ready-count
+{
+   font-size: clamp(120px, 20vw, 200px);
+   font-weight: 900;
+   color: #f01824;
+   line-height: 1.2;
+   margin: 16px 0;
 }
 .card38-failure
 {
@@ -6875,7 +6903,7 @@ D.騎士
          function applyChoice(name)
          {
             if (done) return;
-            if (performance.now() - startedAt >= 1000)
+            if (performance.now() - startedAt >= 1100)
             {
                showFailure();
                return;
@@ -6932,7 +6960,7 @@ D.騎士
          timeoutId = setTimeout(() =>
          {
             showFailure();
-         }, 1000);
+         }, 1100);
 
          panel.appendChild(title);
          panel.appendChild(timerEl);
@@ -6944,7 +6972,41 @@ D.騎士
          document.body.appendChild(overlay);
       }
 
-      runRound(0);
+      const readyOverlay = document.createElement('div');
+      readyOverlay.id = 'card38ReadyOverlay';
+      readyOverlay.className = 'dbd-card-overlay';
+      const readyPanel = document.createElement('div');
+      readyPanel.className = 'dbd-card-panel card38-ready-panel';
+      const readyTitle = document.createElement('div');
+      readyTitle.className = 'card38-ready-title';
+      readyTitle.textContent = '準備好了嗎';
+      const readyCount = document.createElement('div');
+      readyCount.className = 'card38-ready-count';
+      readyCount.setAttribute('role', 'status');
+      readyCount.textContent = '3';
+      readyPanel.append(readyTitle, readyCount);
+      readyOverlay.appendChild(readyPanel);
+      document.body.appendChild(readyOverlay);
+      const readyState = currentState;
+      let countdown = 3;
+      function countDown()
+      {
+         if (!readyOverlay.isConnected || currentState !== readyState || !isActive)
+         {
+            readyOverlay.remove();
+            return;
+         }
+         countdown -= 1;
+         if (countdown === 0)
+         {
+            readyOverlay.remove();
+            runRound(0);
+            return;
+         }
+         readyCount.textContent = String(countdown);
+         setTimeout(countDown, 1000);
+      }
+      setTimeout(countDown, 1000);
       return true;
    }
 
