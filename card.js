@@ -717,6 +717,20 @@
             {
             }
          }
+      },
+      {
+         id: 'card43',
+         zh: '免死金牌',
+         target: 'passive',
+         colorType: 'gold',
+         summary: '本輪不會抽到迷因配件；其他卡片效果完成後，一個最低分欄位 +2 分重抽。',
+         effect:
+         {
+            type: 'card43_immunity',
+            data:
+            {
+            }
+         }
       }
    ];
 
@@ -980,7 +994,6 @@
          "Celestial Witness",
          "Nemesis",
          "Lethal Pursuer",
-         "Barbecue & Chilli",
          "Deerstalker",
          "Predator"
       ]
@@ -1408,7 +1421,7 @@ D.騎士
    // 例：const FORCE_DRAW_CARD_IDS = [17];
    // 每次進入卡片階段時，會優先把這些卡塞進 3 張卡片中（最多 3 張）
    // ==========================
-   const FORCE_DRAW_CARD_IDS = [];
+   const FORCE_DRAW_CARD_IDS = [39];
 
    function normalizeForcedCardId(value)
    {
@@ -2247,6 +2260,175 @@ D.騎士
    min-width: 120px;
    padding: 10px 24px;
    background: var(--dbd-raised);
+}
+
+#card43ImmunityOverlay
+{
+   position: fixed;
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 100060;
+}
+.card43-immunity-panel
+{
+   width: 580px;
+   text-align: center;
+}
+.slot-card.color-gold
+{
+   background: linear-gradient(135deg, #fff2a6 0%, #ffd447 22%, #d99a08 48%, #ffde64 72%, #b87900 100%);
+   color: #4a2c00;
+   border: 2px solid #ffe993;
+   box-shadow: 0 10px 24px rgba(0, 0, 0, .45), 0 0 24px rgba(255, 202, 40, .5), inset 0 0 16px rgba(255, 249, 194, .5);
+}
+.card43-immunity-medal
+{
+   width: 180px;
+   min-height: 230px;
+   margin: 20px auto;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: linear-gradient(135deg, #fff5b0 0%, #ffdc43 25%, #dca000 48%, #ffe779 72%, #ba7b00 100%);
+   border: 3px solid #fff1a0;
+   border-radius: 16px;
+   color: #442604;
+   font-size: 32px;
+   font-weight: 900;
+   box-shadow: 0 0 44px rgba(255, 208, 40, .65), inset 0 0 20px rgba(255, 249, 194, .6);
+}
+.card43-immunity-result
+{
+   margin: 20px 0;
+   font-size: 18px;
+   color: #ffe7a0;
+}
+
+#card39AnswerOverlay
+{
+   position: fixed;
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 100040;
+}
+.card39-answer-panel
+{
+   width: 760px;
+   text-align: center;
+   --answer-accent: #ff7b88;
+}
+.dbd-card-panel.card39-answer-panel
+{
+   background: radial-gradient(ellipse at top, #202c42, #0b101a 70%) !important;
+   padding: 32px !important;
+   border: 2px solid var(--answer-accent) !important;
+   box-shadow: 0 20px 56px rgba(0, 0, 0, .55), 0 0 24px color-mix(in srgb, var(--answer-accent) 18%, transparent) !important;
+}
+.card39-answer-panel[data-result="correct"]
+{
+   --answer-accent: #77e1ac;
+}
+.card39-answer-panel[data-result="timeout"]
+{
+   --answer-accent: #ff7b88;
+}
+.card39-answer-kicker
+{
+   color: var(--dbd-muted);
+   font-size: 11px;
+   letter-spacing: .16em;
+}
+.card39-answer-title
+{
+   color: var(--answer-accent);
+   display: inline-block;
+   font-size: 16px;
+   margin: 14px 0 24px;
+   padding: 6px 18px;
+   border: 1px solid var(--answer-accent);
+   border-radius: 999px;
+}
+.card39-answer-question
+{
+   font-size: 22px;
+   font-weight: 700;
+   line-height: 1.7;
+   margin-bottom: 24px;
+   white-space: pre-wrap;
+   overflow-wrap: anywhere;
+}
+.card39-answer-details
+{
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+   gap: 24px;
+   align-items: stretch;
+}
+.card39-answer-box,
+.card39-answer-note
+{
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   min-height: 180px;
+   min-width: 0;
+}
+.card39-answer-note-text
+{
+   font-size: 22px;
+   line-height: 1.6;
+}
+.card39-answer-box
+{
+   padding: 12px 0;
+}
+.card39-answer-label
+{
+   font-size: 12px;
+   color: var(--dbd-muted);
+   margin-bottom: 6px;
+}
+.card39-answer-value
+{
+   font-size: clamp(48px, 10vw, 88px);
+   color: var(--answer-accent);
+   font-weight: 900;
+   line-height: 1.3;
+   text-shadow: 0 0 24px color-mix(in srgb, var(--answer-accent) 20%, transparent);
+   white-space: pre-wrap;
+   overflow-wrap: anywhere;
+}
+.card39-answer-note
+{
+   padding: 12px 0;
+   font-size: 16px;
+   line-height: 1.7;
+   white-space: pre-wrap;
+   overflow-wrap: anywhere;
+}
+.card39-answer-footer
+{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 20px;
+   margin-top: 20px;
+   padding-top: 18px;
+   font-size: 13px;
+   color: var(--dbd-muted);
+}
+.card39-answer-footer button
+{
+   min-width: 180px;
+   padding: 12px 32px;
+   background: #344664;
+   color: var(--dbd-text);
+   flex-shrink: 0;
 }
 
 /* Shared popup styles merged from card-ui.css. */
@@ -3371,7 +3553,7 @@ D.騎士
             currentCards = currentCards.filter(c => c.id !== card.id);
          }
 
-         if (currentCards && currentCards.length > 0)
+         if (currentCards && currentCards.some(item => item.target !== 'passive'))
          {
             renderCards();
             return;
@@ -3412,7 +3594,8 @@ D.騎士
          const cardEl = document.createElement('div');
          cardEl.className = 'slot-card';
          cardEl.classList.add('color-' + card.colorType.replace(/_/g, '-'));
-         cardEl.setAttribute('draggable', 'true');
+         cardEl.setAttribute('draggable', card.target === 'passive' ? 'false' : 'true');
+         if (card.target === 'passive') cardEl.style.cursor = 'default';
          cardEl.dataset.cardId = card.id;
          if (card.id === 'card41')
          {
@@ -3428,6 +3611,13 @@ D.騎士
          const summary = document.createElement('div');
          summary.className = 'slot-card-summary';
          summary.textContent = card.runtimeSummary || card.summary || '';
+         if (card.id === 'card43')
+         {
+            const notice = document.createElement('strong');
+            notice.textContent = '此卡無法使用';
+            notice.style.cssText = 'display:block;text-align:center;font-weight:900;margin-bottom:12px;';
+            summary.prepend(notice);
+         }
 
          const footer = document.createElement('div');
          footer.className = 'slot-card-footer';
@@ -3439,7 +3629,11 @@ D.騎士
 
          cardEl.addEventListener('dragstart', (e) =>
          {
-            if (!isActive) return;
+            if (!isActive || card.target === 'passive')
+            {
+               e.preventDefault();
+               return;
+            }
             dragInfo = {
                card,
                el: cardEl
@@ -3525,6 +3719,7 @@ D.騎士
    // ==========================
    function startCardPhase(state, options)
    {
+      if (!reservedRoundCards) prepareRound();
       const settings = window.SlotSettings ||
       {
       };
@@ -3554,7 +3749,7 @@ D.騎士
          null;
       isActive = true;
       dragInfo = null;
-      currentCards = pickThreeCards();
+      currentCards = reservedRoundCards.slice();
 
       decorateCardSummaries(); // 先補好敘述
       renderCards(); // 再畫卡
@@ -4014,7 +4209,7 @@ D.騎士
       // 先同步畫面，讓玩家立刻看到指定欄位已經重抽。
       syncCurrentStateToBoardWithoutEndingPhase();
 
-      if (currentCards && currentCards.length > 0)
+      if (currentCards && currentCards.some(item => item.target !== 'passive'))
       {
          decorateCardSummaries();
          renderCards();
@@ -5553,57 +5748,42 @@ D.騎士
    // 24 號卡：保持每格分數不變，但全部重抽同分數的技能或配件
    function doRerollSameScoreAll()
    {
-      if (!currentState) return false;
-      const killerKey = currentState.killerKey;
-      if (!killerKey) return false;
-
-      const newPerks = currentState.perks.slice();
-      const newAddons = currentState.addons.slice();
-
-      const usedPerks = new Set();
-      const usedAddons = new Set();
-
-      // 先處理配件欄位（slot 1、2）
-      for (let i = 0; i < newAddons.length; i++)
+      if (!currentState || !currentState.killerKey) return false;
+      function findSelection(original, getPool, getScore, allowKeep = false)
       {
-         const oldName = newAddons[i];
-         if (!oldName) return false;
-         const score = getAddonScore(oldName);
-         if (score == null) return false;
-
-         const basePool = getAddonNamesByScoresForKiller(killerKey, [score]);
-         if (!basePool.length) return false;
-
-         // 不要抽到原本同一個，且避免與已選中的重複
-         const pool = basePool.filter(name => name !== oldName && !usedAddons.has(name));
-         if (!pool.length) return false;
-
-         const chosen = getRandomItem(pool);
-         newAddons[i] = chosen;
-         usedAddons.add(chosen);
+         const pools = original.map(name =>
+         {
+            const score = getScore(name);
+            if (!name || typeof score !== 'number') return [];
+            const candidates = shuffle(getPool(score).filter(candidate => candidate !== name));
+            if (allowKeep && getPool(score).includes(name)) candidates.push(name);
+            return candidates;
+         });
+         const result = [];
+         const used = new Set();
+         function select(index)
+         {
+            if (index === pools.length) return true;
+            for (const name of pools[index])
+            {
+               if (used.has(name)) continue;
+               result[index] = name;
+               used.add(name);
+               if (select(index + 1)) return true;
+               used.delete(name);
+            }
+            return false;
+         }
+         if (select(0)) return result;
+         return allowKeep ? null : findSelection(original, getPool, getScore, true);
       }
-
-      // 再處理技能欄位（slot 3~6）
-      for (let i = 0; i < newPerks.length; i++)
-      {
-         const oldName = newPerks[i];
-         if (!oldName) return false;
-         const score = getPerkScore(oldName);
-         if (score == null) return false;
-
-         const basePool = getPerkNamesByScores([score]);
-         if (!basePool.length) return false;
-
-         const pool = basePool.filter(name => name !== oldName && !usedPerks.has(name));
-         if (!pool.length) return false;
-
-         const chosen = getRandomItem(pool);
-         newPerks[i] = chosen;
-         usedPerks.add(chosen);
-      }
-
-      currentState.perks = newPerks;
+      const newAddons = findSelection(currentState.addons,
+         score => getAddonNamesByScoresForKiller(currentState.killerKey, [score]), getAddonScore);
+      const newPerks = findSelection(currentState.perks,
+         score => getPerkNamesByScores([score]), getPerkScore);
+      if (!newAddons || !newPerks) return false;
       currentState.addons = newAddons;
+      currentState.perks = newPerks;
       return true;
    }
 
@@ -6412,14 +6592,67 @@ D.騎士
 
    function showCard39AnswerReveal(question, result, onClose)
    {
-      const title = result && result.correct ? '✔ 正確！' : (result && result.timedOut ? 'TIME UP' : '✖ 錯誤！');
-      const lines = [
-         question && question.question ? question.question : '題目讀取失敗',
-         '',
-         `正解：${question && question.answer ? question.answer : '未知'}`
-      ];
-      if (question && question.note) lines.push(`註釋：${question.note}`);
-      showInfoPopup(title, lines.join('\n'), onClose);
+      const correct = !!result?.correct;
+      const timedOut = !!result?.timedOut;
+      const overlay = document.createElement('div');
+      overlay.id = 'card39AnswerOverlay';
+      overlay.className = 'dbd-card-overlay card39-answer-overlay';
+      const panel = document.createElement('div');
+      panel.className = 'dbd-card-panel card39-answer-panel';
+      panel.dataset.result = correct ? 'correct' : timedOut ? 'timeout' : 'wrong';
+      const kicker = document.createElement('div');
+      kicker.className = 'card39-answer-kicker';
+      kicker.textContent = '快問快答 · 解答';
+      const title = document.createElement('h2');
+      title.className = 'card39-answer-title';
+      title.textContent = correct ? '✓ 答對了' : timedOut ? '時間到了' : '答錯了';
+      const prompt = document.createElement('div');
+      prompt.className = 'card39-answer-question';
+      prompt.textContent = question?.question || '題目讀取失敗';
+      const answerBox = document.createElement('div');
+      answerBox.className = 'card39-answer-box';
+      const answerLabel = document.createElement('div');
+      answerLabel.className = 'card39-answer-label';
+      answerLabel.textContent = '正確答案';
+      const answer = document.createElement('div');
+      answer.className = 'card39-answer-value';
+      answer.textContent = question?.answer || '未知';
+      answerBox.append(answerLabel, answer);
+      panel.append(kicker, title, prompt);
+      const details = document.createElement('div');
+      details.className = 'card39-answer-details';
+      details.appendChild(answerBox);
+         const note = document.createElement('div');
+         note.className = 'card39-answer-note';
+         const label = document.createElement('div');
+         label.className = 'card39-answer-label';
+         label.textContent = '補充說明';
+         const text = document.createElement('div');
+         text.className = 'card39-answer-note-text';
+         text.textContent = question?.note || '沒有補充說明';
+         note.append(label, text);
+         details.appendChild(note);
+      panel.appendChild(details);
+      const footer = document.createElement('div');
+      footer.className = 'card39-answer-footer';
+      const effect = document.createElement('div');
+      effect.textContent = correct ? '兩個指定欄位各 +2 分' : '兩個指定欄位各 -1 分';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = '繼續';
+      let closed = false;
+      button.addEventListener('click', () =>
+      {
+         if (closed) return;
+         closed = true;
+         overlay.remove();
+         if (typeof onClose === 'function') onClose();
+      });
+      footer.append(effect, button);
+      panel.appendChild(footer);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+      button.focus({ preventScroll: true });
    }
 
    function getCard39SlotMeta(slotIndex)
@@ -8401,7 +8634,184 @@ D.騎士
       t = setTimeout(next, intervalMs);
    }
 
+   let reservedRoundCards = null;
+   let immunityActive = false;
+   let immunityTriggered = false;
+   let finishingPhase = false;
+   let roundGeneration = 0;
+   let originalAddonCatalog = null;
+
+   function resetRound()
+   {
+      roundGeneration += 1;
+      if (originalAddonCatalog)
+      {
+         window.ADDONS = originalAddonCatalog;
+         originalAddonCatalog = null;
+      }
+      reservedRoundCards = null;
+      immunityActive = false;
+      immunityTriggered = false;
+      finishingPhase = false;
+      isActive = false;
+      dragInfo = null;
+      document.getElementById('card43ImmunityOverlay')?.remove();
+   }
+
+   function prepareRound()
+   {
+      resetRound();
+      reservedRoundCards = window.SlotSettings?.cardsEnabled === false ? [] : pickThreeCards();
+      immunityActive = reservedRoundCards.some(card => card.id === 'card43');
+      if (immunityActive)
+      {
+         // All existing addon draw paths, including fixed-addon effects, read this round's catalog.
+         originalAddonCatalog = window.ADDONS;
+         window.ADDONS = Object.fromEntries(Object.entries(originalAddonCatalog || {}).filter(([name, addon]) =>
+            !(addon.aliases || []).some(alias => String(alias).includes('迷因配件'))
+         ));
+      }
+   }
+
+   function applyImmunityBonus(selectedSlot)
+   {
+      const slots = [1, 2, 3, 4, 5, 6].map(getCard39SlotMeta).filter(meta => meta && typeof meta.score === 'number');
+      if (!slots.length) return '沒有可重抽的欄位';
+      const lowest = Math.min(...slots.map(meta => meta.score));
+      const meta = selectedSlot || getRandomItem(slots.filter(slot => slot.score === lowest));
+      const target = Math.min(5, meta.score + 2);
+      const scores = [];
+      for (let score = target; score <= 5; score++) scores.push(score);
+      for (let score = target - 1; score >= meta.score; score--) scores.push(score);
+      const success = meta.isAddon ? rerollAddonSlotByScore(meta.slotIndex - 1, scores,
+      {
+         allowKeepSameName: false
+      }) : rerollPerkSlotByScore(meta.slotIndex - 3, scores,
+      {
+         allowKeepSameName: false
+      });
+      const after = getCard39SlotMeta(meta.slotIndex);
+      return success ? `${meta.label}：${meta.score} 分 → ${after.score} 分` : `${meta.label} 沒有可用的重抽候選`;
+   }
+
    function finishCardPhase()
+   {
+      if (finishingPhase) return;
+      if (!immunityActive || immunityTriggered)
+      {
+         finishCardPhaseImmediately();
+         return;
+      }
+      finishingPhase = true;
+      immunityTriggered = true;
+      isActive = false;
+      dragInfo = null;
+      clearDropHighlights();
+      const generation = roundGeneration;
+      const slots = [1, 2, 3, 4, 5, 6].map(getCard39SlotMeta).filter(meta => meta && typeof meta.score === 'number');
+      const lowest = Math.min(...slots.map(meta => meta.score));
+      const selectedSlot = getRandomItem(slots.filter(meta => meta.score === lowest));
+      if (!selectedSlot)
+      {
+         finishCardPhaseImmediately();
+         return;
+      }
+      // Show the completed card effect, without applying the gold-card bonus or playing its sound.
+      if (window.previewCardState) window.previewCardState(cloneState(currentState));
+      const source = document.querySelector('.slot-card[data-card-id="card43"]');
+      const cells = document.querySelectorAll('#slotBoard .slot-cell');
+      const destination = cells[selectedSlot.slotIndex];
+      if (!source || !destination)
+      {
+         applyImmunityBonus(selectedSlot);
+         finishCardPhaseImmediately();
+         return;
+      }
+      const start = source.getBoundingClientRect();
+      const target = destination.getBoundingClientRect();
+      const overlay = document.createElement('div');
+      overlay.id = 'card43ImmunityOverlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:100060;pointer-events:auto;';
+      const flyingCard = source.cloneNode(true);
+      flyingCard.removeAttribute('data-card-id');
+      flyingCard.setAttribute('draggable', 'false');
+      flyingCard.classList.add('show');
+      flyingCard.style.cssText = `position:fixed;left:${start.left}px;top:${start.top}px;width:${start.width}px;height:${start.height}px;margin:0;opacity:1;transform:none;pointer-events:none;`;
+      overlay.appendChild(flyingCard);
+      document.body.appendChild(overlay);
+      source.style.visibility = 'hidden';
+      const dx = target.left + target.width / 2 - (start.left + start.width / 2);
+      const dy = target.top + target.height / 2 - (start.top + start.height / 2);
+      const scale = Math.min(target.width / start.width, target.height / start.height);
+      setTimeout(() =>
+      {
+         if (generation !== roundGeneration) return;
+         flyingCard.animate(
+         [
+            { transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: `translate(${dx * .5}px,${dy * .5 - 45}px) rotate(-8deg) scale(.8)`, opacity: 1, offset: .5 },
+            { transform: `translate(${dx}px,${dy}px) rotate(0) scale(${scale})`, opacity: 1 }
+         ],
+         {
+            duration: 800,
+            fill: 'forwards',
+            easing: 'ease-in-out'
+         });
+         setTimeout(() =>
+         {
+            if (generation !== roundGeneration) return;
+            // Hold the gold card over the destination before breaking it into pieces.
+            setTimeout(() =>
+            {
+               if (generation !== roundGeneration) return;
+               for (let row = 0; row < 4; row++)
+               {
+                  for (let col = 0; col < 3; col++)
+                  {
+                     const left = col * 100 / 3;
+                     const right = (col + 1) * 100 / 3;
+                     const top = row * 25;
+                     const bottom = (row + 1) * 25;
+                     const shapes = [
+                        `${left}% ${top}%, ${right}% ${top}%, ${left}% ${bottom}%`,
+                        `${right}% ${top}%, ${right}% ${bottom}%, ${left}% ${bottom}%`
+                     ];
+                     shapes.forEach(shape =>
+                     {
+                        const shard = flyingCard.cloneNode(true);
+                        shard.classList.add('card43-shard');
+                        shard.style.clipPath = `polygon(${shape})`;
+                        overlay.appendChild(shard);
+                        const spreadX = (col - 1) * 85 + (Math.random() - .5) * 55;
+                        const spreadY = (row - 1.5) * 65 + Math.random() * 65;
+                        shard.animate(
+                        [
+                           { transform: `translate(${dx}px,${dy}px) scale(${scale})`, opacity: 1 },
+                           { transform: `translate(${dx + spreadX}px,${dy + spreadY}px) rotate(${(Math.random() - .5) * 100}deg) scale(${scale * .8})`, opacity: 0 }
+                        ],
+                        {
+                           duration: 600,
+                           fill: 'forwards',
+                           easing: 'ease-out'
+                        });
+                     });
+                  }
+               }
+               flyingCard.style.visibility = 'hidden';
+               setTimeout(() =>
+               {
+                  if (generation !== roundGeneration) return;
+                  applyImmunityBonus(selectedSlot);
+                  overlay.remove();
+                  // Apply the bonus and generator sound after the shatter finishes.
+                  finishCardPhaseImmediately();
+               }, 600);
+            }, 400);
+         }, 800);
+      }, 350);
+   }
+
+   function finishCardPhaseImmediately()
    {
       isActive = false;
       dragInfo = null;
@@ -8422,7 +8832,10 @@ D.騎士
       if (typeof applyCallback === 'function')
       {
          const finalState = sanitizeAddonState(cloneState(currentState));
-         applyCallback(finalState);
+         applyCallback(finalState,
+         {
+            instant: immunityTriggered
+         });
          if (window.lockSlotLever)
          {
             window.lockSlotLever(500);
@@ -8645,6 +9058,8 @@ D.騎士
    // ==========================
    window.CardSystem = {
       startCardPhase,
+      prepareRound,
+      resetRound,
       FORCE_DRAW_CARD_IDS
    };
 

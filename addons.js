@@ -3003,7 +3003,7 @@ window.ADDONS = {
   "Shredded Notes": {
     zh: "筆記碎片",
     score: 5,
-    aliases: ["代幣", "恢復時間減少0.33秒", "綠配"],
+    aliases: ["代幣", "恢復時間減少0.33秒", "直線", "迷因配件", "綠配"],
     img: "./images/addons/shreddednotes.png",
     killer: "The Blight",
   },
@@ -3094,7 +3094,7 @@ window.ADDONS = {
   "Cat Figurine": {
     zh: "貓的擺飾",
     score: 1,
-    aliases: ["輔助配件", "白配"],
+    aliases: ["輔助配件", "白配", "迷因配件"],
     img: "./images/addons/catfigurine.png",
     killer: "The Twins",
   },
@@ -3402,7 +3402,7 @@ window.ADDONS = {
   "S.T.A.R.S. Field Combat Manual": {
     zh: "S.T.A.R.S.戰地指南",
     score: 2,
-    aliases: ["殭屍", "氣場變黃", "白配"],
+    aliases: ["殭屍", "氣場變黃", "白配", "迷因配件"],
     img: "./images/addons/starsfieldcombatmanual.png",
     killer: "The Nemesis",
   },

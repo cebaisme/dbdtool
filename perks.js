@@ -37,7 +37,7 @@ window.PERKS = {
   "Insidious": {
     zh: "靜止隱身",
     score: 1,
-    aliases: ["靜隱", "2秒", "隱身", "隱形", "禁止隱身"],
+    aliases: ["靜隱", "禁止隱身", "2秒", "隱身", "隱形"],
     killer: "General",
     img: "./images/perks/insidious.png"
   },
@@ -71,7 +71,7 @@ window.PERKS = {
   },
   "Spies from the Shadows": {
     zh: "鬼鴉諜影",
-    score: 4,
+    score: 3,
     aliases: ["烏鴉", "爆點"],
     killer: "General",
     img: "./images/perks/spiesfromtheshadows.png"
@@ -631,7 +631,7 @@ window.PERKS = {
   },
   "Scourge Hook: Pain Resonance": {
     zh: "禍害之鉤:痛苦迴響",
-    score: 4,
+    score: 5,
     aliases: ["天災鉤子:痛苦共鳴", "鳥人鉤", "天災鉤", "20%"],
     killer: "The Artist",
     img: "./images/perks/scourgehookpainresonance.png"
@@ -736,7 +736,7 @@ window.PERKS = {
   },
   "THWACK!": {
     zh: "物破人驚",
-    score: 1,
+    score: 3,
     aliases: ["框框作響", "框同學", "破壞", "破板", "36公尺", "36米", "尖叫", "大叫", "氣場", "6秒", "3層代幣"],
     killer: "The Skull Merchant",
     img: "./images/perks/thwack.png"
@@ -912,7 +912,7 @@ window.PERKS = {
   "Haywire": {
     zh: "失控",
     score: 1,
-    aliases: ["設備故障", "開關毀滅", "終局", "出口大門", "乾草電線"],
+    aliases: ["設備故障", "乾草電線", "開關毀滅", "終局", "出口大門"],
     killer: "The Animatronic",
     img: "./images/perks/haywire.png"
   },
@@ -967,7 +967,7 @@ window.PERKS = {
   },
   "Turn Back the Clock": {
     zh: "逆轉時光",
-    score: 4,
+    score: 5,
     aliases: ["60秒", "技能按鍵1", "20公尺", "20米", "10%"],
     killer: "The First",
     img: "./images/perks/turnbacktheclock.png"
