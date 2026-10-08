@@ -6,7 +6,7 @@ window.ADDONS = {
 
   "Bear Oil": {
     zh: "熊油",
-    score: 1,
+    score: 2,
     aliases: ["無聲夾", "白配"],
     img: "./images/addons/bearoil.png",
     killer: "The Trapper",
@@ -125,14 +125,14 @@ window.ADDONS = {
   },
   "Trapper Sack": {
     zh: "陷阱殺手袋",
-    score: 5,
+    score: 4,
     aliases: ["無法撿拾", "紫配"],
     img: "./images/addons/trappersack.png",
     killer: "The Trapper",
   },
   "Bloody Coil": {
     zh: "血腥彈簧圈",
-    score: 4,
+    score: 5,
     aliases: ["受傷夾", "移除", "拆除", "點夾", "紅配"],
     img: "./images/addons/bloodycoil.png",
     killer: "The Trapper",
@@ -158,7 +158,7 @@ window.ADDONS = {
   },
   "'The Ghost' - Soot": {
     zh: "「鬼魂」-煤灰",
-    score: 2,
+    score: 3,
     aliases: ["隱身6秒", "白配"],
     img: "./images/addons/theghostsoot.png",
     killer: "The Wraith",
@@ -357,7 +357,7 @@ window.ADDONS = {
     img: "./images/addons/thermalcasing.png",
     killer: "The Hillbilly",
   },
-  "Begrimed Chains": {
+  "Begrimed Chains (Hillbilly)": {
     zh: "汙穢鏈條",
     score: 3,
     aliases: ["重傷", "斷骨", "出血", "流血", "藍配"],
@@ -497,7 +497,7 @@ window.ADDONS = {
     img: "./images/addons/dullbracelet.png",
     killer: "The Nurse",
   },
-  "Pocket Watch": {
+  "Pocket Watch (Nurse)": {
     zh: "懷錶",
     score: 1,
     aliases: ["虛弱間隔時間增加20%", "綠配"],
@@ -506,7 +506,7 @@ window.ADDONS = {
   },
   "Anxious Gasp": {
     zh: "急促的喘息",
-    score: 3,
+    score: 2,
     aliases: ["迷因配件", "尖叫", "大叫", "藍配"],
     img: "./images/addons/anxiousgasp.png",
     killer: "The Nurse",
@@ -527,7 +527,7 @@ window.ADDONS = {
   },
   "Heavy Panting": {
     zh: "沉重的喘息",
-    score: 5,
+    score: 4,
     aliases: ["衝刺攻擊", "拉刀距離", "30%", "藍配"],
     img: "./images/addons/heavypanting.png",
     killer: "The Nurse",
@@ -611,7 +611,7 @@ window.ADDONS = {
   },
   "Tacky Earrings": {
     zh: "俗氣的耳環",
-    score: 4,
+    score: 3,
     aliases: ["跟蹤時的移動速度增加20%", "白配"],
     img: "./images/addons/tackyearrings.png",
     killer: "The Shape",
@@ -625,7 +625,7 @@ window.ADDONS = {
   },
   "Fragrant Tuft of Hair": {
     zh: "一簇芳香的頭髮",
-    score: 2,
+    score: 1,
     aliases: ["舊版", "破綻", "危險", "一刀", "綠配"],
     img: "./images/addons/fragranttuftofhair.png",
     killer: "The Shape",
@@ -639,7 +639,7 @@ window.ADDONS = {
   },
   "Hair Brush": {
     zh: "梳子",
-    score: 4,
+    score: 5,
     aliases: ["踹板速度增加50%", "綠配"],
     img: "./images/addons/hairbrush.png",
     killer: "The Shape",
@@ -653,7 +653,7 @@ window.ADDONS = {
   },
   "Hair Bow": {
     zh: "蝴蝶結",
-    score: 3,
+    score: 4,
     aliases: ["持續時間增加20%", "速度減少20%", "藍配"],
     img: "./images/addons/hairbow.png",
     killer: "The Shape",
@@ -674,14 +674,14 @@ window.ADDONS = {
   },
   "Judith's Journal": {
     zh: "朱蒂斯的日記",
-    score: 4,
+    score: 3,
     aliases: ["血祭品", "速度增加40%", "藍配"],
     img: "./images/addons/judithsjournal.png",
     killer: "The Shape",
   },
   "Mirror Shard": {
     zh: "鏡子碎片",
-    score: 2,
+    score: 5,
     aliases: ["持續時間增加0.25秒", "蓄氣速度減少25%", "藍配"],
     img: "./images/addons/mirrorshard.png",
     killer: "The Shape",
@@ -786,7 +786,7 @@ window.ADDONS = {
   },
   "Half Eggshell": {
     zh: "半個蛋殼",
-    score: 4,
+    score: 3,
     aliases: ["持續時間", "25%", "綠配"],
     img: "./images/addons/halfeggshell.png",
     killer: "The Hag",
@@ -835,14 +835,14 @@ window.ADDONS = {
   },
   "Disfigured Ear": {
     zh: "殘破的耳朵",
-    score: 1,
+    score: 2,
     aliases: ["聾", "6秒", "紫配"],
     img: "./images/addons/disfiguredear.png",
     killer: "The Hag",
   },
   "Grandma's Heart": {
     zh: "奶奶的心",
-    score: 1,
+    score: 2,
     aliases: ["恐懼範圍", "紫配"],
     img: "./images/addons/grandmasheart.png",
     killer: "The Hag",
@@ -947,7 +947,7 @@ window.ADDONS = {
   },
   "Discipline - Class III": {
     zh: "「服從」-第三級",
-    score: 5,
+    score: 4,
     aliases: ["觸發延遲減少10%", "幻象紅光", "假紅光", "恐懼範圍", "假心跳", "藍配"],
     img: "./images/addons/disciplineclassiii.png",
     killer: "The Doctor",
@@ -1234,7 +1234,7 @@ window.ADDONS = {
   },
   "Primer Bulb": {
     zh: "化油器油杯",
-    score: 5,
+    score: 4,
     aliases: ["蓄氣時間減少1秒", "綠配"],
     img: "./images/addons/primerbulb.png",
     killer: "The Cannibal",
@@ -1311,7 +1311,7 @@ window.ADDONS = {
   },
   "Iridescent Flesh": {
     zh: "螢紅血肉",
-    score: 4,
+    score: 5,
     aliases: ["電鋸擊中恢復耐久", "紅配"],
     img: "./images/addons/iridescentflesh.png",
     killer: "The Cannibal",
@@ -1346,7 +1346,7 @@ window.ADDONS = {
   },
   "Wool Shirt": {
     zh: "羊毛衫",
-    score: 3,
+    score: 2,
     aliases: ["睡夢木板", "假板", "延遲時間減少10%", "白配"],
     img: "./images/addons/woolshirt.png",
     killer: "The Nightmare",
@@ -1374,14 +1374,14 @@ window.ADDONS = {
   },
   "Outdoor Rope": {
     zh: "登山繩",
-    score: 4,
+    score: 3,
     aliases: ["睡夢束縛", "血浪", "血池", "移動速度", "15%", "綠配"],
     img: "./images/addons/outdoorrope.png",
     killer: "The Nightmare",
   },
   "Prototype Claws": {
     zh: "原型爪",
-    score: 4,
+    score: 3,
     aliases: ["蓄氣時間減少10%", "綠配"],
     img: "./images/addons/prototypeclaws.png",
     killer: "The Nightmare",
@@ -1393,7 +1393,7 @@ window.ADDONS = {
     img: "./images/addons/bluedress.png",
     killer: "The Nightmare",
   },
-  "Jump Rope": {
+  "Jump Rope (Nightmare)": {
     zh: "跳繩",
     score: 5,
     aliases: ["緩速", "減速", "11%", "藍配"],
@@ -1402,7 +1402,7 @@ window.ADDONS = {
   },
   "Nancy's Masterpiece": {
     zh: "南茜的傑作",
-    score: 3,
+    score: 4,
     aliases: ["南西的傑作", "睡夢投影", "傳送", "冷卻時間減少10%", "藍配"],
     img: "./images/addons/nancysmasterpiece.png",
     killer: "The Nightmare",
@@ -1416,14 +1416,14 @@ window.ADDONS = {
   },
   "Unicorn Block": {
     zh: "獨角獸積木",
-    score: 3,
+    score: 4,
     aliases: ["睡夢木板", "假板", "半徑增加14%", "藍配"],
     img: "./images/addons/unicornblock.png",
     killer: "The Nightmare",
   },
   "Z Block": {
     zh: "「Z」字積木",
-    score: 5,
+    score: 4,
     aliases: ["睡夢木板", "假板", "睡夢束縛", "血浪", "血池", "氣場3秒", "紫配"],
     img: "./images/addons/zblock.png",
     killer: "The Nightmare",
@@ -1437,7 +1437,7 @@ window.ADDONS = {
   },
   "Pill Bottle": {
     zh: "藥瓶",
-    score: 4,
+    score: 5,
     aliases: ["睡眠值", "累計速度", "10%", "50%", "紫配"],
     img: "./images/addons/pillbottle.png",
     killer: "The Nightmare",
@@ -1451,7 +1451,7 @@ window.ADDONS = {
   },
   "Black Box": {
     zh: "黑盒子",
-    score: 4,
+    score: 3,
     aliases: ["出口大門", "15秒", "3秒", "紅配"],
     img: "./images/addons/blackbox.png",
     killer: "The Nightmare",
@@ -1459,7 +1459,7 @@ window.ADDONS = {
 
   "Red Paint Brush": {
     zh: "油漆刷",
-    score: 1,
+    score: 2,
     aliases: ["32公尺", "32米", "氣場", "紅配"],
     img: "./images/addons/redpaintbrush.png",
     killer: "The Nightmare",
@@ -1873,7 +1873,7 @@ window.ADDONS = {
   },
   "Furin": {
     zh: "風鈴",
-    score: 2,
+    score: 3,
     aliases: ["弗林蛋白酶", "全場風聲", "紫配"],
     img: "./images/addons/furin.png",
     killer: "The Spirit",
@@ -2337,7 +2337,7 @@ window.ADDONS = {
   },
   "Ghost Face Caught on Tape": {
     zh: "「被拍到的鬼臉」",
-    score: 5,
+    score: 4,
     aliases: ["瀕死", "倒地", "紅配"],
     img: "./images/addons/ghostfacecaughtontape.png",
     killer: "The Ghost Face",
@@ -3016,7 +3016,7 @@ window.ADDONS = {
   },
   "Blighted Crow": {
     zh: "枯萎烏鴉",
-    score: 4,
+    score: 5,
     aliases: ["速度增加3%", "藍配"],
     img: "./images/addons/blightedcrow.png",
     killer: "The Blight",
@@ -3240,42 +3240,42 @@ window.ADDONS = {
 
   "Inferno Wires": {
     zh: "獄火鐵絲",
-    score: 4,
+    score: 2,
     aliases: ["主要表演", "持續時間增加40%", "白配"],
     img: "./images/addons/infernowires.png",
     killer: "The Trickster",
   },
   "Killing Part Chords": {
     zh: "絕殺和弦",
-    score: 2,
+    score: 4,
     aliases: ["投擲", "移動速度增加1%", "白配"],
     img: "./images/addons/killingpartchords.png",
     killer: "The Trickster",
   },
   "Memento Blades": {
     zh: "紀念飛刀",
-    score: 5,
+    score: 2,
     aliases: ["投擲間隔減少10%", "白配"],
     img: "./images/addons/mementoblades.png",
     killer: "The Trickster",
   },
   "Trick Pouch": {
     zh: "詐騙袋子",
-    score: 3,
+    score: 4,
     aliases: ["4個飛刀", "白配"],
     img: "./images/addons/trickpouch.png",
     killer: "The Trickster",
   },
   "Caged Heart Shoes": {
     zh: "《牢籠心》鞋",
-    score: 4,
+    score: 3,
     aliases: ["投擲", "移動速度增加2.5%", "綠配"],
     img: "./images/addons/cagedheartshoes.png",
     killer: "The Trickster",
   },
   "Ji-Woon's Autograph": {
     zh: "知雲的簽名",
-    score: 2,
+    score: 3,
     aliases: ["智雲的簽名", "連擊", "持續時間增加10%", "綠配"],
     img: "./images/addons/jiwoonsautograph.png",
     killer: "The Trickster",
@@ -3289,7 +3289,7 @@ window.ADDONS = {
   },
   "On Target Single": {
     zh: "《正中紅心》單曲",
-    score: 2,
+    score: 3,
     aliases: ["衰退", "時間增加2秒", "藍配"],
     img: "./images/addons/ontargetsingle.png",
     killer: "The Trickster",
@@ -3303,14 +3303,14 @@ window.ADDONS = {
   },
   "Bloody Boa": {
     zh: "血腥毛圍巾",
-    score: 3,
+    score: 2,
     aliases: ["8個飛刀", "綠配"],
     img: "./images/addons/bloodyboa.png",
     killer: "The Trickster",
   },
   "Fizz-Spin Soda": {
     zh: "泡泡汽水",
-    score: 2,
+    score: 3,
     aliases: ["連擊", "持續時間增加10%", "藍配"],
     img: "./images/addons/fizzspinsoda.png",
     killer: "The Trickster",
@@ -3324,21 +3324,21 @@ window.ADDONS = {
   },
   "Ripper Brace": {
     zh: "撕裂者手套護腕",
-    score: 2,
+    score: 4,
     aliases: ["衰退", "時間增加3秒", "藍配"],
     img: "./images/addons/ripperbrace.png",
     killer: "The Trickster",
   },
   "Waiting For You Watch": {
     zh: "「等著你」懷錶",
-    score: 4,
+    score: 3,
     aliases: ["飛刀命中", "主要表演", "持續時間增加0.4秒", "藍配"],
     img: "./images/addons/waitingforyouwatch.png",
     killer: "The Trickster",
   },
   "Cut Thru U Single": {
     zh: "《切穿你》單曲",
-    score: 3,
+    score: 4,
     aliases: ["穿透刀", "50%", "紫配"],
     img: "./images/addons/cutthruusingle.png",
     killer: "The Trickster",
@@ -3352,7 +3352,7 @@ window.ADDONS = {
   },
   "Edge of Revival Album": {
     zh: "復活之鋒專輯",
-    score: 2,
+    score: 4,
     aliases: ["爆炸刀", "50%", "紫配"],
     img: "./images/addons/edgeofrevivalalbum.png",
     killer: "The Trickster",
@@ -3366,14 +3366,14 @@ window.ADDONS = {
   },
   "Death Throes Compilation": {
     zh: "死亡痛楚合集",
-    score: 3,
+    score: 5,
     aliases: ["主要表演", "氣場", "6秒", "紅配"],
     img: "./images/addons/deaththroescompilation.png",
     killer: "The Trickster",
   },
   "Iridescent Photocard": {
     zh: "螢紅相片卡",
-    score: 4,
+    score: 5,
     aliases: ["飛刀命中", "1%", "7%", "紅配"],
     img: "./images/addons/iridescentphotocard.png",
     killer: "The Trickster",
@@ -4144,14 +4144,14 @@ window.ADDONS = {
   },
   "Uroboros Tendril": {
     zh: "銜尾蛇觸手",
-    score: 4,
+    score: 3,
     aliases: ["移動速度增加5%", "白配"],
     img: "./images/addons/uroborostendril.png",
     killer: "The Mastermind",
   },
   "Bullhorn": {
     zh: "擴音器",
-    score: 3,
+    score: 4,
     aliases: ["遲鈍", "30秒", "綠配"],
     img: "./images/addons/bullhorn.png",
     killer: "The Mastermind",
@@ -4179,7 +4179,7 @@ window.ADDONS = {
   },
   "Loose Crank": {
     zh: "鬆動的曲柄把手",
-    score: 2,
+    score: 4,
     aliases: ["間隔期間", "移動速度增加8%", "綠配"],
     img: "./images/addons/loosecrank.png",
     killer: "The Mastermind",
@@ -4214,7 +4214,7 @@ window.ADDONS = {
   },
   "Video Conference Device": {
     zh: "視訊會議裝置",
-    score: 4,
+    score: 3,
     aliases: ["被動感染速度增加30%", "藍配"],
     img: "./images/addons/videoconferencedevice.png",
     killer: "The Mastermind",
@@ -4249,14 +4249,14 @@ window.ADDONS = {
   },
   "Iridescent Uroboros Vial": {
     zh: "螢紅銜尾蛇藥瓶",
-    score: 5,
+    score: 4,
     aliases: ["開場感染", "破綻", "危險", "一刀", "紅配"],
     img: "./images/addons/iridescenturoborosvial.png",
     killer: "The Mastermind",
   },
   "Lab Photo": {
     zh: "實驗室照片",
-    score: 4,
+    score: 5,
     aliases: ["衝刺破板", "破壞", "紅配"],
     img: "./images/addons/labphoto.png",
     killer: "The Mastermind",
@@ -4305,7 +4305,7 @@ window.ADDONS = {
   },
   "Call to Arms": {
     zh: "武裝動員令",
-    score: 4,
+    score: 5,
     aliases: ["長度增加4公尺", "移動速度增加7%", "綠配"],
     img: "./images/addons/calltoarms.png",
     killer: "The Knight",
@@ -4319,7 +4319,7 @@ window.ADDONS = {
   },
   "Dried Horsemeat": {
     zh: "馬肉乾",
-    score: 4,
+    score: 5,
     aliases: ["隨從追擊時間增加4秒", "綠配"],
     img: "./images/addons/driedhorsemeat.png",
     killer: "The Knight",
@@ -4361,14 +4361,14 @@ window.ADDONS = {
   },
   "Town Watch's Torch": {
     zh: "守衛隊火炬",
-    score: 4,
+    score: 5,
     aliases: ["隱形", "隱身", "藍配"],
     img: "./images/addons/townwatchstorch.png",
     killer: "The Knight",
   },
   "Blacksmith's Hammer": {
     zh: "鐵匠鎚",
-    score: 2,
+    score: 4,
     aliases: ["不治", "60秒", "紫配"],
     img: "./images/addons/blacksmithshammer.png",
     killer: "The Knight",
@@ -4403,7 +4403,7 @@ window.ADDONS = {
   },
   "Knight's Contract": {
     zh: "騎士契約",
-    score: 5,
+    score: 3,
     aliases: ["延長8秒", "紅配"],
     img: "./images/addons/knightscontract.png",
     killer: "The Knight",
@@ -4438,14 +4438,14 @@ window.ADDONS = {
   },
   "Ultrasonic Speaker": {
     zh: "超音波陷阱喇叭",
-    score: 4,
+    score: 5,
     aliases: ["持續時間減少10%", "白配"],
     img: "./images/addons/ultrasonicspeaker.png",
     killer: "The Skull Merchant",
   },
   "Adaptive Lighting": {
     zh: "調適照明",
-    score: 4,
+    score: 3,
     aliases: ["隱形", "隱身", "20%", "綠配"],
     img: "./images/addons/adaptivelighting.png",
     killer: "The Skull Merchant",
@@ -4494,14 +4494,14 @@ window.ADDONS = {
   },
   "Loose Screw": {
     zh: "鬆動螺絲",
-    score: 2,
+    score: 3,
     aliases: ["疲憊", "疲勞", "6秒", "藍配"],
     img: "./images/addons/loosescrew.png",
     killer: "The Skull Merchant",
   },
   "Powdered Glass": {
     zh: "碎玻璃",
-    score: 2,
+    score: 3,
     aliases: ["重傷", "斷骨", "出血", "流血", "70秒", "藍配"],
     img: "./images/addons/powderedglass.png",
     killer: "The Skull Merchant",
@@ -4536,7 +4536,7 @@ window.ADDONS = {
   },
   "Randomised Strobes": {
     zh: "隨機頻閃燈",
-    score: 2,
+    score: 3,
     aliases: ["減速", "緩速", "1秒", "紫配"],
     img: "./images/addons/randomisedstrobes.png",
     killer: "The Skull Merchant",
@@ -4550,7 +4550,7 @@ window.ADDONS = {
   },
   "Iridescent Unpublished Manuscript": {
     zh: "未出版的螢紅手稿",
-    score: 5,
+    score: 4,
     aliases: ["未出版的螢光手稿", "恐懼範圍", "32公尺", "32米", "15秒", "隱身", "隱形", "紅配"],
     img: "./images/addons/iridescentunpublishedmanuscript.png",
     killer: "The Skull Merchant",
@@ -4613,7 +4613,7 @@ window.ADDONS = {
   },
   "Kid's Ball Glove": {
     zh: "兒童棒球手套",
-    score: 4,
+    score: 2,
     aliases: ["持續時間增加8%", "綠配"],
     img: "./images/addons/kidsballglove.png",
     killer: "The Singularity",
@@ -4683,7 +4683,7 @@ window.ADDONS = {
   },
   "Soma Family Photo": {
     zh: "索馬家的合照",
-    score: 4,
+    score: 2,
     aliases: ["緩速", "減速", "3%", "深度傷口", "黃條", "紫配"],
     img: "./images/addons/somafamilyphoto.png",
     killer: "The Singularity",
@@ -4712,7 +4712,7 @@ window.ADDONS = {
 
   "Cereal Rations": {
     zh: "穀類口糧",
-    score: 4,
+    score: 3,
     aliases: ["砲塔", "氣場", "白配"],
     img: "./images/addons/cerealrations.png",
     killer: "The Xenomorph",
@@ -4754,7 +4754,7 @@ window.ADDONS = {
   },
   "Crew Headset": {
     zh: "船員耳機",
-    score: 3,
+    score: 4,
     aliases: ["腳步聲", "6公尺", "6米", "綠配"],
     img: "./images/addons/crewheadset.png",
     killer: "The Xenomorph",
@@ -4768,28 +4768,28 @@ window.ADDONS = {
   },
   "Light Wand": {
     zh: "照明棒",
-    score: 2,
+    score: 3,
     aliases: ["砲塔", "冷卻時間增加3秒", "綠配"],
     img: "./images/addons/lightwand.png",
     killer: "The Xenomorph",
   },
   "Emergency Helmet": {
     zh: "緊急頭盔",
-    score: 3,
+    score: 4,
     aliases: ["抗性", "15%", "藍配"],
     img: "./images/addons/emergencyhelmet.png",
     killer: "The Xenomorph",
   },
   "Kane's Helmet": {
     zh: "肯恩的頭盔",
-    score: 4,
+    score: 3,
     aliases: ["重傷", "斷骨", "70秒", "藍配"],
     img: "./images/addons/kaneshelmet.png",
     killer: "The Xenomorph",
   },
   "Moulted Skin": {
     zh: "蛻落之皮",
-    score: 3,
+    score: 4,
     aliases: ["疲憊", "疲勞", "30秒", "藍配"],
     img: "./images/addons/moultedskin.png",
     killer: "The Xenomorph",
@@ -4845,7 +4845,7 @@ window.ADDONS = {
   },
   "Improvised Cattle Prod": {
     zh: "臨時電牛棒",
-    score: 4,
+    score: 3,
     aliases: ["10公尺", "10米", "氣場", "15秒", "紅配"],
     img: "./images/addons/improvisedcattleprod.png",
     killer: "The Xenomorph",
@@ -4955,7 +4955,7 @@ window.ADDONS = {
     img: "./images/addons/yardstick.png",
     killer: "The Good Guy",
   },
-  "Mirror Shards": {
+  "Mirror Shards (Good Guy)": {
     zh: "鏡子碎片",
     score: 1,
     aliases: ["幻影腳步", "紫配"],
@@ -5006,7 +5006,7 @@ window.ADDONS = {
 
   "Blurry Photo": {
     zh: "模糊相片",
-    score: 4,
+    score: 3,
     aliases: ["恢復移動速度", "縮短7%", "白配"],
     img: "./images/addons/blurryphoto.png",
     killer: "The Unknown",
@@ -5048,21 +5048,21 @@ window.ADDONS = {
   },
   "Notebook of Theories": {
     zh: "理論筆記本",
-    score: 3,
+    score: 4,
     aliases: ["緩速", "減速", "2秒", "綠配"],
     img: "./images/addons/notebookoftheories.png",
     killer: "The Unknown",
   },
   "Slashed Backpack": {
     zh: "被割開的背包",
-    score: 4,
+    score: 3,
     aliases: ["幻象", "間隔時間減少65%", "綠配"],
     img: "./images/addons/slashedbackpack.png",
     killer: "The Unknown",
   },
   "Victim's Map": {
     zh: "受害者的地圖",
-    score: 2,
+    score: 3,
     aliases: ["殺手直覺", "3秒", "綠配"],
     img: "./images/addons/victimsmap.png",
     killer: "The Unknown",
@@ -5076,7 +5076,7 @@ window.ADDONS = {
   },
   "Footprint Cast": {
     zh: "腳印模",
-    score: 3,
+    score: 4,
     aliases: ["間隔時間減少15秒", "藍配"],
     img: "./images/addons/footprintcast.png",
     killer: "The Unknown",
@@ -5090,14 +5090,14 @@ window.ADDONS = {
   },
   "Hypnotist's Watch": {
     zh: "催眠師之錶",
-    score: 3,
+    score: 4,
     aliases: ["疲憊", "疲勞", "15秒", "藍配"],
     img: "./images/addons/hypnotistswatch.png",
     killer: "The Unknown",
   },
   "Vanishing Box": {
     zh: "消失盒",
-    score: 4,
+    score: 3,
     aliases: ["修開發電機", "120%", "藍配"],
     img: "./images/addons/vanishingbox.png",
     killer: "The Unknown",
@@ -5307,28 +5307,28 @@ window.ADDONS = {
   },
   "Clock Tower Gear": {
     zh: "鐘塔齒輪",
-    score: 4,
+    score: 2,
     aliases: ["變形", "冷卻時間5%", "白配"],
     img: "./images/addons/clocktowergear.png",
     killer: "The Dark Lord",
   },
   "Ruby Circlet": {
     zh: "紅寶石圓環",
-    score: 3,
+    score: 2,
     aliases: ["地獄火", "冷卻時間5%", "白配"],
     img: "./images/addons/rubycirclet.png",
     killer: "The Dark Lord",
   },
   "Traveller's Hat": {
     zh: "旅人之帽",
-    score: 4,
+    score: 2,
     aliases: ["變形速度增加5%", "白配"],
     img: "./images/addons/travellershat.png",
     killer: "The Dark Lord",
   },
   "Blood-Filled Goblet": {
     zh: "充滿鮮血的高腳杯",
-    score: 2,
+    score: 3,
     aliases: ["氣味寶珠", "持續時間增加60%", "綠配"],
     img: "./images/addons/bloodfilledgoblet.png",
     killer: "The Dark Lord",
@@ -5356,7 +5356,7 @@ window.ADDONS = {
   },
   "Winged Boots": {
     zh: "帶翼之靴",
-    score: 3,
+    score: 4,
     aliases: ["傳送", "最大距離20%", "綠配"],
     img: "./images/addons/wingedboots.png",
     killer: "The Dark Lord",
@@ -5391,7 +5391,7 @@ window.ADDONS = {
   },
   "Sylph Feather": {
     zh: "精靈之羽",
-    score: 4,
+    score: 3,
     aliases: ["代幣", "冷卻時間減少5%", "25%", "藍配"],
     img: "./images/addons/sylphfeather.png",
     killer: "The Dark Lord",
@@ -5419,7 +5419,7 @@ window.ADDONS = {
   },
   "Warg's Fang": {
     zh: "座狼之牙",
-    score: 4,
+    score: 5,
     aliases: ["氣味寶珠", "氣場", "5秒", "紫配"],
     img: "./images/addons/wargsfang.png",
     killer: "The Dark Lord",
@@ -5433,7 +5433,7 @@ window.ADDONS = {
   },
   "Iridescent Ring of Vlad": {
     zh: "佛拉德的螢紅戒指",
-    score: 1,
+    score: 4,
     aliases: ["佛拉德的虹彩戒指", "地獄火", "追蹤", "紅配"],
     img: "./images/addons/iridescentringofvlad.png",
     killer: "The Dark Lord",
@@ -5468,14 +5468,14 @@ window.ADDONS = {
   },
   "Young Coconut": {
     zh: "未熟的椰子",
-    score: 4,
+    score: 1,
     aliases: ["狗", "速度5%", "白配"],
     img: "./images/addons/youngcoconut.png",
     killer: "The Houndmaster",
   },
   "Barley Meal": {
     zh: "大麥粥",
-    score: 5,
+    score: 4,
     aliases: ["距離20%", "綠配"],
     img: "./images/addons/barleymeal.png",
     killer: "The Houndmaster",
@@ -5552,7 +5552,7 @@ window.ADDONS = {
   },
   "Leather Harness": {
     zh: "皮革馬具",
-    score: 3,
+    score: 1,
     aliases: ["修開發電機", "狗", "速度20%", "30秒", "紫配"],
     img: "./images/addons/leatherharness.png",
     killer: "The Houndmaster",
@@ -5622,14 +5622,14 @@ window.ADDONS = {
   },
   "Blood-Stained Handkerchief": {
     zh: "斷裂鎖鏈",
-    score: 3,
+    score: 4,
     aliases: ["35%", "綠配"],
     img: "./images/addons/bloodstainedhandkerchief.png",
     killer: "The Ghoul",
   },
   "Broken Chain": {
     zh: "染血手帕",
-    score: 4,
+    score: 3,
     aliases: ["1公尺", "1米", "綠配"],
     img: "./images/addons/brokenchain.png",
     killer: "The Ghoul",
@@ -5755,7 +5755,7 @@ window.ADDONS = {
   },
   "Restaurant Menu": {
     zh: "餐廳菜單",
-    score: 5,
+    score: 4,
     aliases: ["回收斧頭", "時間20%", "白配"],
     img: "./images/addons/restaurantmenu.png",
     killer: "The Animatronic",
@@ -5776,7 +5776,7 @@ window.ADDONS = {
   },
   "Party Hat": {
     zh: "派對帽",
-    score: 3,
+    score: 4,
     aliases: ["250%", "3秒", "20%", "綠配"],
     img: "./images/addons/partyhat.png",
     killer: "The Animatronic",
@@ -5790,28 +5790,28 @@ window.ADDONS = {
   },
   "Security Guard's Badge": {
     zh: "保全徽章",
-    score: 4,
+    score: 3,
     aliases: ["隱形", "隱身", "25%", "綠配"],
     img: "./images/addons/securityguardsbadge.png",
     killer: "The Animatronic",
   },
   "Streamers": {
     zh: "飾帶",
-    score: 2,
+    score: 4,
     aliases: ["實況主", "保全", "15%", "綠配"],
     img: "./images/addons/streamers.png",
     killer: "The Animatronic",
   },
   "Bonnie's Guitar Strings": {
     zh: "邦尼的吉他弦",
-    score: 4,
+    score: 5,
     aliases: ["發電機", "氣場", "隱形", "隱身", "100%", "藍配"],
     img: "./images/addons/bonniesguitarstrings.png",
     killer: "The Animatronic",
   },
   "Chica's Bib": {
     zh: "奇卡的圍兜",
-    score: 3,
+    score: 4,
     aliases: ["疲憊", "疲勞", "5秒", "藍配"],
     img: "./images/addons/chicasbib.png",
     killer: "The Animatronic",
@@ -5874,7 +5874,7 @@ window.ADDONS = {
   },
   "Iridescent Remnant": {
     zh: "螢紅殘靈",
-    score: 3,
+    score: 2,
     aliases: ["虹彩軀殼", "32公尺", "32米", "封版", "12秒", "紅配"],
     img: "./images/addons/iridescentremnant.png",
     killer: "The Animatronic",
@@ -5923,7 +5923,7 @@ window.ADDONS = {
   },
   "Crumpled Sheet Music": {
     zh: "皺巴巴的樂譜",
-    score: 3,
+    score: 4,
     aliases: ["10", "綠配"],
     img: "./images/addons/crumpledsheetmusic.png",
     killer: "The Krasue",
@@ -5972,7 +5972,7 @@ window.ADDONS = {
   },
   "Spattered Handkerchief": {
     zh: "濺血手帕",
-    score: 4,
+    score: 5,
     aliases: ["出口大門", "感染", "藍配"],
     img: "./images/addons/spatteredhandkerchief.png",
     killer: "The Krasue",
@@ -5993,7 +5993,7 @@ window.ADDONS = {
   },
   "Mysterious Elixir": {
     zh: "神秘靈藥",
-    score: 4,
+    score: 2,
     aliases: ["封鎖窗戶", "10秒", "紫配"],
     img: "./images/addons/mysteriouselixir.png",
     killer: "The Krasue",
@@ -6007,7 +6007,7 @@ window.ADDONS = {
   },
   "Rotten Swine": {
     zh: "腐爛豬玀",
-    score: 3,
+    score: 2,
     aliases: ["破壞", "15%", "紫配"],
     img: "./images/addons/rottenswine.png",
     killer: "The Krasue",
@@ -6050,7 +6050,7 @@ window.ADDONS = {
   },
   "Shattered Wrist Rocket": {
     zh: "破碎的腕帶火箭",
-    score: 3,
+    score: 2,
     aliases: ["地下道", "地底門", "破壞", "發電機", "木板", "板子", "白配"],
     img: "./images/addons/shatteredwristrocket.png",
     killer: "The First",
@@ -6064,7 +6064,7 @@ window.ADDONS = {
   },
   "Bloody Roller Skate": {
     zh: "血腥溜冰鞋",
-    score: 4,
+    score: 5,
     aliases: ["地下道", "地底門", "敏捷", "加速", "20%", "2秒", "綠配"],
     img: "./images/addons/bloodyrollerskate.png",
     killer: "The First",
@@ -6085,7 +6085,7 @@ window.ADDONS = {
   },
   "Mid-Century Radio": {
     zh: "中世紀收音機",
-    score: 3,
+    score: 2,
     aliases: ["32公尺", "32米", "氣場", "綠配"],
     img: "./images/addons/midcenturyradio.png",
     killer: "The First",
@@ -6113,14 +6113,14 @@ window.ADDONS = {
   },
   "Neck Tendril": {
     zh: "頸部觸手",
-    score: 4,
+    score: 3,
     aliases: ["重傷", "斷骨", "出血", "流血", "70秒", "藍配"],
     img: "./images/addons/necktendril.png",
     killer: "The First",
   },
   "Rabbit Remains": {
     zh: "兔子殘骸",
-    score: 5,
+    score: 4,
     aliases: ["疲憊", "疲勞", "20秒", "藍配"],
     img: "./images/addons/rabbitremains.png",
     killer: "The First",
@@ -6141,28 +6141,28 @@ window.ADDONS = {
   },
   "Broken Skateboard": {
     zh: "破損的滑板",
-    score: 2,
+    score: 3,
     aliases: ["跨越速度", "60秒", "30%", "紫配"],
     img: "./images/addons/brokenskateboard.png",
     killer: "The First",
   },
   "Electroshock Collar": {
     zh: "電擊項圈",
-    score: 2,
+    score: 3,
     aliases: ["32公尺", "32米", "封鎖", "12秒", "紫配"],
     img: "./images/addons/electroshockcollar.png",
     killer: "The First",
   },
   "Pizza Goggles": {
     zh: "披薩護目鏡",
-    score: 1,
+    score: 5,
     aliases: ["減少90%", "冷卻縮短20秒", "紫配"],
     img: "./images/addons/pizzagoggles.png",
     killer: "The First",
   },
   "Chess Piece": {
     zh: "棋子",
-    score: 3,
+    score: 4,
     aliases: ["兩次", "攻擊半徑減少50%", "冷卻時間增加15秒", "紅配"],
     img: "./images/addons/chesspiece.png",
     killer: "The First",
@@ -6184,14 +6184,14 @@ window.ADDONS = {
 
   "Bent Wheel": {
     zh: "彎曲的輪子",
-    score: 3,
+    score: 2,
     aliases: ["跳嚇", "瞄準距離", "4公尺", "4米", "白配"],
     img: "./images/addons/bentwheel.png",
     killer: "The Slasher",
   },
   "Garden Claw": {
     zh: "花園爪",
-    score: 3,
+    score: 2,
     aliases: ["殺手本能", "2秒", "白配"],
     img: "./images/addons/gardenclaw.png",
     killer: "The Slasher",
@@ -6205,49 +6205,49 @@ window.ADDONS = {
   },
   "Orderly's Shoe": {
     zh: "護理員的鞋子",
-    score: 4,
+    score: 2,
     aliases: ["跳嚇", "迅捷", "加速", "5秒", "白配"],
     img: "./images/addons/orderlysshoe.png",
     killer: "The Slasher",
   },
   "Bloody Smile": {
     zh: "血腥笑容",
-    score: 4,
+    score: 3,
     aliases: ["跳嚇", "無處不在的邪惡", "偵測距離", "4公尺", "4米", "綠配"],
     img: "./images/addons/bloodysmile.png",
     killer: "The Slasher",
   },
   "Coroner's Coffee": {
     zh: "驗屍官的咖啡",
-    score: 5,
+    score: 4,
     aliases: ["投擲刺", "推力", "25%", "迅捷", "加速", "8%", "3秒", "綠配"],
     img: "./images/addons/coronerscoffee.png",
     killer: "The Slasher",
   },
   "Party Noisemaker": {
     zh: "派對噪音製造器",
-    score: 3,
+    score: 2,
     aliases: ["跳嚇", "破壞", "木板", "板子", "牆壁", "32公尺", "32米", "氣場", "6秒", "綠配"],
     img: "./images/addons/partynoisemaker.png",
     killer: "The Slasher",
   },
   "Sleeping Bag": {
     zh: "睡袋",
-    score: 3,
+    score: 4,
     aliases: ["鉤刺", "鉤子", "位置", "8公尺", "8米", "5秒", "綠配"],
     img: "./images/addons/sleepingbag.png",
     killer: "The Slasher",
   },
   "Toxic Waste": {
     zh: "毒性廢料",
-    score: 3,
+    score: 2,
     aliases: ["跳嚇", "鉤子", "廢料堆", "遲鈍", "8公尺", "8米", "13秒", "綠配"],
     img: "./images/addons/toxicwaste.png",
     killer: "The Slasher",
   },
   "Eye Goop": {
     zh: "眼睛黏液",
-    score: 3,
+    score: 4,
     aliases: ["鉤刺", "隱跡", "無法偵測", "13秒", "藍配"],
     img: "./images/addons/eyegoop.png",
     killer: "The Slasher",
@@ -6261,7 +6261,7 @@ window.ADDONS = {
   },
   "Mirror Shards": {
     zh: "鏡片碎片",
-    score: 4,
+    score: 2,
     aliases: ["鉤刺", "拔刺", "破裂", "30秒", "藍配"],
     img: "./images/addons/mirrorshards_jason.png",
     killer: "The Slasher",
@@ -6275,7 +6275,7 @@ window.ADDONS = {
   },
   "Two Nails": {
     zh: "兩根釘子",
-    score: 3,
+    score: 4,
     aliases: ["投擲刺", "氣場", "1公尺", "1米", "6秒", "藍配"],
     img: "./images/addons/twonails.png",
     killer: "The Slasher",
@@ -6296,7 +6296,7 @@ window.ADDONS = {
   },
   "Deputy's Badge": {
     zh: "副警長徽章",
-    score: 4,
+    score: 5,
     aliases: ["無處不在的邪惡", "發電機", "爆炸", "退修", "5%", "10%", "技能檢定", "紫配"],
     img: "./images/addons/deputysbadge.png",
     killer: "The Slasher",
@@ -6310,14 +6310,14 @@ window.ADDONS = {
   },
   "Dirty Money": {
     zh: "髒錢",
-    score: 3,
+    score: 4,
     aliases: ["發電機", "代幣", "跨窗", "翻窗", "破壞", "木板", "板子", "普通刺", "紅配"],
     img: "./images/addons/dirtymoney.png",
     killer: "The Slasher",
   },
   "Iridescent Boat Motor": {
     zh: "螢虹船馬達",
-    score: 4,
+    score: 2,
     aliases: ["虹彩", "無處不在的邪惡", "窗戶", "封鎖", "13秒", "紅配"],
     img: "./images/addons/iridescentboatmotor.png",
     killer: "The Slasher",
@@ -6339,7 +6339,7 @@ window.ADDONS = {
   },
   "Koenrad's Gauntlet": {
     zh: "柯恩拉德的護手",
-    score: 4,
+    score: 2,
     aliases: ["神聖之光", "光柱", "操控時間", "25%", "操控速度", "10%", "白配"],
     img: "./images/addons/koenradsgauntlet.png",
     killer: "The Judgment",
@@ -6402,7 +6402,7 @@ window.ADDONS = {
   },
   "Electric Torch": {
     zh: "電子火把",
-    score: 3,
+    score: 4,
     aliases: ["神聖之光", "光柱", "操控速度", "25%", "移動速度", "10%", "藍配"],
     img: "./images/addons/electrictorch.png",
     killer: "The Judgment",
@@ -6423,7 +6423,7 @@ window.ADDONS = {
   },
   "Superheated Glass": {
     zh: "過熱玻璃",
-    score: 4,
+    score: 3,
     aliases: ["魯伯特之淚", "Prince Rupert's Drop", "狂熱", "神聖之光", "光柱", "破壞", "破壞動作", "破壞牆", "木板", "板子", "尖叫", "大叫", "異端", "12公尺", "12米", "藍配"],
     img: "./images/addons/superheatedglass.png",
     killer: "The Judgment",
@@ -6444,7 +6444,7 @@ window.ADDONS = {
   },
   "Eyes of Gerhardt": {
     zh: "格哈特之眼",
-    score: 3,
+    score: 2,
     aliases: ["異端", "發電機", "大門", "櫃子", "氣場", "5秒", "紫配"],
     img: "./images/addons/eyesofgerhardt.png",
     killer: "The Judgment",
