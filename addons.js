@@ -6107,7 +6107,7 @@ window.ADDONS = {
   "Forged Death Certificate": {
     zh: "偽造的死亡證明",
     score: 2,
-    aliases: ["恐懼範圍減少", "12公尺", "12米", "藍配"],
+    aliases: ["隱身", "隱形", "藍配"],
     img: "./images/addons/forgeddeathcertificate.png",
     killer: "The First",
   },
