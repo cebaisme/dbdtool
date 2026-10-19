@@ -897,7 +897,7 @@ window.PERKS = {
   },
   "Hex: Nothing but Misery": {
     zh: "厄咒:無盡痛苦",
-    score: 2,
+    score: 3,
     aliases: ["厄咒:眾生皆苦", "厄咒", "普通攻擊", "普攻", "緩速", "減速", "5%", "15秒"],
     killer: "The Ghoul",
     img: "./images/perks/hexnothingbutmisery.png"

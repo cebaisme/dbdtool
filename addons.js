@@ -1393,11 +1393,12 @@ window.ADDONS = {
     img: "./images/addons/bluedress.png",
     killer: "The Nightmare",
   },
-  "Jump Rope (Nightmare)": {
+  "Jump Rope (freddy)": {
+    en: "Jump Rope",
     zh: "跳繩",
     score: 5,
     aliases: ["緩速", "減速", "11%", "藍配"],
-    img: "./images/addons/jumpropedreamdemon.png",
+    img: "./images/addons/jumprope(freddy).png",
     killer: "The Nightmare",
   },
   "Nancy's Masterpiece": {
@@ -4906,11 +4907,12 @@ window.ADDONS = {
     img: "./images/addons/hairspraycandle.png",
     killer: "The Good Guy",
   },
-  "Jump Rope": {
+  "Jump Rope (chucky)": {
+    en: "Jump Rope",
     zh: "跳繩",
     score: 5,
     aliases: ["持續時間增加8%", "綠配"],
-    img: "./images/addons/jumprope.png",
+    img: "./images/addons/jumprope(chucky).png",
     killer: "The Good Guy",
   },
   "Power Drill": {
@@ -6107,7 +6109,7 @@ window.ADDONS = {
   "Forged Death Certificate": {
     zh: "偽造的死亡證明",
     score: 2,
-    aliases: ["隱身", "隱形", "藍配"],
+    aliases: ["恐懼範圍減少", "12公尺", "12米", "藍配"],
     img: "./images/addons/forgeddeathcertificate.png",
     killer: "The First",
   },

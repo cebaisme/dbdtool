@@ -1,3 +1,1455 @@
+// Card features consolidated in load order. Each feature keeps its own scope.
+
+/* BEGIN MERGED: world-stop-effects.js */
+(function()
+{
+   'use strict';
+   const activeEffects = new Set();
+   function create()
+   {
+      let root = null;
+      let filter = null;
+      let center = null;
+      let radius = 0;
+      let disposed = false;
+      const animations = new Set();
+      function play(element, frames, options)
+      {
+         if (disposed || !element || typeof element.animate !== 'function') return Promise.resolve();
+         const animation = element.animate(frames, options);
+         animations.add(animation);
+         return animation.finished.catch(() => {}).finally(() => animations.delete(animation));
+      }
+      function dispose()
+      {
+         disposed = true;
+         activeEffects.delete(controller);
+         for (const animation of animations) animation.cancel();
+         animations.clear();
+         if (root) root.remove();
+         root = null;
+      }
+      function pointCircle(size)
+      {
+         return `circle(${size}px at ${center.x}px ${center.y}px)`;
+      }
+      function makeRing(reverse)
+      {
+         const ring = document.createElement('div');
+         const diameter = radius * 2;
+         ring.style.cssText = `position:absolute;width:${diameter}px;height:${diameter}px;left:${center.x - radius}px;top:${center.y - radius}px;border-radius:50%;pointer-events:none;will-change:transform,opacity;background:radial-gradient(circle,transparent 63%,rgba(112,79,214,.12) 66%,rgba(238,222,147,.6) 69%,rgba(255,251,220,.95) 70%,rgba(175,155,255,.5) 71%,transparent 75%);`;
+         root.appendChild(ring);
+         return play(ring,
+            reverse ? [{transform: 'scale(1.45)', opacity: 0}, {transform: 'scale(.7)', opacity: .8, offset: .6}, {transform: 'scale(.005)', opacity: 0}] :
+               [{transform: 'scale(.005)', opacity: 0}, {transform: 'scale(.25)', opacity: 1, offset: .22}, {transform: 'scale(1.45)', opacity: 0}],
+            {duration: reverse ? 850 : 1000, easing: 'cubic-bezier(.2,.65,.3,1)', fill: 'forwards'}).finally(() => ring.remove());
+      }
+      async function enter(origin)
+      {
+         if (disposed || root) return;
+         center = origin || {x: window.innerWidth / 2, y: window.innerHeight / 2};
+         radius = Math.ceil(Math.hypot(Math.max(center.x, window.innerWidth - center.x), Math.max(center.y, window.innerHeight - center.y))) + 80;
+         root = document.createElement('div');
+         root.id = 'worldStopEffect';
+         root.setAttribute('aria-hidden', 'true');
+         root.style.cssText = 'position:fixed;inset:0;z-index:100090;pointer-events:none;overflow:hidden;contain:layout size;';
+         filter = document.createElement('div');
+         filter.style.cssText = 'position:absolute;inset:0;pointer-events:none;backdrop-filter:invert(1) hue-rotate(155deg) saturate(1.7);-webkit-backdrop-filter:invert(1) hue-rotate(155deg) saturate(1.7);background:rgba(114,73,166,.08);will-change:clip-path;';
+         filter.style.clipPath = pointCircle(0);
+         root.appendChild(filter);
+         const callout = document.createElement('div');
+         callout.textContent = '時よ止まれ！';
+         callout.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff2c0;font-family:inherit;font-weight:900;font-size:clamp(34px,7vw,84px);letter-spacing:.08em;text-shadow:0 3px 12px #000,0 0 25px #d6ae55;';
+         root.appendChild(callout);
+         document.body.appendChild(root);
+         await Promise.all([
+            play(filter, [{clipPath: pointCircle(0)}, {clipPath: pointCircle(radius)}], {duration: 1000, easing: 'cubic-bezier(.2,.65,.3,1)', fill: 'forwards'}),
+            makeRing(false),
+            play(callout, [{opacity: 0, transform: 'scale(.94)'}, {opacity: 1, transform: 'scale(1)', offset: .2}, {opacity: 1, offset: .72}, {opacity: 0, transform: 'scale(1.03)'}], {duration: 1150, fill: 'forwards'})
+         ]);
+         if (disposed || !root) return;
+         callout.remove();
+         filter.style.clipPath = 'none';
+         for (const animation of filter.getAnimations()) animation.cancel();
+         // Keep only the page behind the normal-colored selection dialog inverted.
+         root.style.zIndex = '100070';
+      }
+      async function resume()
+      {
+         if (disposed || !root) return;
+         root.style.zIndex = '100090';
+         const caption = document.createElement('div');
+         caption.textContent = '時間開始流動';
+         caption.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#f1e3ac;font-family:inherit;font-size:clamp(32px,7vw,80px);font-weight:900;letter-spacing:.08em;text-shadow:0 3px 16px #000;';
+         root.appendChild(caption);
+         await Promise.all([
+            play(filter, [{clipPath: pointCircle(radius)}, {clipPath: pointCircle(0)}], {duration: 850, easing: 'cubic-bezier(.45,0,.75,.65)', fill: 'forwards'}),
+            makeRing(true),
+            play(caption, [{opacity: 0}, {opacity: 1, offset: .18}, {opacity: 1, offset: .75}, {opacity: 0}], {duration: 1100, fill: 'forwards'})
+         ]);
+         dispose();
+      }
+      const controller = {enter, resume, dispose};
+      activeEffects.add(controller);
+      return controller;
+   }
+   window.WorldStopEffects = {create, disposeAll: () => { for (const effect of Array.from(activeEffects)) effect.dispose(); }};
+})();
+;
+/* END MERGED: world-stop-effects.js */
+
+/* BEGIN MERGED: ban-pick.js */
+(function()
+{
+   'use strict';
+   const instances = new Set();
+   function createGame(names, random = Math.random, settings = {})
+   {
+      const pool = Array.from(new Set(names));
+      const initialCount = settings.initialCount || 12;
+      const rounds = settings.rounds || 4;
+      const rerollBudget = settings.budget || {used: 0, limit: 3};
+      if (pool.length < initialCount + 2 * (rounds - 1) + rerollBudget.limit) throw new Error('輪番取捨候選池不足。');
+      function pick(list) { return list[Math.min(list.length - 1, Math.floor(random() * list.length))]; }
+      const initial = pool.slice();
+      for (let i = initial.length - 1; i > 0; i--)
+      {
+         const j = Math.min(i, Math.floor(random() * (i + 1)));
+         [initial[i], initial[j]] = [initial[j], initial[i]];
+      }
+      const cells = initial.slice(0, initialCount).map(name => ({name, banned: false, locked: false}));
+      const seen = new Set(cells.map(cell => cell.name));
+      let round = 1;
+      let phase = 'player';
+      let lockUsed = false;
+      let queue = [];
+      function playerAction(index, mode)
+      {
+         const cell = cells[index];
+         if (phase !== 'player' || !cell || cell.banned || cell.locked || !['ban', 'lock'].includes(mode)) return false;
+         if (mode === 'lock') { cell.locked = true; lockUsed = true; }
+         else cell.banned = true;
+         const available = cells.map((value, i) => i).filter(i => !cells[i].banned && !cells[i].locked);
+         queue = [];
+         for (let i = 0; i < (mode === 'lock' ? 2 : 1); i++)
+         {
+            const target = pick(available);
+            available.splice(available.indexOf(target), 1);
+            queue.push({type: 'ban', index: target});
+         }
+         const replacements = round === rounds ? 0 : mode === 'lock' ? 2 : 1;
+         const replacementsPool = pool.filter(name => !seen.has(name));
+         for (let i = 0; i < replacements; i++)
+         {
+            const target = pick(available);
+            const name = pick(replacementsPool);
+            available.splice(available.indexOf(target), 1);
+            replacementsPool.splice(replacementsPool.indexOf(name), 1);
+            queue.push({type: 'replace', index: target, name});
+         }
+         phase = 'computer';
+         return true;
+      }
+      function reroll(index)
+      {
+         const cell = cells[index];
+         if (!['player', 'finished'].includes(phase) || !cell || cell.banned || cell.locked || rerollBudget.used >= rerollBudget.limit) return false;
+         const choices = pool.filter(name => !seen.has(name));
+         if (!choices.length) return false;
+         cell.name = pick(choices);
+         seen.add(cell.name);
+         rerollBudget.used++;
+         return true;
+      }
+      function replaceByComputer(index)
+      {
+         const cell = cells[index];
+         if (!cell || cell.banned || cell.locked) return false;
+         const choices = pool.filter(name => !seen.has(name));
+         if (!choices.length) return false;
+         cell.name = pick(choices);
+         seen.add(cell.name);
+         return true;
+      }
+      function applyComputerAction(action, replacement = null)
+      {
+         if (phase !== 'computer' || queue[0] !== action) return false;
+         const cell = cells[action.index];
+         if (cell.banned || cell.locked) return false;
+         if (action.type === 'ban') cell.banned = true;
+         else if (replacement) { if (!replacement()) return false; }
+         else { cell.name = action.name; seen.add(action.name); }
+         queue.shift();
+         if (!queue.length)
+         {
+            if (round === rounds) phase = 'finished';
+            else { round++; phase = 'player'; }
+         }
+         return true;
+      }
+      return {
+         cells,
+         playerAction,
+         reroll,
+         applyComputerAction,
+         replaceByComputer,
+         get canComputerReplace() { return pool.some(name => !seen.has(name)); },
+         get round() { return round; },
+         get rounds() { return rounds; },
+         get phase() { return phase; },
+         get lockUsed() { return lockUsed; },
+         get rerollsUsed() { return rerollBudget.used; },
+         get rerollsRemaining() { return rerollBudget.limit - rerollBudget.used; },
+         get nextAction() { return queue[0] || null; },
+         get result() { return phase === 'finished' ? cells.filter(cell => !cell.banned).map(cell => cell.name) : null; }
+      };
+   }
+   function open(options)
+   {
+      let catalog = options.catalog;
+      const sharedBudget = {used: 0, limit: 3};
+      let game = createGame(Object.keys(catalog), Math.random, {budget: sharedBudget});
+      let stage = 'perk';
+      const groups = {perk: {game, catalog, label: '技能'}};
+      if (options.addonCatalog) groups.addon = {game: createGame(Object.keys(options.addonCatalog), Math.random, {initialCount: 6, rounds: 2, budget: sharedBudget}), catalog: options.addonCatalog, label: '配件'};
+      let confirm = null;
+      const overlay = document.createElement('div');
+      overlay.id = 'banPickOverlay';
+      let mode = 'ban';
+      let disposed = false;
+      let busy = false;
+      let applied = false;
+      const animations = new Set();
+      const icons = {
+         ban: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M15 15 49 49M49 15 15 49"/></svg>',
+         lock: '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="15" y="28" width="34" height="27" rx="4"/><path d="M22 28V18a10 10 0 0 1 20 0v10M32 39v6"/></svg>',
+         replace: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M15 27a19 19 0 0 1 32-12l6 6M53 9v12H41M49 37a19 19 0 0 1-32 12l-6-6M11 55V43h12"/></svg>'
+      };
+      overlay.innerHTML = `
+      <style>
+      #banPickOverlay{position:fixed;inset:0;z-index:100080;display:flex;align-items:center;justify-content:center;background:#080c14ed;padding:20px;overflow:hidden;box-sizing:border-box;color:#edf2f8;font-family:inherit}
+      #banPickOverlay *{box-sizing:border-box}.bp-panel{width:min(940px,100%);max-height:95dvh;overflow-x:hidden;overflow-y:auto;padding:24px;border:1px solid #526177;border-radius:20px;background:linear-gradient(145deg,#1b2331,#0e131e);box-shadow:0 20px 80px #0009}.bp-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.bp-header h2{margin:0;font-size:28px}.bp-round{color:#b9cbe3;font-size:17px;font-weight:700}.bp-layout{display:grid;grid-template-columns:90px minmax(0,1fr) 90px;gap:20px;align-items:stretch}.bp-tools{display:flex;flex-direction:column;justify-content:space-around;gap:30px}.bp-tool{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1;border:2px solid #5d6a7d;border-radius:14px;background:#202b3d;color:#c2cede;cursor:pointer;transition:background .15s,border-color .15s,opacity .15s}.bp-tool svg,.bp-flying svg{width:70%;height:70%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.bp-tool.active{color:#fff;border-color:#82bfff;background:#315d8b;box-shadow:0 0 0 3px #65a4e329}.bp-tool.lock-mode.active{color:#ffdf8d;border-color:#f0c469;background:#705824}.bp-tool:disabled{cursor:default}.bp-tool.used{opacity:.28;filter:grayscale(1);border-style:dashed;box-shadow:none}.bp-tool.computer{cursor:default;color:#ec8993;background:#312333}.bp-tool.computer.swap{color:#a8bcff;background:#252940}.bp-tool.acting{border-color:currentColor;box-shadow:0 0 22px #b3cafa55}.bp-tool-caption{font-size:12px;text-align:center;color:#a7b5c9;margin-top:8px;line-height:1.4}.bp-tools > div{width:100%}.bp-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding:15px;border:1px solid #4b5971;border-radius:16px;background:#070c15}.bp-boards{display:flex;flex-direction:column;gap:12px;min-width:0;padding:15px;border:1px solid #4b5971;border-radius:16px;background:#070c15}.bp-boards .bp-grid{padding:0;border:0;border-radius:0;background:none}.bp-section-head{display:flex;justify-content:space-between;gap:10px;padding:0 4px 8px;font-size:14px;color:#c6d6ec}.bp-perk-grid .bp-cell{aspect-ratio:auto;height:clamp(54px,13vh,104px)}.bp-addon-grid .bp-cell{aspect-ratio:auto;height:clamp(54px,13vh,104px)}.bp-cell{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1;border:1px solid #4a5a72;border-radius:11px;background:#1b2638;overflow:hidden;cursor:pointer}.bp-cell img{width:85%;height:85%;object-fit:contain;pointer-events:none;transition:opacity .2s,filter .2s}.bp-perk-grid .bp-cell img{width:100%;height:100%;transform:scale(1.1)}.bp-cell:hover:enabled{border-color:#b0d7ff;background:#2b4260}.bp-cell:disabled{cursor:default}.bp-cell.banned{border-color:#70323e;background:#19101b}.bp-cell.banned img{opacity:.2;filter:grayscale(1)}.bp-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}.bp-mark.ban-mark{color:#ff4f69;font-size:clamp(38px,7vw,90px);font-weight:500;text-shadow:0 1px 8px #000}.bp-cell.locked{border:2px solid #efcd79;background:#3d3622;box-shadow:inset 0 0 16px #ddb65722}.bp-mark.lock-mark{inset:auto 3px 3px auto;width:30px;height:30px;color:#ffdf8d;background:#272316e8;border-radius:7px}.bp-mark svg{width:90%;height:90%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.bp-help{min-height:58px;margin-top:18px;padding:13px 15px;border-radius:10px;background:#26344a;color:#e0eafa;line-height:1.6;font-size:14px}.bp-submit{display:block;margin:16px auto 0;padding:12px 26px;border:1px solid #9cb6d9;border-radius:10px;background:#38618e;color:#fff;font:inherit;font-weight:700;cursor:pointer}.bp-flying{position:fixed;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#ff536a;filter:drop-shadow(0 0 8px #0009)}.bp-flying.swap{color:#b2bfff}.bp-cell:focus-visible,.bp-tool:focus-visible{outline:3px solid #e3edff;outline-offset:3px}
+      @media(max-width:650px){#banPickOverlay{padding:8px}.bp-panel{padding:14px}.bp-header h2{font-size:23px}.bp-round{font-size:14px}.bp-layout{grid-template-columns:45px minmax(0,1fr) 45px;gap:8px}.bp-grid{padding:6px;gap:6px}.bp-boards{padding:6px;gap:6px}.bp-tool{border-radius:9px}.bp-tool-caption{font-size:10px}.bp-tools{gap:20px}.bp-mark.lock-mark{width:20px;height:20px}.bp-help{font-size:12px}}
+      </style>
+      <section class="bp-panel" role="dialog" aria-modal="true" aria-label="輪番取捨">
+         <header class="bp-header"><h2>輪番取捨</h2><span class="bp-round"></span></header>
+         <div class="bp-layout">
+            <div class="bp-tools"><div><button class="bp-tool active" id="bpBan" aria-label="禁用模式" aria-pressed="true">${icons.ban}</button><div class="bp-tool-caption">禁用</div></div><div><button class="bp-tool lock-mode" id="bpLock" aria-label="鎖定模式" aria-pressed="false">${icons.lock}</button><div class="bp-tool-caption" id="bpLockLabel">鎖定 · 不限次數</div></div><div><button class="bp-tool" id="bpReroll" aria-label="重骰模式" aria-pressed="false">${icons.replace}</button><div class="bp-tool-caption" id="bpRerollLabel">重骰 · 剩 3 次</div></div></div>
+            <div class="bp-boards"><section class="bp-section"><div class="bp-grid bp-perk-grid" id="bpPerkGrid" aria-label="十二個候選技能"></div></section>${options.addonCatalog ? '<section class="bp-section"><div class="bp-grid bp-addon-grid" id="bpAddonGrid" aria-label="六個候選配件"></div></section>' : ''}</div>
+            <div class="bp-tools"><div><button class="bp-tool computer" id="bpComputerBan" disabled aria-label="電腦禁用">${icons.ban}</button><div class="bp-tool-caption">電腦禁用</div></div><div><button class="bp-tool computer swap" id="bpComputerSwap" disabled aria-label="電腦替換">${icons.replace}</button><div class="bp-tool-caption">電腦替換</div></div></div>
+         </div>
+         <div class="bp-help" role="status" aria-live="polite"></div>
+      </section>`;
+      document.body.appendChild(overlay);
+      const q = selector => overlay.querySelector(selector);
+      function dispose()
+      {
+         if (disposed) return;
+         disposed = true;
+         for (const animation of animations) animation.cancel();
+         animations.clear();
+         overlay.remove();
+         instances.delete(controller);
+      }
+      async function animate(element, frames, duration)
+      {
+         if (disposed || !element || typeof element.animate !== 'function') return;
+         const animation = element.animate(frames, {duration, easing: 'ease-in-out'});
+         animations.add(animation);
+         try { await animation.finished; } catch (_) {} finally { animations.delete(animation); }
+      }
+      function help(text) { q('.bp-help').textContent = text; }
+      function cellElement(index, key = stage)
+      {
+         return q(key === 'perk' ? '#bpPerkGrid' : '#bpAddonGrid').children[index];
+      }
+      function allFinished()
+      {
+         return Object.values(groups).every(group => group.game.phase === 'finished');
+      }
+      function activate(key)
+      {
+         stage = key;
+         game = groups[key].game;
+         catalog = groups[key].catalog;
+      }
+      function render()
+      {
+         const totalRounds = Object.values(groups).reduce((sum, group) => sum + group.game.rounds, 0);
+         const completedRounds = Object.values(groups).reduce((sum, group) => sum + (group.game.phase === 'finished' ? group.game.rounds : group.game.round - 1), 0);
+         q('.bp-round').textContent = allFinished() ? `第 ${totalRounds} / ${totalRounds} 回合 · 完成` : `第 ${completedRounds + 1} / ${totalRounds} 回合`;
+         const canPlay = !busy && !allFinished();
+         q('#bpBan').disabled = !canPlay;
+         q('#bpLock').disabled = !canPlay;
+         q('#bpReroll').disabled = busy || game.rerollsRemaining === 0;
+         q('#bpReroll').className = 'bp-tool' + (game.rerollsRemaining === 0 ? ' used' : mode === 'reroll' ? ' active' : '');
+         q('#bpReroll').setAttribute('aria-pressed', String(mode === 'reroll'));
+         q('#bpRerollLabel').textContent = `重骰 · 剩 ${game.rerollsRemaining} 次`;
+         q('#bpBan').className = 'bp-tool' + (mode === 'ban' ? ' active' : '');
+         q('#bpLock').className = 'bp-tool lock-mode' + (mode === 'lock' ? ' active' : '');
+         q('#bpBan').setAttribute('aria-pressed', String(mode === 'ban'));
+         q('#bpLock').setAttribute('aria-pressed', String(mode === 'lock'));
+         const locks = Object.values(groups).reduce((sum, group) => sum + group.game.cells.filter(cell => cell.locked).length, 0);
+         q('#bpLockLabel').textContent = `鎖定 · 已鎖 ${locks} 格`;
+         for (const [key, group] of Object.entries(groups))
+         {
+            const model = group.game;
+            const grid = q(key === 'perk' ? '#bpPerkGrid' : '#bpAddonGrid');
+            grid.replaceChildren();
+            model.cells.forEach((cell, index) =>
+            {
+               const item = group.catalog[cell.name];
+               const button = document.createElement('button');
+               button.className = 'bp-cell' + (cell.banned ? ' banned' : '') + (cell.locked ? ' locked' : '');
+               const allowed = !busy && (model.phase === 'player' || (model.phase === 'finished' && mode === 'reroll'));
+               button.disabled = !allowed || cell.banned || cell.locked;
+               button.title = `${item.zh || cell.name} / ${item.en || cell.name}${cell.banned ? ' · 已禁用' : cell.locked ? ' · 已鎖定' : ''}`;
+               button.setAttribute('aria-label', button.title);
+               const image = document.createElement('img');
+               image.src = item.img || '';
+               image.alt = item.zh || cell.name;
+               image.draggable = false;
+               button.appendChild(image);
+               if (cell.banned || cell.locked)
+               {
+                  const mark = document.createElement('span');
+                  mark.className = 'bp-mark ' + (cell.banned ? 'ban-mark' : 'lock-mark');
+                  if (cell.banned) mark.textContent = '×';
+                  else mark.innerHTML = icons.lock;
+                  button.appendChild(mark);
+               }
+               button.onclick = () => takeTurn(index, key);
+               grid.appendChild(button);
+            });
+         }
+         if (allFinished() && !confirm)
+         {
+            confirm = document.createElement('button');
+            confirm.className = 'bp-submit';
+            confirm.textContent = groups.addon ? '套用 4 技能＋2 配件' : '套用這 4 個技能';
+            confirm.onclick = () =>
+            {
+               if (disposed || applied || busy || !allFinished()) return;
+               applied = true;
+               const result = groups.addon ? {perks: groups.perk.game.result.slice(), addons: groups.addon.game.result.slice()} : groups.perk.game.result.slice();
+               dispose();
+               options.onComplete(result);
+            };
+            q('.bp-panel').appendChild(confirm);
+         }
+         if (confirm) confirm.disabled = busy;
+      }
+      function prompt()
+      {
+         if (mode === 'reroll') { help(`重骰模式：點上方技能或下方配件重新抽取，剩 ${game.rerollsRemaining} 次。兩區共用次數，不消耗回合。`); return; }
+         if (allFinished()) { help('兩區已完成！確認後套用亮著的 4 個技能與 2 個配件。'); return; }
+         help(mode === 'lock' ? '鎖定模式：點技能或配件格保護它。電腦同區禁用兩格、跨區隨機替換兩格；各區最後一回合不替換。' : '禁用模式：自由點選技能區或配件區禁用一格，電腦在同區禁用，但替換可能跨到另一區。技能四回合、配件兩回合，各區最後一回合不替換。');
+      }
+      function setMode(next)
+      {
+         if (disposed || busy || (allFinished() && next !== 'reroll') || (next === 'reroll' && game.rerollsRemaining === 0)) return;
+         mode = mode === next && next !== 'ban' ? 'ban' : next;
+         render();
+         prompt();
+      }
+      async function fly(action)
+      {
+         const source = q(action.type === 'ban' ? '#bpComputerBan' : '#bpComputerSwap');
+         const destination = cellElement(action.index, action.key || stage);
+         source.classList.add('acting');
+         if (source.getBoundingClientRect && destination.getBoundingClientRect)
+         {
+            const from = source.getBoundingClientRect(), to = destination.getBoundingClientRect();
+            const token = document.createElement('div');
+            token.className = 'bp-flying' + (action.type === 'replace' ? ' swap' : '');
+            token.innerHTML = icons[action.type === 'ban' ? 'ban' : 'replace'];
+            token.style.cssText = `left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px;`;
+            overlay.appendChild(token);
+            await animate(token, [{transform: 'translate(0,0) scale(1)'}, {transform: `translate(${to.left + to.width / 2 - from.left - from.width / 2}px,${to.top + to.height / 2 - from.top - from.height / 2}px) scale(1.2)`}], 560);
+            token.remove();
+         }
+         source.classList.remove('acting');
+      }
+      async function takeTurn(index, key)
+      {
+         if (disposed || busy) return;
+         activate(key);
+         if (mode === 'reroll')
+         {
+            if (!game.reroll(index)) return;
+            busy = true;
+            render();
+            help(stage === 'addon' ? '正在重骰配件…' : '正在重骰技能…');
+            await animate(cellElement(index), [{transform: 'rotateY(90deg)', opacity: .2}, {transform: 'rotateY(0deg)', opacity: 1}], 420);
+            if (disposed) return;
+            busy = false;
+            if (game.rerollsRemaining === 0) mode = 'ban';
+            render();
+            prompt();
+            return;
+         }
+         if (!game.playerAction(index, mode)) return;
+         busy = true;
+         mode = 'ban';
+         render();
+         await animate(cellElement(index), [{transform: 'scale(.9)'}, {transform: 'scale(1)'}], 200);
+         const replaced = new Set();
+         while (!disposed && game.nextAction)
+         {
+            const action = game.nextAction;
+            let target = {key: stage, index: action.index};
+            if (action.type === 'replace')
+            {
+               const candidates = Object.entries(groups).flatMap(([key, group]) => group.game.canComputerReplace ? group.game.cells.map((cell, index) => ({key, index, cell})).filter(item => !item.cell.banned && !item.cell.locked && !replaced.has(item.key + ':' + item.index)) : []);
+               if (!candidates.length) { game.applyComputerAction(action, () => true); continue; }
+               target = candidates[Math.floor(Math.random() * candidates.length)];
+            }
+            help(`電腦正在${action.type === 'ban' ? '禁用' : '替換'}${target.key === 'addon' ? '配件' : '技能'}…`);
+            await fly({...action, key: target.key, index: target.index});
+            if (disposed) return;
+            game.applyComputerAction(action, action.type === 'replace' ? () => groups[target.key].game.replaceByComputer(target.index) : null);
+            if (action.type === 'replace') replaced.add(target.key + ':' + target.index);
+            render();
+            await animate(cellElement(target.index, target.key), action.type === 'ban' ? [{opacity: 1}, {opacity: .4}, {opacity: 1}] : [{transform: 'rotateY(90deg)', opacity: .2}, {transform: 'rotateY(0deg)', opacity: 1}], 340);
+         }
+         if (disposed) return;
+         busy = false;
+         render();
+         prompt();
+      }
+      q('#bpBan').onclick = () => setMode('ban');
+      q('#bpLock').onclick = () => setMode('lock');
+      q('#bpReroll').onclick = () => setMode('reroll');
+      const controller = {dispose};
+      instances.add(controller);
+      render();
+      prompt();
+      return controller;
+   }
+   window.BanPickCard = {createGame, open, disposeAll: () => { for (const instance of Array.from(instances)) instance.dispose(); }};
+})();
+;
+/* END MERGED: ban-pick.js */
+
+/* BEGIN MERGED: casino-cards.js */
+(function()
+{
+   'use strict';
+   const instances = new Set();
+   function ensureStyles()
+   {
+      if (document.getElementById('casinoCardStyles')) return;
+      const style = document.createElement('style');
+      style.id = 'casinoCardStyles';
+      style.textContent = `
+      #card17GuessOverlay .card17-guess-panel,#card17RewardPickerOverlay .card17-picker-panel,#card17DuelOverlay .card17-duel-panel,#blackjackOverlay .bj-table,#blackjackRewardOverlay .bj-table{background:radial-gradient(ellipse at 50% 15%,#23734e,#12482f 65%,#0b3023)!important;border:9px solid #493024!important;outline:1px solid #a98042;box-shadow:0 25px 80px #0009,inset 0 0 0 2px #b79c5a,inset 0 0 75px #001d1670!important;color:#fff3d7}
+      #card17GuessOverlay .card17-guess-panel,#card17RewardPickerOverlay .card17-picker-panel,#card17DuelOverlay .card17-duel-panel{background-image:repeating-linear-gradient(87deg,#ffffff02 0 1px,transparent 1px 4px),radial-gradient(ellipse at top,#23734e,#12482f 65%,#0b3023)!important}
+      #blackjackOverlay{position:fixed;inset:0;z-index:100080;background:#080c0bed;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;font-family:inherit;color:#fff3d7;overflow:hidden}#blackjackOverlay *{box-sizing:border-box}.bj-table{position:relative;width:min(1050px,100%);max-height:94dvh;overflow-y:auto;overflow-x:hidden;border-radius:32px;padding:25px 30px 22px}.bj-title{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:20px}.bj-title h2{margin:0;font-size:30px}.bj-wager-label{border:1px solid #c9b16c;color:#ffe5a6;border-radius:50px;padding:8px 18px;font-size:14px}.bj-intro{text-align:center;padding:20px 10px}.bj-intro p{line-height:1.8;color:#e5eddb}.bj-bet-input{display:block;width:min(400px,95%);margin:24px auto 10px;accent-color:#e3c46f}.bj-bet-amount{font-size:40px;font-weight:800;color:#ffe5a6}.bj-button{font:inherit;cursor:pointer;padding:12px 27px;border:1px solid #dfc78c;background:#e4c47b;color:#2d2515;font-weight:800;border-radius:10px}.bj-button.secondary{background:#123c2c;color:#fff0c6}.bj-button:disabled{opacity:.4;cursor:default}.bj-seat{padding:12px 0}.bj-seat-label{display:flex;justify-content:space-between;gap:12px;font-size:14px;letter-spacing:.08em;color:#e0d9b7;margin-bottom:12px}.bj-hand{min-height:130px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}.bj-card{width:88px;height:120px;flex:0 0 88px;display:flex;align-items:center;justify-content:center;border:1px solid #d6c38c;border-radius:10px;background:linear-gradient(135deg,#26382f,#0e1b16);box-shadow:0 4px 9px #0005;position:relative}.bj-card img{width:90%;height:90%;object-fit:contain;filter:drop-shadow(0 2px 3px #0008)}.bj-card.back{background:repeating-linear-gradient(45deg,#274d64 0 4px,#18384c 4px 8px);box-shadow:0 4px 9px #0005,inset 0 0 0 5px #dec994,inset 0 0 0 7px #18384c}.bj-card.back::after{content:'?';font-size:38px;color:#dfc98e;font-weight:900}.bj-divider{display:flex;align-items:center;gap:18px;margin:14px 0;color:#c4b67e99;font-size:12px;letter-spacing:.25em;text-align:center}.bj-divider::before,.bj-divider::after{content:'';height:1px;flex:1;background:#b8a66a66}.bj-formula{text-align:right;margin:18px 0;color:#ffedb6;font-size:clamp(19px,3vw,28px);font-weight:800;overflow-wrap:anywhere}.bj-controls{display:flex;justify-content:center;gap:15px;border-top:1px solid #c2b17666;padding-top:20px;margin-top:10px}.bj-status{min-height:28px;text-align:center;line-height:1.6;font-size:16px;margin:12px 0;color:#fff4cf}.bj-result{font-size:24px;font-weight:900}.bj-subtle{font-size:12px;color:#d0ddca}.bj-rules{text-align:center;font-size:12px;color:#d0ddca;margin:8px 0 0}
+      @media(max-width:650px){#blackjackOverlay{padding:8px}.bj-table{padding:17px 12px;border-width:6px!important;border-radius:20px}.bj-card{width:64px;height:88px;flex-basis:64px}.bj-hand{gap:8px;min-height:96px}.bj-title h2{font-size:24px}.bj-wager-label{padding:6px 10px}.bj-controls{gap:9px}.bj-button{padding:11px 19px}}
+      `;
+      document.head.appendChild(style);
+   }
+   function createGame(catalog, random = Math.random)
+   {
+      const deck = Object.keys(catalog).filter(name => Number.isInteger(catalog[name].score) && catalog[name].score >= 0 && catalog[name].score <= 5);
+      if (deck.length < 4) throw new Error('二十一點至少需要四個有效技能。');
+      for (let i = deck.length - 1; i > 0; i--)
+      {
+         const j = Math.floor(random() * (i + 1));
+         [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      const player = [], dealer = [];
+      const total = hand => hand.reduce((sum, name) => sum + catalog[name].score, 0);
+      let phase = 'ready', result = null;
+      function resolve()
+      {
+         const p = total(player), d = total(dealer);
+         result = p > 21 ? 'lose' : d > 21 || p > d ? 'win' : p < d ? 'lose' : 'push';
+         phase = 'finished';
+      }
+      function start()
+      {
+         if (phase !== 'ready') return false;
+         player.push(deck.shift()); dealer.push(deck.shift());
+         player.push(deck.shift()); dealer.push(deck.shift());
+         phase = 'player';
+         return true;
+      }
+      function hit()
+      {
+         if (phase !== 'player' || !deck.length) return false;
+         player.push(deck.shift());
+         if (total(player) > 21) resolve();
+         else if (total(player) === 21 || !deck.length) phase = 'dealer';
+         return true;
+      }
+      function stand()
+      {
+         if (phase !== 'player') return false;
+         phase = 'dealer';
+         return true;
+      }
+      function dealerStep()
+      {
+         if (phase !== 'dealer') return false;
+         let drew = false;
+         if (total(dealer) < 17 && deck.length) { dealer.push(deck.shift()); drew = true; }
+         if (total(dealer) >= 17 || !deck.length) resolve();
+         return drew;
+      }
+      return {player, dealer, start, hit, stand, dealerStep,
+         get phase() { return phase; }, get result() { return result; },
+         get playerTotal() { return total(player); }, get dealerTotal() { return total(dealer); }};
+   }
+   function open(options)
+   {
+      ensureStyles();
+      const catalog = options.catalog;
+      const game = createGame(catalog);
+      const maxWager = Math.max(1, options.maxWager || 5);
+      let wager = 1, busy = false, disposed = false, applied = false;
+      const animations = new Set();
+      const overlay = document.createElement('div');
+      overlay.id = 'blackjackOverlay';
+      overlay.innerHTML = `
+      <section class="bj-table" role="dialog" aria-modal="true" aria-label="二十一點">
+         <header class="bj-title"><h2>二十一點</h2><span class="bj-wager-label">下注 <b id="bjWager">1</b> 點</span></header>
+         <div class="bj-intro"><p>選擇下注點數。贏了獲得等額點數，輸了扣除等額點數。</p><input id="bjBet" class="bj-bet-input" aria-label="下注點數" type="range" min="1" max="${maxWager}" value="1"><div class="bj-bet-amount">1 點</div><p>技能原本的 0～5 分就是牌面點數；移到自己的技能牌上可查看分數。<br>莊家未滿 17 點必須要牌，超過 21 點爆牌。平手${options.tieRule === 'dealer' ? '算莊家贏' : '不加不扣'}。</p><button class="bj-button" id="bjStart">下注並開始</button></div>
+         <div class="bj-game" hidden><div class="bj-seat"><div class="bj-seat-label"><span>莊家</span><span class="bj-dealer-total"></span></div><div class="bj-hand" id="bjDealer"></div></div><div class="bj-divider">BLACKJACK · 21</div><div class="bj-seat"><div class="bj-seat-label"><span>你的手牌</span><span class="bj-subtle">移到技能牌上查看點數</span></div><div class="bj-hand" id="bjPlayer"></div></div><div class="bj-formula" aria-live="polite"></div><div class="bj-status" role="status"></div><div class="bj-controls"><button class="bj-button" id="bjHit">進牌</button><button class="bj-button secondary" id="bjStand">停牌</button><button class="bj-button" id="bjConfirm" hidden>確認結果</button></div><p class="bj-rules">技能點數直接相加 · 21 點自動停牌 · 勝負按下注點數 1：1 結算</p></div>
+      </section>`;
+      document.body.appendChild(overlay);
+      const q = selector => overlay.querySelector(selector);
+      function dispose()
+      {
+         if (disposed) return;
+         disposed = true;
+         for (const animation of animations) animation.cancel();
+         animations.clear();
+         overlay.remove();
+         instances.delete(controller);
+      }
+      async function animate(element)
+      {
+         if (disposed || !element || !element.animate) return;
+         const animation = element.animate([{transform: 'translateX(140px) rotate(5deg)', opacity: 0}, {transform: 'translateX(0) rotate(0)', opacity: 1}], {duration: 380, easing: 'cubic-bezier(.2,.7,.25,1)'});
+         animations.add(animation);
+         try { await animation.finished; } catch (_) {} finally { animations.delete(animation); }
+      }
+      function render()
+      {
+         for (const who of ['dealer', 'player'])
+         {
+            const hand = q(who === 'dealer' ? '#bjDealer' : '#bjPlayer');
+            hand.replaceChildren();
+            game[who].forEach((name, index) =>
+            {
+               const card = document.createElement('div');
+               const hidden = who === 'dealer' && index > 0 && game.phase === 'player';
+               card.className = 'bj-card' + (hidden ? ' back' : '');
+               if (hidden) card.setAttribute('aria-label', '莊家暗牌');
+               else
+               {
+                  const item = catalog[name];
+                  const image = document.createElement('img');
+                  image.src = item.img || ''; image.alt = item.zh || name; image.draggable = false;
+                  card.appendChild(image);
+                  card.title = who === 'player' ? `${item.zh || name} · ${item.score} 分` : (item.zh || name);
+                  card.setAttribute('aria-label', card.title);
+               }
+               hand.appendChild(card);
+            });
+         }
+         q('.bj-formula').textContent = `${game.player.map(name => catalog[name].score).join('+')}=${game.playerTotal}/21`;
+         q('.bj-dealer-total').textContent = game.phase === 'finished' ? `${game.dealerTotal} 點` : '';
+         q('#bjHit').disabled = busy || game.phase !== 'player';
+         q('#bjStand').disabled = busy || game.phase !== 'player';
+         const done = game.phase === 'finished';
+         q('#bjHit').hidden = done; q('#bjStand').hidden = done; q('#bjConfirm').hidden = !done;
+         q('#bjConfirm').disabled = busy;
+         if (done)
+         {
+            const result = game.result === 'push' && options.tieRule === 'dealer' ? 'lose' : game.result;
+            q('.bj-status').className = 'bj-status bj-result';
+            q('.bj-status').textContent = result === 'win' ? `你贏了！＋${wager} 點` : result === 'lose' ? `${game.playerTotal > 21 ? '爆牌！' : '莊家勝出！'}－${wager} 點` : '平手 · 不加不扣';
+         }
+      }
+      async function dealerTurn()
+      {
+         while (!disposed && game.phase === 'dealer')
+         {
+            const drew = game.dealerStep();
+            render();
+            if (drew) await animate(q('#bjDealer').children[game.dealer.length - 1]);
+         }
+      }
+      q('#bjBet').oninput = () =>
+      {
+         wager = Math.max(1, Math.min(maxWager, Number(q('#bjBet').value) || 1));
+         q('#bjWager').textContent = String(wager);
+         q('.bj-bet-amount').textContent = wager + ' 點';
+      };
+      q('#bjStart').onclick = async () =>
+      {
+         if (disposed || busy || !game.start()) return;
+         busy = true; q('.bj-intro').hidden = true; q('.bj-game').hidden = false;
+         render();
+         const dealt = [q('#bjPlayer').children[0], q('#bjDealer').children[0], q('#bjPlayer').children[1], q('#bjDealer').children[1]];
+         dealt.forEach(card => {card.style.visibility = 'hidden';});
+         for (const card of dealt) {if (disposed) return; card.style.visibility = 'visible'; await animate(card);}
+         if (disposed) return;
+         busy = false; q('.bj-status').textContent = '選擇進牌，或停牌交給莊家。'; render();
+      };
+      q('#bjHit').onclick = async () =>
+      {
+         if (disposed || busy || !game.hit()) return;
+         busy = true; render(); await animate(q('#bjPlayer').children[game.player.length - 1]);
+         if (disposed) return;
+         if (game.phase === 'dealer') q('.bj-status').textContent = '莊家進牌中…';
+         await dealerTurn(); if (disposed) return;
+         busy = false; render();
+      };
+      q('#bjStand').onclick = async () =>
+      {
+         if (disposed || busy || !game.stand()) return;
+         busy = true; q('.bj-status').textContent = '莊家進牌中…'; render();
+         await dealerTurn(); if (disposed) return;
+         busy = false; render();
+      };
+      q('#bjConfirm').onclick = () =>
+      {
+         if (disposed || busy || applied || game.phase !== 'finished') return;
+         applied = true;
+         const result = game.result === 'push' && options.tieRule === 'dealer' ? 'lose' : game.result;
+         dispose(); options.onComplete(result, wager);
+      };
+      const controller = {dispose}; instances.add(controller); return controller;
+   }
+   ensureStyles();
+   window.CasinoCards = {createGame, open, ensureStyles, disposeAll: () => {for (const instance of Array.from(instances)) instance.dispose();}};
+})();
+;
+/* END MERGED: casino-cards.js */
+
+/* BEGIN MERGED: casino-duel.js */
+(function()
+{
+   'use strict';
+   const api = window.CasinoCards;
+   const instances = new Set();
+   const originalDispose = api.disposeAll;
+   const specials = {return: ['收回成命', '移除自己指定的一張牌（至少保留一張）。'], force: ['強迫進牌', '強迫莊家額外抽一張牌。'], redraw: ['重新洗命', '將自己最後一張牌換成牌庫中的另一張。'], swap: ['交換命運', '指定自己與莊家各一張牌，互相交換。'], limit24: ['突破極限', '將雙方本局的分數上限改成 24 分。'], limit18: ['步步為營', '將雙方本局的分數上限改成 18 分。'], insurance: ['保本護身', '選擇後自動生效，本局輸了不扣分、不重抽。']};
+   function sampleSpecials(random = Math.random)
+   {
+      const keys = Object.keys(specials);
+      for (let i = keys.length - 1; i > 0; i--) {const j = Math.floor(random() * (i + 1)); [keys[i], keys[j]] = [keys[j], keys[i]];}
+      return keys.slice(0, 3);
+   }
+   specials.insight = ['明察秋毫', '揭曉指定莊家牌的分數，再決定是否拿到自己手裡。'];
+   specials.insurance[1] = '選擇後自動生效：輸了固定扣 5 分，贏了按下注點數獲得獎勵。';
+   function createDuel(catalog, random = Math.random, settings = {})
+   {
+      const deck = Object.keys(catalog).filter(name => Number.isInteger(catalog[name].score) && catalog[name].score >= 0 && catalog[name].score <= 5);
+      if (deck.length < 6) throw new Error('至少需要六個技能。');
+      for (let i = deck.length - 1; i > 0; i--)
+      {
+         const j = Math.floor(random() * (i + 1));
+         [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      const player = [], dealer = [], known = new Set(), notes = new Map();
+      const specialKeys = Object.keys(specials).filter(key => key !== 'insurance');
+      const dealerSpecial = specials[settings.dealerSpecial] ? settings.dealerSpecial : specialKeys[Math.floor(random() * specialKeys.length)];
+      let dealerAction = null;
+      let revealed = null;
+      let phase = 'ready', special = 'return', used = false, exchange = null, result = null, dealerBeforeExchange = null, limit = 21;
+      const score = name => catalog[name].score;
+      const total = hand => hand.reduce((sum, name) => sum + score(name), 0);
+      const outcome = (p, d, cap = limit) => p > cap && d > cap ? 'push' : p > cap ? 'lose' : d > cap || p > d ? 'win' : p < d ? 'lose' : 'push';
+      function draw(hand)
+      {
+         if (!deck.length) return false;
+         const name = deck.shift(); hand.push(name);
+         if (hand === player) known.add(name);
+         return true;
+      }
+      function start(type)
+      {
+         if (phase !== 'ready' || !specials[type]) return false;
+         special = type;
+         for (let i = 0; i < 3; i++) {draw(player); draw(dealer);}
+         phase = 'player'; return true;
+      }
+      function hit()
+      {
+         if (revealed || phase !== 'player' || total(player) >= limit) return false;
+         return draw(player);
+      }
+      function stand()
+      {
+         if (revealed || phase !== 'player') return false;
+         phase = 'dealer'; return true;
+      }
+      function dealerStep()
+      {
+         if (phase !== 'dealer' || total(dealer) >= 18 || !deck.length) return false;
+         return draw(dealer);
+      }
+      function exchangeCards()
+      {
+         if (phase !== 'dealer' || (total(dealer) < 18 && deck.length)) return false;
+         const p = total(player), d = total(dealer);
+         dealerBeforeExchange = d;
+         const rank = value => value === 'lose' ? 2 : value === 'push' ? 1 : 0;
+         const baseline = rank(outcome(p, d));
+         let best = baseline, options = [];
+         if (dealerSpecial === 'swap') player.forEach((pn, pi) => dealer.forEach((dn, di) =>
+         {
+            if (score(pn) === score(dn)) return;
+            const value = rank(outcome(p - score(pn) + score(dn), d - score(dn) + score(pn)));
+            if (value > best) {best = value; options = [{pi, di, playerCard: pn, dealerCard: dn}];}
+            else if (value === best && value > baseline) options.push({pi, di, playerCard: pn, dealerCard: dn});
+         }));
+         if (dealerSpecial === 'swap' && options.length)
+         {
+            exchange = {...options[Math.floor(random() * options.length)], playerBefore: p, dealerBefore: d};
+            player[exchange.pi] = exchange.dealerCard; dealer[exchange.di] = exchange.playerCard;
+            exchange.playerAfter = total(player); exchange.dealerAfter = total(dealer);
+            known.add(exchange.dealerCard);
+            dealerAction = {type:'swap', ...exchange};
+         }
+         else if (dealerSpecial === 'return' && dealer.length > 1)
+         {
+            const candidates = dealer.map((name, index) => ({index, value:rank(outcome(p, d - score(name)))})).filter(option => option.value > baseline);
+            if (candidates.length)
+            {
+               const highest = Math.max(...candidates.map(option => option.value));
+               const candidatesBest = candidates.filter(option => option.value === highest);
+               const selected = candidatesBest[Math.floor(random() * candidatesBest.length)];
+               const removed = dealer.splice(selected.index, 1)[0]; dealerAction = {type:'return', removed};
+            }
+         }
+         else if ((dealerSpecial === 'force' || dealerSpecial === 'redraw') && deck.length)
+         {
+            const expected = deck.reduce((sum, name) => sum + rank(dealerSpecial === 'force' ? outcome(p + score(name), d) : outcome(p, d - score(dealer[dealer.length - 1]) + score(name))), 0) / deck.length;
+            if (expected > baseline)
+            {
+               if (dealerSpecial === 'force') draw(player);
+               else {dealer.pop(); draw(dealer);}
+               dealerAction = {type:dealerSpecial};
+            }
+         }
+         else if (dealerSpecial === 'limit24' || dealerSpecial === 'limit18')
+         {
+            const cap = dealerSpecial === 'limit24' ? 24 : 18;
+            if (rank(outcome(p, d, cap)) > baseline) {limit = cap; dealerAction = {type:dealerSpecial};}
+         }
+         else if (dealerSpecial === 'insight')
+         {
+            const candidates = player.map((name, index) => ({index, value:rank(outcome(p - score(name), d + score(name)))})).filter(option => option.value > baseline);
+            if (candidates.length)
+            {
+               const highest = Math.max(...candidates.map(option => option.value));
+               const best = candidates.filter(option => option.value === highest);
+               const selected = best[Math.floor(random() * best.length)];
+               const taken = player.splice(selected.index, 1)[0]; dealer.push(taken); dealerAction = {type:'insight', taken};
+            }
+         }
+         if (dealerAction) Object.assign(dealerAction, {playerBefore:p, dealerBefore:d, playerAfter:total(player), dealerAfter:total(dealer), limitAfter:limit});
+         phase = 'response'; return dealerAction;
+      }
+      function canUse()
+      {
+         if (special === 'insurance' || used || !['player', 'response'].includes(phase)) return false;
+         if (special === 'return') return player.length > 1;
+         if (special === 'insight') return dealer.length > 0;
+         if (special === 'swap') return player.length > 0 && dealer.length > 0;
+         if (special === 'limit24' || special === 'limit18') return true;
+         return deck.length > 0;
+      }
+      function useSpecial(selection = {})
+      {
+         if (!canUse()) return false;
+         if (special === 'insight') return false;
+         if (special === 'return')
+         {
+            if (!Number.isInteger(selection.playerIndex) || selection.playerIndex < 0 || selection.playerIndex >= player.length) return false;
+            player.splice(selection.playerIndex, 1);
+         }
+         else if (special === 'swap')
+         {
+            const p = selection.playerIndex, d = selection.dealerIndex;
+            if (!Number.isInteger(p) || !Number.isInteger(d) || p < 0 || p >= player.length || d < 0 || d >= dealer.length) return false;
+            [player[p], dealer[d]] = [dealer[d], player[p]];
+            known.add(player[p]);
+         }
+         else if (special === 'limit24') limit = 24;
+         else if (special === 'limit18') limit = 18;
+         else if (special === 'force') draw(dealer);
+         else {player.pop(); draw(player);}
+         used = true; return true;
+      }
+      function finish()
+      {
+         if (revealed || phase !== 'response') return false;
+         result = outcome(total(player), total(dealer)); phase = 'finished'; return true;
+      }
+      function revealDealer(index)
+      {
+         if (special !== 'insight' || !canUse() || !Number.isInteger(index) || index < 0 || index >= dealer.length) return false;
+         revealed = dealer[index]; known.add(revealed); used = true; return true;
+      }
+      function takeRevealed(take)
+      {
+         if (!revealed) return false;
+         if (take)
+         {
+            const index = dealer.indexOf(revealed);
+            if (index < 0) return false;
+            player.push(dealer.splice(index, 1)[0]);
+         }
+         revealed = null; return true;
+      }
+      return {player, dealer, known, notes, start, hit, stand, dealerStep, exchangeCards, canUse, useSpecial, revealDealer, takeRevealed, finish,
+         get phase() {return phase;}, get special() {return special;}, get used() {return used;}, get exchange() {return exchange;},
+         get dealerBeforeExchange() {return dealerBeforeExchange;},
+         get dealerSpecial() {return dealerSpecial;}, get dealerAction() {return dealerAction;},
+         get limit() {return limit;},
+         get lossAmount() {return special === 'insurance' ? 5 : null;},
+         get result() {return result;}, get playerTotal() {return total(player);}, get dealerTotal() {return total(dealer);}};
+   }
+   function open(options)
+   {
+      api.ensureStyles();
+      if (!document.getElementById('casinoDuelStyles'))
+      {
+         const style = document.createElement('style'); style.id = 'casinoDuelStyles';
+         style.textContent = '.bj-special-options{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:18px 0}.bj-special-choice{flex:1;min-width:150px;max-width:260px;padding:15px;background:#123c2c;color:#fff0c6;border:1px solid #8b9c75;border-radius:12px;cursor:pointer;font:inherit}.bj-special-choice[aria-pressed="true"]{border:2px solid #ffe49b;background:#306448}.bj-special-choice small{display:block;margin-top:8px;line-height:1.6}.bj-duel-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:15px 0}.bj-note-card{display:flex;flex-direction:column;align-items:center;gap:6px}.bj-note-select{max-width:100px;background:#173c2b;color:#fff0c6;border:1px solid #b9a46c;border-radius:6px;padding:5px;font:inherit;font-size:12px}.bj-card .bj-card-score{position:absolute;bottom:3px;right:5px;padding:2px 6px;border-radius:5px;background:#081c16e8;color:#ffe49b;font-weight:bold}.bj-note-result{font-size:12px;color:#ffedb6}.bj-estimate{text-align:right;color:#d5d8c3;font-size:14px;line-height:1.7;margin-top:10px}.bj-dealer-special{font-size:13px;color:#ffe5a6;text-align:center;line-height:1.7}.bj-duel-log{min-height:24px;color:#ffe5a6;text-align:center;line-height:1.6}.bj-duel-controls{flex-wrap:wrap}.bj-special-used{opacity:.55}';
+         document.head.appendChild(style);
+      }
+      const game = createDuel(options.catalog), catalog = options.catalog;
+      const offeredSpecials = sampleSpecials();
+      let selected = offeredSpecials[0], wager = 1, busy = false, disposed = false, applied = false, popup = null, specialExpanded = false, targeting = null;
+      const animations = new Set();
+      const overlay = document.createElement('div'); overlay.id = 'blackjackOverlay';
+      overlay.innerHTML = `<section class="bj-table" role="dialog" aria-modal="true" aria-label="二十一點"><header class="bj-title"><h2>二十一點</h2><span class="bj-wager-label">下注 <b id="bjWager">1</b> 點</span></header><div class="bj-intro"><div class="bj-setup-layout"><div class="bj-setup-cards"><h3 class="bj-setup-heading">特殊牌</h3><p class="bj-special-introduction">特殊牌可以改變手牌，幫助你逆轉局勢。<br>選擇一張，本局可使用一次。</p><div class="bj-special-options"></div></div><div class="bj-setup-wager"><h3 class="bj-setup-heading">賭注</h3><div class="bj-wager-center"><div class="bj-bet-amount">1 點</div><div class="bj-chip-holder"></div><input id="bjBet" class="bj-bet-input" aria-label="下注點數" type="range" min="1" max="${Math.max(1, Math.min(15, options.maxWager || 5))}" value="1"><button class="bj-button" id="bjStart">下注並開始</button></div></div></div></div><div class="bj-game" hidden><div class="bj-game-scroll"><div class="bj-dealer-special"></div><div class="bj-seat"><div class="bj-seat-label"><span>莊家</span><span class="bj-dealer-total"></span></div><div class="bj-hand" id="bjDealer"></div><div class="bj-estimate"></div></div><div class="bj-divider">BLACKJACK · 21</div><div class="bj-seat"><div class="bj-seat-label"><span>你的手牌</span><span class="bj-subtle">點擊卡牌查看分數</span></div><div class="bj-hand" id="bjPlayer"></div></div><div class="bj-formula"></div><div class="bj-duel-log" aria-live="polite"></div><div class="bj-status" role="status"></div><div class="bj-duel-tools"><button class="bj-button secondary" id="bjSpecial" aria-expanded="false"></button><div class="bj-special-detail" hidden><div><b id="bjSpecialName"></b><p id="bjSpecialDescription"></p></div><button class="bj-button" id="bjUseSpecial">使用</button></div></div></div><div class="bj-controls bj-duel-controls"><button class="bj-button" id="bjHit">進牌</button><button class="bj-button secondary" id="bjStand">停牌</button><button class="bj-button" id="bjReveal" hidden>結算並揭曉分數</button><button class="bj-button" id="bjConfirm" hidden>確認結果</button></div></div></section>`;
+      document.body.appendChild(overlay);
+      const q = selector => overlay.querySelector(selector);
+      const chipStyle = document.createElement('style');
+      chipStyle.textContent = '.bj-chip-piles{height:94px;display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:8px auto 2px;max-width:100%;pointer-events:none}.bj-chip-pile{position:relative;width:53px;height:84px;flex:0 1 53px}.bj-chip{position:absolute;left:0;bottom:calc(var(--chip-level)*10px);width:100%;height:22px;box-sizing:border-box;border:2px solid #fff0bd;border-radius:50%;background:repeating-conic-gradient(from 12deg,#e8d9a8 0deg 13deg,#ad3444 13deg 58deg,#e8d9a8 58deg 71deg,#ad3444 71deg 120deg);box-shadow:0 4px 0 #722633,0 5px 0 #e1bf70,0 7px 5px #0007;animation:bjChipDrop .18s ease-out both}.bj-chip::after{content:"";position:absolute;inset:3px 9px;border:1px dashed #efd3a5;border-radius:50%;background:#922f3d}.bj-chip-pile:nth-child(3n+2) .bj-chip{filter:hue-rotate(115deg)}.bj-chip-pile:nth-child(3n) .bj-chip{filter:hue-rotate(205deg)}.bj-wager-limit{font-size:13px;font-weight:400;color:#e3d9b8;margin-top:5px}@keyframes bjChipDrop{from{transform:translateY(-9px);opacity:.25}to{transform:translateY(0);opacity:1}}@media(max-width:500px){.bj-chip-piles{gap:5px}.bj-chip-pile{width:40px;flex-basis:40px}.bj-chip::after{inset:3px 7px}}';
+      overlay.appendChild(chipStyle);
+      chipStyle.textContent += `
+         #blackjackOverlay .bj-table{display:flex;flex-direction:column;overflow:hidden}
+         #blackjackOverlay .bj-title{flex:0 0 auto}
+         #blackjackOverlay .bj-intro{overflow-y:auto;min-height:0}
+         #blackjackOverlay .bj-game{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+         #blackjackOverlay .bj-game[hidden],#blackjackOverlay .bj-intro[hidden]{display:none}
+         .bj-game-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 5px 6px;scrollbar-width:thin}
+         #blackjackOverlay .bj-duel-controls{flex:0 0 auto;margin:0;padding:13px 0 0;background:#103e2c;border-top:1px solid #bba36588;position:relative;z-index:1}
+         @media(max-height:850px){#blackjackOverlay .bj-title{margin-bottom:10px}#blackjackOverlay .bj-game .bj-seat{padding:7px 0}#blackjackOverlay .bj-game .bj-hand{min-height:148px}#blackjackOverlay .bj-game .bj-card{height:116px;flex-basis:116px;width:80px}.bj-note-card{width:80px}.bj-seat-label{margin-bottom:7px}.bj-divider{margin:8px 0}.bj-formula{margin:10px 0;font-size:25px}.bj-duel-tools{min-height:86px;margin:9px 0}#blackjackOverlay #bjSpecial{height:85px;width:85px;flex-basis:85px}.bj-status{margin:7px 0;min-height:23px}.bj-above-score{height:22px;line-height:22px;font-size:20px}}
+      `;
+      chipStyle.textContent += `
+         #blackjackOverlay .bj-game .bj-hand{gap:14px;min-height:170px;padding:8px 0 5px;align-items:flex-start}
+         #blackjackOverlay .bj-game .bj-card{width:94px;height:140px;flex:0 0 140px;padding:6px;border:1px solid #d9bd71;border-radius:11px;background:linear-gradient(145deg,#244353,#142c39 48%,#0b1923);box-shadow:0 4px 0 #07121b,0 9px 12px #0005;cursor:pointer;transition:border-color .15s,transform .15s}
+         #blackjackOverlay .bj-game .bj-card img{width:95%;height:85%;object-fit:contain}
+         #blackjackOverlay .bj-game .bj-card:hover{border-color:#ffdf8d;transform:translateY(-3px)}
+         #blackjackOverlay .bj-game .bj-card:focus-visible{outline:2px solid #ffe39a;outline-offset:4px}
+         .bj-note-card{gap:7px;width:94px}
+         .bj-above-score{height:25px;line-height:25px;font-size:22px;color:#ffedb6;font-weight:800;text-align:center}
+         .bj-duel-tools{justify-content:flex-start;align-items:center;gap:14px;min-height:102px;margin:16px 0}
+         #bjSpecial{flex:0 0 102px;width:102px;height:102px;padding:8px;font-size:17px;line-height:1.6;border:1px solid #d9bd71;background:linear-gradient(145deg,#244353,#0b1923);box-shadow:0 4px 9px #0005}
+         #bjSpecial small{display:block;font-size:13px;font-weight:400}
+         #bjSpecial[aria-expanded="true"]{border-color:#ffe39a;box-shadow:0 0 7px #eacb6f66}
+         .bj-special-detail{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 21px;background:#072b2080;border:1px solid #a48b4e;border-radius:12px}
+         .bj-special-detail[hidden]{display:none}.bj-special-detail b{font-size:21px}.bj-special-detail p{margin:6px 0 0;line-height:1.7;font-size:15px}.bj-special-detail .bj-button{flex-shrink:0}
+         .bj-card-popup-shade{position:fixed;inset:0;z-index:3;background:#0009;display:flex;align-items:center;justify-content:center;padding:18px}
+         .bj-card-popup{position:relative;width:min(360px,100%);padding:28px 25px 24px;border:1px solid #e2c577;border-radius:16px;background:linear-gradient(145deg,#132e35,#07191e);box-shadow:0 20px 70px #0009;text-align:center;color:#fff0c6}
+         .bj-card-popup h3{margin:0 20px 15px;font-size:23px}.bj-card-popup img{display:block;width:112px;height:112px;object-fit:contain;margin:12px auto}.bj-popup-score{font-size:30px;font-weight:800;margin:16px 0}.bj-popup-close{position:absolute;right:12px;top:9px;background:none;border:0;color:#f4d99c;font-size:28px;cursor:pointer}.bj-popup-prompt{display:block;line-height:1.7;margin:12px 0 9px}.bj-guess-input{width:100%;padding:12px 14px;font:inherit;font-size:24px;color:#fff0c6;caret-color:#ffe09b;background:#051a20;border:1px solid #d5b769;border-radius:8px;outline:none}.bj-guess-input:focus{border-color:#ffe29c;box-shadow:0 0 0 2px #e5c47733}.bj-popup-hint{font-size:12px;color:#d4ceb2;margin:8px 0 14px}.bj-popup-error{font-size:13px;color:#ffaca7;min-height:20px}.bj-popup-actions{display:flex;gap:12px;justify-content:center}.bj-popup-actions .bj-button{flex:1;padding:11px 16px}
+         @media(max-width:650px){#blackjackOverlay .bj-game .bj-card{width:76px;height:114px;flex-basis:114px}.bj-note-card{width:76px}#blackjackOverlay .bj-game .bj-hand{min-height:146px;gap:11px}.bj-special-detail{padding:12px;gap:10px}.bj-special-detail b{font-size:18px}.bj-special-detail p{font-size:13px}.bj-special-detail .bj-button{padding:11px 15px}#bjSpecial{flex-basis:85px;width:85px;height:85px;font-size:15px}}
+      `;
+      chipStyle.textContent += `
+         #blackjackOverlay .bj-table{width:min(1180px,100%)}
+         .bj-intro{padding:16px 4px 8px;text-align:left}
+         .bj-setup-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(270px,1fr);gap:30px}
+         .bj-setup-heading{font-size:27px;margin:0 0 19px;font-weight:800;color:#fff0c6}
+         .bj-setup-heading::after{content:'';display:block;width:100px;height:1px;background:#d4b865;margin-top:13px}
+         .bj-intro .bj-special-introduction{font-size:15px;line-height:1.8;margin:0 0 27px;color:#fff0d1}
+         .bj-special-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0;padding:9px 0}
+         .bj-special-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;min-width:0;max-width:none;width:100%;min-height:305px;aspect-ratio:.61;padding:24px 14px;border:2px solid #96aebe;border-radius:16px;background:linear-gradient(145deg,#234659,#142c3a 48%,#0a1823);color:#fff4d5;box-shadow:0 5px 0 #0a131c,0 12px 16px #0007;transition:transform .18s,border-color .18s,box-shadow .18s;text-shadow:0 1px 2px #0008}
+         .bj-special-choice b{font-size:clamp(20px,2.2vw,28px);font-weight:800;white-space:nowrap;line-height:1.4}
+         .bj-special-choice small{font-size:15px;line-height:1.9;margin:0;width:100%;text-align:center;border-top:1px solid #7f9daa88;padding-top:24px;overflow-wrap:anywhere}
+         .bj-special-choice[aria-pressed="true"]{border:3px solid #f0cf7a;background:linear-gradient(145deg,#294c5e,#173342 48%,#0a1a25);transform:translateY(-8px);box-shadow:0 5px 0 #826e35,0 12px 20px #0008,0 0 10px #edcf7240}
+         .bj-special-choice:hover{transform:translateY(-5px)}
+         .bj-special-choice[aria-pressed="true"]:hover{transform:translateY(-8px)}
+         .bj-special-choice:focus-visible{outline:2px solid #fff3b4;outline-offset:4px}
+         .bj-setup-wager{border-left:1px solid #c6a84999;padding-left:28px;display:flex;flex-direction:column}
+         .bj-wager-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:19px;padding:12px 0 7px;min-width:0}
+         .bj-bet-amount{font-size:clamp(42px,5vw,66px);font-weight:800;line-height:1.2;color:#ffe4a0;text-align:center}
+         .bj-chip-holder{width:100%;min-height:112px;display:flex;align-items:center;justify-content:center}
+         .bj-chip-piles{width:100%;height:108px;gap:7px;margin:0;align-items:flex-end}
+         .bj-chip-pile{width:60px;flex:0 1 60px;height:100px;min-width:0}
+         .bj-chip{height:25px;bottom:calc(var(--chip-level)*13px);box-shadow:0 4px 0 #722633,0 5px 0 #e1bf70,0 8px 5px #0007}
+         .bj-setup-wager .bj-bet-input{width:100%;margin:5px 0 15px;cursor:pointer}
+         .bj-setup-wager #bjStart{width:100%;max-width:310px;padding:17px 15px;font-size:20px;background:linear-gradient(135deg,#f4d68a,#dfb857);border-color:#f4d68a;box-shadow:0 5px 12px #0003}
+         @media(max-width:900px){.bj-setup-layout{grid-template-columns:minmax(0,1.6fr) minmax(220px,1fr);gap:18px}.bj-setup-wager{padding-left:18px}.bj-special-options{gap:8px}.bj-special-choice{padding:18px 9px;min-height:280px}.bj-special-choice b{font-size:19px}.bj-special-choice small{font-size:13px}}
+         @media(max-width:700px){.bj-setup-layout{grid-template-columns:1fr;gap:25px}.bj-setup-wager{border-left:0;border-top:1px solid #c6a84999;padding:20px 0 0}.bj-special-choice{min-height:235px;aspect-ratio:.68}.bj-special-choice b{font-size:clamp(17px,4vw,24px)}.bj-special-introduction{font-size:14px}.bj-wager-center{gap:12px}.bj-setup-heading{font-size:23px}.bj-setup-wager .bj-bet-input{max-width:360px}.bj-bet-amount{font-size:45px}.bj-chip-piles{max-width:360px}.bj-special-options{padding-top:7px}}
+         @media(prefers-reduced-motion:reduce){.bj-chip{animation:none}.bj-special-choice{transition:none}}
+      `;
+      chipStyle.textContent += `
+         #blackjackOverlay .bj-table{max-height:94dvh;padding-top:16px;padding-bottom:16px}
+         #blackjackOverlay .bj-game{flex:1 1 auto;overflow:hidden}
+         #blackjackOverlay .bj-game-scroll{display:flex;flex-direction:column;overflow:hidden;padding:0 3px 3px}
+         #blackjackOverlay .bj-game .bj-seat{flex:1 1 auto;min-height:0;padding:4px 0}
+         #blackjackOverlay .bj-game .bj-seat-label{margin-bottom:4px;font-size:13px;line-height:1.4}
+         #blackjackOverlay .bj-game .bj-hand{min-height:0;gap:clamp(3px,1vw,12px);padding:3px 0;flex-wrap:nowrap;align-items:flex-start}
+         #blackjackOverlay .bj-game .bj-note-card{width:clamp(42px,9.5dvh,80px);flex:0 1 clamp(42px,9.5dvh,80px);min-width:0;gap:4px}
+         #blackjackOverlay .bj-game .bj-card{width:100%;height:clamp(64px,14dvh,116px);flex:0 0 auto;min-width:0;padding:3px}
+         #blackjackOverlay .bj-game .bj-above-score{height:20px;line-height:20px;font-size:19px}
+         #blackjackOverlay .bj-game .bj-divider{margin:6px 0;line-height:1.3;font-size:10px;flex-shrink:0}
+         #blackjackOverlay .bj-game .bj-estimate{font-size:12px;line-height:1.4;margin-top:4px}
+         #blackjackOverlay .bj-game .bj-formula{font-size:clamp(18px,3dvh,25px);margin:6px 0;line-height:1.3;flex-shrink:0}
+         #blackjackOverlay .bj-game .bj-duel-tools{min-height:0;height:auto;margin:7px 0;gap:12px;flex-wrap:nowrap;flex-shrink:0}
+         #blackjackOverlay #bjSpecial{width:72px;height:72px;flex:0 0 72px;font-size:14px;padding:5px;line-height:1.5}
+         #blackjackOverlay #bjSpecial small{font-size:11px}
+         #blackjackOverlay .bj-special-detail{padding:10px 15px;gap:12px}
+         #blackjackOverlay .bj-special-detail b{font-size:18px}
+         #blackjackOverlay .bj-special-detail p{font-size:13px;line-height:1.5;margin-top:4px}
+         #blackjackOverlay .bj-special-detail .bj-button{padding:9px 20px}
+         #blackjackOverlay .bj-game .bj-status{min-height:0;margin:4px 0;line-height:1.4;font-size:14px;flex-shrink:0}
+         #blackjackOverlay .bj-game .bj-status.bj-result{font-size:22px}
+         #blackjackOverlay .bj-game .bj-duel-log{min-height:0;line-height:1.4;font-size:12px;flex-shrink:0;overflow-wrap:anywhere}
+         #blackjackOverlay .bj-game .bj-dealer-special{font-size:12px;line-height:1.4;margin-bottom:3px;flex-shrink:0}
+         #blackjackOverlay .bj-duel-controls{padding-top:10px}
+         @media(max-height:700px){#blackjackOverlay .bj-title{margin-bottom:5px}#blackjackOverlay .bj-title h2{font-size:25px}#blackjackOverlay .bj-game .bj-card{height:clamp(52px,12dvh,85px)}#blackjackOverlay .bj-game .bj-note-card{width:56px;flex-basis:56px}#blackjackOverlay .bj-game .bj-duel-tools{margin:4px 0}#blackjackOverlay #bjSpecial{height:58px;width:68px;flex-basis:68px;font-size:13px}#blackjackOverlay .bj-duel-controls .bj-button{padding:8px 20px}#blackjackOverlay .bj-game .bj-divider{margin:3px 0}}
+      `;
+      chipStyle.textContent += `
+         .bj-chip-mound{position:relative;isolation:isolate;width:min(100%,300px);height:160px;pointer-events:none;perspective:650px}
+         .bj-scatter-item{position:absolute;width:59px;height:59px;transform-origin:center;filter:drop-shadow(2px 5px 3px #0006)}
+         .bj-chip-mound .bj-chip{position:relative;display:block;left:auto;bottom:auto;width:59px;height:59px;border:2px solid #f3e5bd;border-radius:50%;background:repeating-conic-gradient(from 9deg,var(--chip-color) 0deg 35deg,#f6e9c8 35deg 49deg,var(--chip-color) 49deg 60deg);box-shadow:0 4px 0 var(--chip-edge),0 7px 0 var(--chip-edge),0 8px 0 #e6d7ac;transform:rotateX(var(--chip-tilt));animation:bjMoundDrop .2s ease-out both}
+         .bj-chip-mound .bj-chip::after{inset:9px;border:1px dashed #f6e6bd;border-radius:50%;background:var(--chip-color);box-shadow:inset 0 0 0 3px #ffffff0c}
+         @keyframes bjMoundDrop{from{opacity:0;translate:0 -11px}to{opacity:1;translate:0 0}}
+         @media(prefers-reduced-motion:reduce){.bj-chip-mound .bj-chip{animation:none}}
+      `;
+      const chipColors = [['#b9313f','#762532'],['#388847','#235e31'],['#2677b8','#174e83'],['#bb9134','#806021'],['#8950a7','#54306e']];
+      const chipStacks = [{count:5,x:28,y:45},{count:4,x:65,y:31},{count:3,x:39,y:18},{count:2,x:72,y:6},{count:1,x:27,y:0,leaning:true}];
+      const chipPositions = [];
+      chipStacks.forEach((stack, column) =>
+      {
+         for (let level = 0; level < stack.count; level++)
+         {
+            chipPositions.push({x:stack.x, y:stack.y + level * 10,
+               angle:stack.leaning ? 22 : 0, tilt:stack.leaning ? 12 : 54, leaning:!!stack.leaning,
+               color:chipColors[column], z:10 + column * 20 + level});
+         }
+      });
+      const chipMound = document.createElement('div'); chipMound.className = 'bj-chip-mound'; chipMound.setAttribute('role', 'img');
+      chipStyle.textContent += `
+         .bj-chip-mound .bj-chip-leaning .bj-chip{box-shadow:0 1px 0 var(--chip-edge),0 2px 0 #dccb9d;border-width:1px}
+         #blackjackOverlay .bj-special-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px 10px}
+         #blackjackOverlay .bj-special-choice{aspect-ratio:.61;min-height:280px;padding:23px 12px;gap:25px}
+         #blackjackOverlay .bj-special-choice b{font-size:21px}
+         #blackjackOverlay .bj-special-choice small{font-size:13px;padding-top:13px;line-height:1.7}
+         #blackjackOverlay .bj-card.bj-target-eligible{border:2px solid #ffe39a;box-shadow:0 0 10px #f7da7955;cursor:crosshair}
+         #blackjackOverlay .bj-card.bj-target-selected{border:2px solid #95e69d;box-shadow:0 0 12px #94e69c88;transform:translateY(-4px)}
+         @media(max-height:750px){#blackjackOverlay .bj-special-choice{min-height:240px;padding:16px 9px;gap:17px}#blackjackOverlay .bj-special-choice small{font-size:12px;padding-top:14px}#blackjackOverlay .bj-special-choice b{font-size:19px}#blackjackOverlay .bj-intro .bj-special-introduction{margin-bottom:14px}}
+      `;
+      const chipNodes = [];
+      q('.bj-chip-holder').replaceChildren(chipMound);
+      function renderChips()
+      {
+         const amount = q('.bj-bet-amount'); amount.textContent = wager + ' 點';
+         chipMound.setAttribute('aria-label', wager + ' 枚下注籌碼');
+         while (chipNodes.length > wager) chipNodes.pop().remove();
+         while (chipNodes.length < wager)
+         {
+            const layout = chipPositions[chipNodes.length];
+            const wrapper = document.createElement('span'); wrapper.className = 'bj-scatter-item' + (layout.leaning ? ' bj-chip-leaning' : '');
+            wrapper.style.cssText = `left:${layout.x}%;bottom:${layout.y}px;z-index:${layout.z};transform:translateX(-50%) rotate(${layout.angle}deg);--chip-tilt:${layout.tilt}deg;--chip-color:${layout.color[0]};--chip-edge:${layout.color[1]}`;
+            const chip = document.createElement('span'); chip.className = 'bj-chip'; wrapper.appendChild(chip);
+            chipMound.appendChild(wrapper); chipNodes.push(wrapper);
+         }
+      }
+      function dispose()
+      {
+         if (disposed) return; disposed = true;
+         if (popup) {popup.remove(); popup = null;}
+         for (const animation of animations) animation.cancel();
+         animations.clear(); overlay.remove(); instances.delete(controller);
+      }
+      async function animate(element, from = 'translateX(140px) rotate(5deg)')
+      {
+         if (disposed || !element || !element.animate) return;
+         const animation = element.animate([{transform: from, opacity: 0}, {transform: 'translateX(0) rotate(0)', opacity: 1}], {duration: 420, easing: 'cubic-bezier(.2,.7,.25,1)'});
+         animations.add(animation);
+         try {await animation.finished;} catch (_) {} finally {animations.delete(animation);}
+      }
+      function openCard(name, who, trigger, offerTake = false)
+      {
+         if (busy || popup || disposed) return;
+         const item = catalog[name];
+         const known = who === 'player' || game.known.has(name) || game.phase === 'finished';
+         const shade = document.createElement('div'); shade.className = 'bj-card-popup-shade'; popup = shade;
+         const panel = document.createElement('div'); panel.className = 'bj-card-popup'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', known ? (item.zh || name) : '記錄猜測'); shade.appendChild(panel);
+         let decided = false;
+         const close = () =>
+         {
+            if (offerTake && !decided) {game.takeRevealed(false); decided = true;}
+            shade.remove(); popup = null;
+            if (offerTake && !disposed) render();
+            if (!disposed && trigger && trigger.isConnected && trigger.focus) trigger.focus();
+         };
+         const closeButton = document.createElement('button'); closeButton.className = 'bj-popup-close'; closeButton.textContent = '×'; closeButton.setAttribute('aria-label', '關閉'); closeButton.onclick = close; panel.appendChild(closeButton);
+         const heading = document.createElement('h3'); heading.textContent = known ? (item.zh || name) : '記錄猜測'; panel.appendChild(heading);
+         const image = document.createElement('img'); image.src = item.img || ''; image.alt = item.zh || name; panel.appendChild(image);
+         const focusable = [closeButton];
+         let input = null, save = null;
+         if (known)
+         {
+            const score = document.createElement('div'); score.className = 'bj-popup-score'; score.textContent = item.score + ' 分'; panel.appendChild(score);
+            if (offerTake)
+            {
+               const question = document.createElement('p'); question.textContent = '要把這張牌拿到自己手裡嗎？'; panel.appendChild(question);
+               const actions = document.createElement('div'); actions.className = 'bj-popup-actions'; panel.appendChild(actions);
+               for (const take of [false,true])
+               {
+                  const button = document.createElement('button'); button.className = 'bj-button' + (take ? '' : ' secondary'); button.textContent = take ? '拿過來' : '留給莊家';
+                  button.onclick = () => {if (decided || disposed) return; game.takeRevealed(take); decided = true; close(); q('.bj-duel-log').textContent = take ? '明察秋毫：已將指定牌拿到自己手裡。' : '明察秋毫：已確認分數，將牌留給莊家。';};
+                  actions.appendChild(button); focusable.push(button);
+               }
+            }
+            else
+            {
+               const button = document.createElement('button'); button.className = 'bj-button'; button.textContent = '關閉'; button.onclick = close; panel.appendChild(button); focusable.push(button);
+            }
+         }
+         else
+         {
+            const label = document.createElement('label'); label.className = 'bj-popup-prompt'; label.textContent = '你猜這張牌幾分？'; label.setAttribute('for', 'bjGuessInput'); panel.appendChild(label);
+            input = document.createElement('input'); input.id = 'bjGuessInput'; input.className = 'bj-guess-input'; input.type = 'text'; input.inputMode = 'numeric'; input.maxLength = 1; input.autocomplete = 'off'; input.value = game.notes.has(name) ? String(game.notes.get(name)) : ''; panel.appendChild(input); focusable.push(input);
+            const hint = document.createElement('div'); hint.className = 'bj-popup-hint'; hint.textContent = '輸入 0～5'; panel.appendChild(hint);
+            const error = document.createElement('div'); error.className = 'bj-popup-error'; error.setAttribute('role', 'alert'); panel.appendChild(error);
+            const actions = document.createElement('div'); actions.className = 'bj-popup-actions'; panel.appendChild(actions);
+            const clear = document.createElement('button'); clear.className = 'bj-button secondary'; clear.textContent = '清除';
+            clear.onclick = () => {game.notes.delete(name); close(); render();}; actions.appendChild(clear); focusable.push(clear);
+            save = document.createElement('button'); save.className = 'bj-button'; save.textContent = '儲存';
+            save.onclick = () =>
+            {
+               const value = input.value.trim().replace(/[０-５]/g, c => String(c.charCodeAt(0) - 65296));
+               if (value !== '' && !/^[0-5]$/.test(value)) {error.textContent = '請輸入 0～5。'; input.focus(); return;}
+               if (value === '') game.notes.delete(name); else game.notes.set(name, Number(value));
+               close(); render();
+            };
+            actions.appendChild(save); focusable.push(save);
+         }
+         shade.onclick = event => {if (event.target === shade) close();};
+         shade.onkeydown = event =>
+         {
+            if (event.key === 'Escape') {event.preventDefault(); close();}
+            else if (event.key === 'Enter' && input && event.target === input) {event.preventDefault(); save.onclick();}
+            else if (event.key === 'Tab')
+            {
+               const first = focusable[0], last = focusable[focusable.length - 1];
+               if (event.shiftKey && event.target === first) {event.preventDefault(); last.focus();}
+               else if (!event.shiftKey && event.target === last) {event.preventDefault(); first.focus();}
+            }
+         };
+         overlay.appendChild(shade);
+         if (input) {input.focus(); if (input.select) input.select();} else closeButton.focus();
+      }
+      function estimate()
+      {
+         let sum = 0, missing = false;
+         const parts = game.dealer.map(name =>
+         {
+            if (game.known.has(name)) {sum += catalog[name].score; return '已知 ' + catalog[name].score;}
+            if (game.notes.has(name)) {sum += game.notes.get(name); return '猜測 ' + game.notes.get(name);}
+            missing = true; return '？';
+         });
+         q('.bj-estimate').textContent = parts.join(' ＋ ') + ' ＝ ' + (missing ? '尚有未知（已填 ' + sum + '）' : '推算 ' + sum);
+      }
+      function render()
+      {
+         const done = game.phase === 'finished';
+         for (const who of ['dealer', 'player'])
+         {
+            const hand = q(who === 'dealer' ? '#bjDealer' : '#bjPlayer'); hand.replaceChildren();
+            game[who].forEach((name, index) =>
+            {
+               const item = catalog[name], wrapper = document.createElement('div'); wrapper.className = 'bj-note-card';
+               const card = document.createElement('div'); card.className = 'bj-card';
+               const image = document.createElement('img'); image.src = item.img || ''; image.alt = item.zh || name; image.draggable = false; card.appendChild(image);
+               const visible = who === 'player' || game.known.has(name) || done;
+               card.title = visible ? '點擊查看技能與分數' : '點擊記錄猜測';
+               card.setAttribute('aria-label', visible ? (item.zh || name) + '，點擊查看分數' : '未知技能分數，點擊記錄猜測');
+               card.setAttribute('role', 'button'); card.tabIndex = busy ? -1 : 0;
+               if (targeting)
+               {
+                  const eligible = targeting.kind === 'insight' ? who === 'dealer' : targeting.kind === 'return' ? who === 'player' : targeting.playerIndex === null ? who === 'player' : who === 'dealer';
+                  if (eligible) card.className += ' bj-target-eligible';
+                  if (who === 'player' && targeting.playerIndex === index) card.className += ' bj-target-selected';
+               }
+               card.onclick = () =>
+               {
+                  if (targeting) return selectTarget(who, index); else openCard(name, who, card);
+               };
+               card.onkeydown = event => {if (event.key === 'Enter' || event.key === ' ') {event.preventDefault(); card.onclick();}};
+               if (who === 'dealer')
+               {
+                  const above = document.createElement('div'); above.className = 'bj-above-score'; above.textContent = visible ? String(item.score) : game.notes.has(name) ? game.notes.get(name) + '?' : ''; wrapper.appendChild(above);
+               }
+               wrapper.appendChild(card);
+               if (who === 'player')
+               {
+                  const below = document.createElement('div'); below.className = 'bj-above-score'; below.textContent = String(item.score); wrapper.appendChild(below);
+               }
+               if (done && game.notes.has(name))
+               {
+                  const label = document.createElement('span'); label.className = 'bj-note-result'; label.textContent = `你猜 ${game.notes.get(name)} → 實際 ${item.score}`; wrapper.appendChild(label);
+               }
+               hand.appendChild(wrapper);
+            });
+         }
+         q('.bj-formula').textContent = `${game.playerTotal}/${game.limit}`;
+         q('.bj-divider').textContent = `BLACKJACK · ${game.limit}`;
+         q('.bj-dealer-total').textContent = done ? `${game.dealer.map(name => catalog[name].score).join('+')}=${game.dealerTotal}/${game.limit}` : '';
+         q('.bj-estimate').hidden = done; if (!done) estimate();
+         q('.bj-dealer-special').textContent = `莊家特殊牌：${specials[game.dealerSpecial][0]} · ${game.dealerAction ? '已使用' : game.phase === 'player' ? (game.dealerSpecial === 'insight' ? '可指定你的一張牌，決定是否拿走。' : game.dealerSpecial === 'force' ? '強迫你額外抽一張牌。' : specials[game.dealerSpecial][1].replace('自己', '莊家').replace('與莊家', '與你')) : '未使用'}`;
+         q('#bjHit').hidden = q('#bjStand').hidden = game.phase !== 'player';
+         q('#bjHit').disabled = busy || !!targeting || game.playerTotal >= game.limit;
+         q('#bjStand').disabled = busy || !!targeting;
+         q('#bjStand').textContent = game.playerTotal > game.limit ? '交給莊家 · 保留救場機會' : '停牌';
+         q('#bjSpecial').hidden = done;
+         q('#bjSpecial').disabled = busy;
+         q('#bjSpecial').replaceChildren();
+         const specialTitle = document.createElement('b'); specialTitle.textContent = specials[game.special][0]; q('#bjSpecial').appendChild(specialTitle);
+         const specialState = document.createElement('small'); specialState.textContent = game.special === 'insurance' ? '被動生效' : game.used ? '已使用' : '限一次'; q('#bjSpecial').appendChild(specialState);
+         q('#bjSpecial').setAttribute('aria-expanded', String(specialExpanded && !done));
+         q('.bj-special-detail').hidden = done || !specialExpanded;
+         q('#bjSpecialName').textContent = specials[game.special][0]; q('#bjSpecialDescription').textContent = targeting ? targeting.kind === 'insight' ? '點選一張莊家卡牌，查看分數後決定是否拿取。' : targeting.kind === 'return' ? '點選要移除的我方卡牌。' : targeting.playerIndex === null ? '先點選要交換的我方卡牌。' : '再點選一張莊家卡牌，立即互換。' : specials[game.special][1];
+         q('#bjUseSpecial').disabled = busy || !game.canUse(); q('#bjUseSpecial').textContent = game.special === 'insurance' ? '自動生效' : targeting ? '取消選擇' : game.used ? '已使用' : '使用';
+         q('#bjReveal').hidden = game.phase !== 'response'; q('#bjReveal').disabled = busy || !!targeting;
+         q('#bjConfirm').hidden = !done; q('#bjConfirm').disabled = busy;
+         if (done)
+         {
+            const action = game.dealerAction;
+            q('.bj-duel-log').textContent = (action
+               ? `莊家使用「${specials[action.type][0]}」：莊家 ${action.dealerBefore} → ${action.dealerAfter} 分，你 ${action.playerBefore} → ${action.playerAfter} 分。`
+               : `莊家補牌完成：${game.dealerBeforeExchange} 分，未使用特殊牌。`) + (game.used ? '你使用了「' + specials[game.special][0] + '」。' : '');
+            const result = game.result === 'push' && options.tieRule === 'dealer' ? 'lose' : game.result;
+            q('.bj-status').className = 'bj-status bj-result';
+            q('.bj-status').textContent = result === 'win' ? `你贏了！＋${wager} 點` : result === 'lose' ? `${game.playerTotal > game.limit ? '你爆牌了！' : '莊家勝出！'}－${wager} 點` : game.playerTotal > game.limit && game.dealerTotal > game.limit ? '雙方爆牌 · 平手，不加不扣' : '平手 · 不加不扣';
+            if (result === 'lose' && game.special === 'insurance') q('.bj-status').textContent = '本局落敗 · 保本護身生效，固定扣 5 分';
+         }
+         else q('.bj-status').textContent = game.phase === 'response' ? '最後回應：使用特殊牌或直接結算，之後不再補牌。' : '選擇進牌、停牌，或使用特殊牌。';
+      }
+      function wagerLimit()
+      {
+         return Math.max(1, Math.min(15, options.maxWager || 5));
+      }
+      function selectSpecial(type)
+      {
+         selected = type; q('.bj-special-options').replaceChildren();
+         wager = Math.min(wager, wagerLimit());
+         q('#bjBet').max = String(wagerLimit()); q('#bjBet').value = String(wager);
+         q('#bjWager').textContent = String(wager); renderChips();
+         offeredSpecials.forEach(key =>
+         {
+            const button = document.createElement('button'); button.className = 'bj-special-choice'; button.setAttribute('aria-pressed', String(key === selected));
+            const title = document.createElement('b'); title.textContent = specials[key][0];
+            const description = document.createElement('small'); description.textContent = specials[key][1]; button.appendChild(title); button.appendChild(description);
+            button.onclick = () => selectSpecial(key); q('.bj-special-options').appendChild(button);
+         });
+      }
+      q('#bjBet').oninput = () =>
+      {
+         wager = Math.max(1, Math.min(wagerLimit(), Number(q('#bjBet').value) || 1));
+         q('#bjBet').value = String(wager);
+         q('#bjWager').textContent = String(wager); renderChips();
+      };
+      q('#bjStart').onclick = async () =>
+      {
+         if (busy || popup || disposed || !game.start(selected)) return;
+         busy = true; q('.bj-intro').hidden = true; q('.bj-game').hidden = false; render();
+         const cards = [];
+         for (let i = 0; i < 3; i++) cards.push(q('#bjPlayer').children[i], q('#bjDealer').children[i]);
+         cards.forEach(card => {card.style.visibility = 'hidden';});
+         for (const card of cards) {if (disposed) return; card.style.visibility = 'visible'; await animate(card);}
+         if (disposed) return; busy = false; render();
+      };
+      q('#bjHit').onclick = async () =>
+      {
+         if (busy || targeting || popup || disposed || !game.hit()) return;
+         busy = true; render(); await animate(q('#bjPlayer').children[game.player.length - 1]);
+         if (disposed) return; busy = false; render();
+      };
+      q('#bjStand').onclick = async () =>
+      {
+         if (busy || targeting || popup || disposed || !game.stand()) return;
+         busy = true; render(); q('.bj-status').textContent = '莊家補牌中…';
+         while (!disposed && game.dealerStep()) {render(); q('.bj-status').textContent = '莊家補牌中…'; await animate(q('#bjDealer').children[game.dealer.length - 1]);}
+         if (disposed) return;
+         const action = game.exchangeCards(); render();
+         q('.bj-duel-log').textContent = action ? `莊家使用了「${specials[action.type][0]}」！` : '莊家沒有使用特殊牌。';
+         if (action && action.type === 'swap') await Promise.all([animate(q('#bjPlayer').children[action.pi], 'translateY(-90px)'), animate(q('#bjDealer').children[action.di], 'translateY(90px)')]);
+         else if (action && (action.type === 'force' || action.type === 'redraw'))
+         {
+            const hand = q(action.type === 'force' ? '#bjPlayer' : '#bjDealer'); await animate(hand.children[hand.children.length - 1]);
+         }
+         if (disposed) return; busy = false; render();
+      };
+      q('#bjSpecial').onclick = () =>
+      {
+         if (busy || popup || disposed || game.phase === 'finished') return;
+         specialExpanded = !specialExpanded; if (!specialExpanded) targeting = null; render();
+      };
+      async function applySpecial(selection = {})
+      {
+         if (busy || popup || disposed || !game.useSpecial(selection)) return;
+         targeting = null;
+         busy = true; render(); q('.bj-duel-log').textContent = '你使用了「' + specials[game.special][0] + '」。';
+         if (game.special === 'swap')
+         {
+            await Promise.all([animate(q('#bjPlayer').children[selection.playerIndex], 'translateY(-70px)'), animate(q('#bjDealer').children[selection.dealerIndex], 'translateY(70px)')]);
+         }
+         else
+         {
+            const hand = game.special === 'force' ? q('#bjDealer') : q('#bjPlayer'); await animate(hand.children[hand.children.length - 1]);
+         }
+         if (disposed) return; busy = false; render();
+      }
+      function selectTarget(who, index)
+      {
+         if (!targeting || busy || popup || disposed) return;
+         if (targeting.kind === 'insight')
+         {
+            if (who !== 'dealer' || !game.revealDealer(index)) return;
+            const name = game.dealer[index]; targeting = null; render(); openCard(name, who, null, true); return;
+         }
+         if (targeting.kind === 'return') {if (who === 'player') return applySpecial({playerIndex:index}); return;}
+         if (who === 'player') {targeting.playerIndex = index; render();}
+         else if (targeting.playerIndex !== null) return applySpecial({playerIndex:targeting.playerIndex, dealerIndex:index});
+      }
+      q('#bjUseSpecial').onclick = () =>
+      {
+         if (busy || popup || disposed || !game.canUse()) return;
+         if (targeting) {targeting = null; render(); return;}
+         if (game.special === 'return' || game.special === 'swap' || game.special === 'insight')
+         {
+            targeting = {kind:game.special, playerIndex:null}; render(); return;
+         }
+         return applySpecial();
+      };
+      q('#bjReveal').onclick = async () =>
+      {
+         if (busy || targeting || popup || disposed || !game.finish()) return;
+         busy = true; render();
+         await Promise.all(Array.from(q('#bjDealer').children).map(card => animate(card, 'rotateY(90deg)')));
+         if (disposed) return; busy = false; render();
+      };
+      q('#bjConfirm').onclick = () =>
+      {
+         if (disposed || busy || applied || game.phase !== 'finished') return;
+         applied = true; const result = game.result === 'push' && options.tieRule === 'dealer' ? 'lose' : game.result;
+         const settlement = {lossAmount:game.lossAmount === null ? wager : game.lossAmount};
+         dispose(); options.onComplete(result, wager, settlement);
+      };
+      const controller = {dispose}; instances.add(controller); selectSpecial(selected); renderChips(); return controller;
+   }
+   api.createDuel = createDuel; api.sampleSpecials = sampleSpecials; api.open = open;
+   api.disposeAll = () => {for (const instance of Array.from(instances)) instance.dispose(); originalDispose();};
+})();
+;
+/* END MERGED: casino-duel.js */
+
+/* BEGIN MERGED: blackjack-reward.js */
+(function()
+{
+   'use strict';
+   const instances = new Set();
+   function createPlan(state, catalogs, budget)
+   {
+      const slots = [...state.addons.map(name => ({kind: 'addon', name})), ...state.perks.map(name => ({kind: 'perk', name}))].map(slot =>
+      {
+         const catalog = slot.kind === 'addon' ? catalogs.addons : catalogs.perks;
+         return {...slot, original: catalog[slot.name].score, target: catalog[slot.name].score, extra: 0};
+      });
+      const cost = slot => Math.abs(slot.target - slot.original) + slot.extra;
+      function pool(index)
+      {
+         const slot = slots[index], catalog = slot.kind === 'addon' ? catalogs.addons : catalogs.perks;
+         const fixed = new Set(slots.filter(other => other !== slot && other.kind === slot.kind && cost(other) === 0).map(other => other.name));
+         return Object.keys(catalog).filter(name => catalog[name].score === slot.target && !fixed.has(name) && (slot.kind !== 'addon' || catalog[name].killer === state.killerKey));
+      }
+      function validate()
+      {
+         if (slots.reduce((sum, slot) => sum + cost(slot), 0) > budget) return false;
+         return slots.every((slot, index) =>
+         {
+            if (!cost(slot)) return true;
+            const others = slots.filter(other => other !== slot && other.kind === slot.kind && cost(other) > 0 && other.target === slot.target).length;
+            return pool(index).length - others >= slot.extra + 1;
+         });
+      }
+      function set(index, target, extra)
+      {
+         const slot = slots[index];
+         if (!slot || !Number.isInteger(target) || !Number.isInteger(extra) || extra < 0 || target < (slot.kind === 'addon' ? 1 : 0) || target > 5) return false;
+         const oldTarget = slot.target, oldExtra = slot.extra;
+         slot.target = target; slot.extra = extra;
+         if (validate()) return true;
+         slot.target = oldTarget; slot.extra = oldExtra;
+         return false;
+      }
+      return {slots, set, validate, pool, cost,
+         get used() { return slots.reduce((sum, slot) => sum + cost(slot), 0); },
+         get remaining() { return budget - this.used; }};
+   }
+   function open(options)
+   {
+      const state = {killerKey: options.state.killerKey, addons: options.state.addons.slice(), perks: options.state.perks.slice()};
+      let remaining = options.budget;
+      let plan = createPlan(state, options.catalogs, remaining);
+      let selected = 0, choosing = false, disposed = false, completed = false;
+      const overlay = document.createElement('div'); overlay.id = 'blackjackRewardOverlay';
+      overlay.innerHTML = `<style>
+      #blackjackRewardOverlay{position:fixed;inset:0;z-index:100080;display:flex;align-items:center;justify-content:center;background:#080c0bed;padding:20px;box-sizing:border-box;color:#fff3d7;font-family:inherit}#blackjackRewardOverlay *{box-sizing:border-box}.bj-reward-slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:18px 0}.bj-reward-slot,.bj-reward-choice{font:inherit;color:#fff3d7;background:#123d2d;border:1px solid #a59462;border-radius:10px;padding:9px;cursor:pointer;min-width:0}.bj-reward-slot.active{background:#376e43;border:2px solid #ffe19c}.bj-reward-slot img,.bj-reward-choice img{width:100%;height:80px;object-fit:contain}.bj-reward-slot strong,.bj-reward-slot small{display:block;font-size:12px;margin-top:5px}.bj-reward-editor{padding:18px;border:1px solid #b5a06988;border-radius:14px;background:#00251766;text-align:center}.bj-reward-line{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:12px 0}.bj-reward-line button{padding:7px 16px}.bj-reward-line span{min-width:150px}.bj-reward-message{min-height:30px;text-align:center;color:#ffe4a4;line-height:1.7;margin:14px 0}.bj-reward-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px}.bj-reward-choice span{display:block;font-size:13px;margin:6px 0}.bj-reward-budget{font-size:22px;color:#ffe19c;font-weight:800}.bj-reward-commit{display:block;margin:18px auto 0}.bj-reward-note{font-size:12px;line-height:1.8;color:#d4dec9;text-align:center}@media(max-width:650px){#blackjackRewardOverlay{padding:8px}.bj-reward-slots{gap:4px}.bj-reward-slot{padding:4px}.bj-reward-slot img{height:45px}.bj-reward-slot strong,.bj-reward-slot small{font-size:10px}.bj-reward-line span{min-width:110px}}
+      </style><section class="bj-table" role="dialog" aria-modal="true" aria-label="二十一點獎勵分配"><header class="bj-title"><h2>分配獎勵</h2><div class="bj-reward-balance"><div class="bj-reward-chips" aria-hidden="true"></div><span class="bj-reward-budget"></span></div></header><div class="bj-reward-slots"></div><div class="bj-reward-editor"><div class="bj-reward-preview"><img id="bjRewardPreview" alt=""><strong id="bjRewardName"></strong><span id="bjRewardCurrent"></span></div><div class="bj-reward-adjustments"><h3>調整此欄位</h3><div class="bj-reward-line"><label>目標分數</label><button class="bj-button secondary" id="bjScoreMinus" aria-label="降低目標分數">−</button><span id="bjRewardTarget"></span><button class="bj-button secondary" id="bjScorePlus" aria-label="提高目標分數">＋</button></div><div class="bj-reward-line"><label>候選數量</label><button class="bj-button secondary" id="bjChoiceMinus" aria-label="減少候選數量">−</button><span id="bjRewardOptions"></span><button class="bj-button secondary" id="bjChoicePlus" aria-label="增加候選數量">＋</button></div><div class="bj-reward-cost"><span id="bjRewardBreakdown"></span><strong id="bjRewardCost"></strong></div></div></div><div class="bj-reward-choices"></div><div class="bj-reward-message" role="status"></div><footer class="bj-reward-footer"><span>選牌後立即換上，剩餘點數可繼續使用。</span><button class="bj-button" id="bjRewardCommit"></button><button class="bj-button secondary" id="bjRewardFinish"></button></footer></section>`;
+      document.body.appendChild(overlay);
+      const style = document.createElement('style');
+      style.textContent = `
+         #blackjackRewardOverlay .bj-table{width:min(1160px,100%);max-height:94dvh;overflow:hidden;display:flex;flex-direction:column;padding:22px 25px 18px}
+         #blackjackRewardOverlay .bj-title{flex-shrink:0;margin-bottom:12px}
+         .bj-reward-balance{display:flex;align-items:center;gap:12px}.bj-reward-budget{white-space:nowrap;font-size:23px}
+         .bj-reward-chips{height:38px;display:flex;align-items:flex-end;gap:3px}.bj-reward-chip-pile{position:relative;width:24px;height:36px}.bj-reward-mini-chip{position:absolute;left:0;bottom:calc(var(--level)*5px);width:24px;height:10px;border:1px solid #f0dca8;border-radius:50%;background:repeating-conic-gradient(#a33f48 0deg 50deg,#f1e5bd 50deg 65deg);box-shadow:0 2px 0 #632832}.bj-reward-chip-pile:nth-child(2n) .bj-reward-mini-chip{filter:hue-rotate(190deg)}
+         #blackjackRewardOverlay .bj-reward-slots{gap:11px;margin:8px 0 17px;padding-top:5px;flex-shrink:0}
+         #blackjackRewardOverlay .bj-reward-slot{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:5px;padding:12px 8px 9px;border-radius:12px;border:1px solid #9c925e;background:linear-gradient(145deg,#233e50,#142a38 55%,#0a1a25);box-shadow:0 5px 8px #0004;transition:transform .16s,border-color .16s}
+         #blackjackRewardOverlay .bj-reward-slot.active{border:2px solid #f2d082;background:linear-gradient(145deg,#29495a,#152e3c 55%,#0c1c26);transform:translateY(-5px);box-shadow:0 0 8px #eac36766,0 7px 12px #0005}
+         #blackjackRewardOverlay .bj-reward-slot img{height:clamp(48px,11dvh,95px);object-fit:contain}
+         #blackjackRewardOverlay .bj-reward-slot strong{font-size:13px;margin:0;line-height:1.4;text-align:center;min-height:19px}
+         #blackjackRewardOverlay .bj-reward-slot small{font-size:14px;margin:0;width:90%;text-align:center;padding:3px 5px;border:1px solid #a4b6bd44;border-radius:7px;background:#ffffff05}
+         #blackjackRewardOverlay .bj-reward-editor{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);gap:28px;border:0;border-radius:0;border-top:1px solid #b09d5c55;background:none;padding:20px 6px 5px;text-align:left;min-height:0}
+         #blackjackRewardOverlay .bj-reward-editor[hidden]{display:none}
+         .bj-reward-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-right:1px solid #b09d5c55;padding-right:25px;min-width:0}
+         #bjRewardPreview{width:100%;max-width:175px;height:clamp(65px,19dvh,175px);object-fit:contain;filter:drop-shadow(0 4px 5px #0006)}
+         #bjRewardName{font-size:22px;text-align:center;line-height:1.3}#bjRewardCurrent{font-size:16px;border:1px solid #b2aa7155;border-radius:8px;padding:5px 17px}
+         .bj-reward-adjustments h3{font-size:23px;font-weight:800;margin:0 0 13px;padding-bottom:12px;border-bottom:1px solid #b09d5c55}
+         #blackjackRewardOverlay .bj-reward-line{display:grid;grid-template-columns:minmax(90px,1fr) 44px minmax(70px,1fr) 44px;gap:12px;margin:12px 0;align-items:center}
+         .bj-reward-line label{font-size:18px}.bj-reward-line .bj-button{padding:8px 9px}
+         #blackjackRewardOverlay .bj-reward-line span{min-width:0;text-align:center;border:1px solid #b2aa7166;background:#071f24a0;border-radius:9px;padding:4px 8px;font-size:28px;line-height:1.3}
+         .bj-reward-cost{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid #b09d5c55;padding-top:15px;margin-top:15px;font-size:14px;color:#e6ddb7}.bj-reward-cost strong{font-size:19px;color:#ffdf8c}
+         #blackjackRewardOverlay .bj-reward-message{min-height:22px;margin:8px 0 5px;font-size:13px;line-height:1.5}
+         .bj-reward-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-shrink:0;margin-top:6px}.bj-reward-footer>span{font-size:12px;color:#d1d6bb;flex:1}.bj-reward-footer .bj-button{padding:13px 23px;font-size:17px}#bjRewardCommit{background:linear-gradient(135deg,#f1d68c,#dcb359);border-color:#f0d180;color:#2b2416;flex:1}#bjRewardFinish{min-width:130px;font-size:15px}
+         #blackjackRewardOverlay .bj-reward-choices:empty{display:none}#blackjackRewardOverlay .bj-reward-choices{display:flex;gap:12px;justify-content:center;padding:18px 0;min-height:0;flex-wrap:nowrap;flex:1}
+         #blackjackRewardOverlay .bj-reward-choice{flex:0 1 170px;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;border-color:#c2ab6e;background:linear-gradient(145deg,#233e50,#0a1a25);box-shadow:0 5px 8px #0005;padding:15px 10px;min-height:170px}
+         #blackjackRewardOverlay .bj-reward-choice img{height:clamp(60px,17dvh,140px)}.bj-reward-choice:hover{border-color:#ffe19c;transform:translateY(-4px)}
+         @media(max-height:750px){#blackjackRewardOverlay .bj-table{padding:15px 20px}#blackjackRewardOverlay .bj-title{margin-bottom:5px}#blackjackRewardOverlay .bj-reward-slots{margin-bottom:10px}#blackjackRewardOverlay .bj-reward-slot{padding:8px 5px}#blackjackRewardOverlay .bj-reward-slot img{height:65px}#blackjackRewardOverlay .bj-reward-editor{padding-top:12px}.bj-reward-adjustments h3{font-size:20px;margin-bottom:8px;padding-bottom:8px}#blackjackRewardOverlay .bj-reward-line{margin:8px 0}.bj-reward-cost{margin-top:9px;padding-top:9px}#bjRewardPreview{height:110px}#bjRewardName{font-size:19px}.bj-reward-footer .bj-button{padding:10px 18px}}
+         @media(max-width:700px){#blackjackRewardOverlay .bj-table{padding:16px 12px}.bj-reward-budget{font-size:16px}.bj-reward-balance{gap:6px}#blackjackRewardOverlay .bj-reward-slots{gap:5px}#blackjackRewardOverlay .bj-reward-slot strong{font-size:10px}#blackjackRewardOverlay .bj-reward-slot small{font-size:12px}#blackjackRewardOverlay .bj-reward-slot img{height:50px}#blackjackRewardOverlay .bj-reward-editor{gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr)}.bj-reward-preview{padding-right:10px}.bj-reward-line label{font-size:13px}#blackjackRewardOverlay .bj-reward-line{grid-template-columns:minmax(55px,1fr) 33px minmax(40px,.8fr) 33px;gap:5px}#blackjackRewardOverlay .bj-reward-line span{font-size:24px}.bj-reward-cost{font-size:12px}.bj-reward-cost strong{font-size:16px}.bj-reward-footer{gap:8px;flex-wrap:wrap}.bj-reward-footer>span{flex-basis:100%}#bjRewardFinish{min-width:100px}#bjRewardName{font-size:17px}}
+      `;
+      overlay.appendChild(style);
+      const q = selector => overlay.querySelector(selector);
+      const catalogFor = slot => slot.kind === 'addon' ? options.catalogs.addons : options.catalogs.perks;
+      function dispose() { if (disposed) return; disposed = true; overlay.remove(); instances.delete(controller); }
+      function render()
+      {
+         q('.bj-reward-budget').textContent = `剩餘 ${remaining} / ${options.budget} 點`;
+         const chips = q('.bj-reward-chips'); chips.replaceChildren();
+         for (let start = 0; start < remaining; start += 5)
+         {
+            const pile = document.createElement('div'); pile.className = 'bj-reward-chip-pile';
+            for (let level = 0; level < Math.min(5, remaining - start); level++)
+            {
+               const chip = document.createElement('span'); chip.className = 'bj-reward-mini-chip'; chip.style.cssText = '--level:' + level; pile.appendChild(chip);
+            }
+            chips.appendChild(pile);
+         }
+         const container = q('.bj-reward-slots'); container.replaceChildren();
+         plan.slots.forEach((slot, index) =>
+         {
+            const item = catalogFor(slot)[slot.name], button = document.createElement('button');
+            button.className = 'bj-reward-slot' + (index === selected ? ' active' : '');
+            button.disabled = choosing;
+            const image = document.createElement('img'); image.src = item.img || ''; image.alt = item.zh || slot.name;
+            const title = document.createElement('strong'); title.textContent = item.zh || slot.name;
+            const info = document.createElement('small'); info.textContent = `${slot.original} 分`;
+            button.append(image, title, info); button.onclick = () => {if (choosing || disposed) return; if (selected !== index) plan = createPlan(state, options.catalogs, remaining); selected = index; q('.bj-reward-message').textContent = ''; render();};
+            container.appendChild(button);
+         });
+         const slot = plan.slots[selected];
+         q('#bjRewardName').textContent = catalogFor(slot)[slot.name].zh || slot.name;
+         const preview = q('#bjRewardPreview'); preview.src = catalogFor(slot)[slot.name].img || ''; preview.alt = catalogFor(slot)[slot.name].zh || slot.name;
+         q('#bjRewardCurrent').textContent = `目前 ${slot.original} 分`;
+         q('#bjRewardTarget').textContent = String(slot.target);
+         q('#bjRewardOptions').textContent = String(slot.extra + 1);
+         const price = plan.cost(slot);
+         q('#bjRewardBreakdown').textContent = `調整分數 ${Math.abs(slot.target - slot.original)} 點 ＋ 額外候選 ${slot.extra} 點`;
+         q('#bjRewardCost').textContent = `本次花費 ${price} 點`;
+         q('#bjRewardCommit').textContent = '更換此欄位';
+         q('#bjRewardCommit').disabled = choosing || price <= 0 || remaining <= 0;
+         q('#bjRewardFinish').textContent = remaining ? `完成 · 放棄剩餘 ${remaining} 點` : '完成';
+         q('#bjRewardFinish').disabled = choosing;
+         q('.bj-reward-editor').hidden = choosing;
+         q('#bjRewardCommit').hidden = choosing;
+      }
+      function adjust(targetDelta, extraDelta)
+      {
+         if (choosing || disposed) return;
+         const slot = plan.slots[selected];
+         let valid = false;
+         if (targetDelta)
+         {
+            for (let target = slot.target + targetDelta; target >= (slot.kind === 'addon' ? 1 : 0) && target <= 5; target += targetDelta)
+            {
+               if (plan.set(selected, target, slot.extra)) { valid = true; break; }
+            }
+         }
+         else valid = plan.set(selected, slot.target, slot.extra + extraDelta);
+         if (!valid) q('.bj-reward-message').textContent = '點數不足、分數超出範圍，或沒有足夠的不重複候選。';
+         else q('.bj-reward-message').textContent = '';
+         render();
+      }
+      q('#bjScoreMinus').onclick = () => adjust(-1, 0); q('#bjScorePlus').onclick = () => adjust(1, 0);
+      q('#bjChoiceMinus').onclick = () => adjust(0, -1); q('#bjChoicePlus').onclick = () => adjust(0, 1);
+      q('#bjRewardCommit').onclick = () =>
+      {
+         if (disposed || choosing || !plan.validate() || plan.cost(plan.slots[selected]) <= 0) return;
+         const index = selected, slot = plan.slots[index], price = plan.cost(slot);
+         if (price > remaining) return;
+         choosing = true; render();
+         const pool = plan.pool(index);
+         for (let i = pool.length - 1; i > 0; i--) {const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]];}
+         const candidates = pool.slice(0, slot.extra + 1);
+         q('.bj-reward-message').textContent = `為${slot.kind === 'addon' ? '配件 ' + (index + 1) : '技能 ' + (index - 1)}選擇一個 ${slot.target} 分項目（${candidates.length} 選 1）`;
+         const container = q('.bj-reward-choices'); container.replaceChildren();
+         let picked = false;
+         for (const name of candidates)
+         {
+            const item = catalogFor(slot)[name], button = document.createElement('button'); button.className = 'bj-reward-choice';
+            const image = document.createElement('img'); image.src = item.img || ''; image.alt = item.zh || name;
+            const label = document.createElement('span'); label.textContent = `${item.zh || name} · ${item.score} 分`;
+            button.append(image, label); button.onclick = () =>
+            {
+               if (disposed || picked || !choosing) return;
+               picked = true;
+               if (slot.kind === 'addon') state.addons[index] = name; else state.perks[index - 2] = name;
+               remaining -= price;
+               plan = createPlan(state, options.catalogs, remaining); choosing = false;
+               container.replaceChildren(); render();
+               q('.bj-reward-message').textContent = `已更換為「${item.zh || name}」，花費 ${price} 點。${remaining ? '可繼續選擇欄位更換。' : '點數已用完，請按完成。'}`;
+            };
+            container.appendChild(button);
+         }
+      };
+      q('#bjRewardFinish').onclick = () =>
+      {
+         if (disposed || choosing || completed) return;
+         completed = true; dispose(); options.onComplete({addons: state.addons.slice(), perks: state.perks.slice()});
+      };
+      const controller = {dispose}; instances.add(controller); render(); return controller;
+   }
+   window.BlackjackReward = {createPlan, open, disposeAll: () => {for (const instance of Array.from(instances)) instance.dispose();}};
+})();
+;
+/* END MERGED: blackjack-reward.js */
+
+/* BEGIN MERGED: original-card.js */
 (function()
 {
    // ==========================
@@ -287,7 +1739,7 @@
          id: 'card17',
          zh: '狂賭之冤',
          target: 'any',
-         colorType: 'perk',
+         colorType: 'casino',
          summary: '選擇 0–5 的分數後與莊家 0–6 對決。莊家比較大則獲勝，較小則失敗，相同則平手。',
          effect:
          {
@@ -461,25 +1913,18 @@
          }
       },
 
-      // 28. 特殊卡：幫撐十秒（技能組強制改寫 + 圖片過場）
+      // 28. 普通卡：輪番取捨（十二技能，四回合禁用與替換）
       {
          id: 'card28',
-         zh: '幫撐十秒',
+         zh: '輪番取捨',
          target: 'any',
          colorType: 'all-colored',
-         summary: '...',
+         summary: '同時從 12 個技能與 6 個配件輪流禁用、鎖定或重骰，留下 4 技能與 2 配件；兩區共用 3 次重骰。',
          effect:
          {
-            type: 'card28_hold10s',
+            type: 'card28_ban_pick',
             data:
             {
-               // 你可以把這張換成 PNG/JPG/GIF（GIF 可以直接放，<img> 會自動播放）
-               image: './images/other/星爆氣流斬.gif',
-               timeoutMs: 10220,
-               perkSetsZh: [
-                  ['牢牢緊握', '瘋狂勇氣', '欣喜若狂'],
-                  ['把最好的留在最後', '招聘']
-               ]
             }
          }
       },
@@ -623,16 +2068,16 @@
          }
       },
 
-      // 37. 普通卡：殺手皇后（直接炸掉上一階段讓玩家重新拉拉霸）
+      // 37. The World：限時自由更換配件與技能
       {
          id: 'card37',
-         zh: '殺手皇后',
+         zh: '砸瓦魯多',
          target: 'any',
-         colorType: 'killer-queen',
-         summary: `「殺手皇后，第三爆彈，敗者食塵」`,
+         colorType: 'star-platinum',
+         summary: '無駄無駄無駄無駄!',
          effect:
          {
-            type: 'card37_restart_slot',
+            type: 'card37_star_platinum',
             data:
             {
             }
@@ -731,6 +2176,36 @@
             {
             }
          }
+      },
+      {
+         id: 'card44',
+         zh: '二十一點',
+         target: 'any',
+         colorType: 'casino',
+         summary: '用技能點數挑戰莊家。輸了隨機扣除技能與配件分數；贏了獲得可自由分配與增加候選的點數。',
+         effect:
+         {
+            type: 'card44_blackjack',
+            data:
+            {
+            }
+         }
+      },
+      {
+         id: 'card45',
+         zh: '退讓一步',
+         target: 'slot-addon-perk',
+         colorType: 'slot',
+         summary: '指定欄位減 1 分，從最多 5 個同分候選中選擇替換。',
+         effect: {type: 'score_down_choice', data: {decrease: 1, choices: 5}}
+      },
+      {
+         id: 'card46',
+         zh: '退讓兩步',
+         target: 'slot-addon-perk',
+         colorType: 'slot',
+         summary: '指定欄位減 2 分，從最多 10 個同分候選中選擇替換。',
+         effect: {type: 'score_down_choice', data: {decrease: 2, choices: 10}}
       }
    ];
 
@@ -1309,8 +2784,7 @@ C.24
 D.36
 答 A 註釋:跟蹤模式下隱身
 
-若是我今天想要到陰屍路的專屬地圖，我在燒祭品的情況下機率為多少？(假設所有玩家上一場都不是這張圖)
-)
+若是我今天想要到陰屍路的專屬地圖，我在燒祭品的情況下機率為多少？（前提：所有玩家上一場都不是該地圖，且沒有人阻擋地圖祭品。）
 A.0%
 B.2.33%
 C.6.81%
@@ -1789,6 +3263,21 @@ D.騎士
    transform: translate(-50%, 0);
 }
 
+.the-world-title
+{
+   ruby-position: over;
+   ruby-align: center;
+}
+.the-world-title rt
+{
+   font-size: .42em;
+   font-weight: 500;
+   letter-spacing: .08em;
+}
+.slot-card.color-star-platinum .slot-card-header
+{
+   line-height: 1.8;
+}
 .slot-card-header
 {
    font-size: 22px;
@@ -1834,6 +3323,33 @@ D.騎士
 {
    background: linear-gradient(135deg, #b34fd1ff, #612b72ff);
 }
+.slot-card.color-casino
+{
+   background: linear-gradient(135deg, #28734f 0%, #174c35 55%, #0b2c21 100%);
+   border-color: #c9ad67;
+   color: #fff3d7;
+}
+.slot-card.color-casino .slot-card-header
+{
+   color: #ffe3a0;
+}
+.dbd-card-panel.card-choice-double-list
+{
+   max-width: min(900px, calc(100vw - 40px)) !important;
+}
+.card-choice-double-list .card-choice-list
+{
+   display: grid;
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.card-choice-double-list .card-choice-item
+{
+   min-width: 0;
+}
+@media(max-width:650px)
+{
+   .card-choice-double-list .card-choice-list {grid-template-columns:1fr;}
+}
 
 .slot-card.color-deity
 {
@@ -1858,10 +3374,11 @@ D.騎士
    background: linear-gradient(135deg, #5caf4eff, #2a5a21ff);
 }
 
-/* 敗者食塵 */
-.slot-card.color-killer-queen
+/* The World */
+.slot-card.color-star-platinum
 {
-   background: linear-gradient(135deg, #F4CFE0 0%, #E8AFC8 45%, #D889B3 100%);
+   background: linear-gradient(135deg, #E8CF8D 0%, #DDB65F 48%, #C69B43 100%);
+   text-shadow: 0 1px 2px rgba(65, 39, 0, .75), 0 0 4px rgba(65, 39, 0, .25);
 }
 
 .slot-cell.card-drop-ok
@@ -2830,8 +4347,8 @@ D.騎士
 
       excludeIds = excludeIds || [];
 
-      // 特殊卡：目前支援 card1 / card28 / card30 / card33（總機率 5%）
-      const specialIds = ['card1', 'card28', 'card30', 'card33'];
+      // 特殊卡：目前支援 card1 / card30 / card33（總機率 5%）
+      const specialIds = ['card1', 'card30', 'card33'];
       const specials = CARDS.filter(c => specialIds.includes(c.id));
       const normals = CARDS.filter(c => !specialIds.includes(c.id));
 
@@ -2906,6 +4423,7 @@ D.騎士
       panel.classList.add('dbd-card-panel');
       panel.className = 'dbd-card-panel card-choice-panel';
       if (options.largePortraits) panel.classList.add('card-choice-large-portraits');
+      if (options.doubleList) panel.classList.add('card-choice-double-list');
 
       const titleEl = document.createElement('div');
       titleEl.className = 'card-choice-title';
@@ -2949,7 +4467,7 @@ D.騎士
 
          const sub = document.createElement('div');
          sub.className = 'card-choice-text-sub';
-         sub.textContent = ''; // 不顯示英文
+         sub.textContent = options.showScores ? `${type === 'addon' ? getAddonScore(name) : getPerkScore(name)} 分` : '';
 
          textBox.appendChild(main);
          textBox.appendChild(sub);
@@ -3920,8 +5438,8 @@ D.騎士
             ok = doBecomeWraith(card.effect.data);
             break;
 
-         case 'card28_hold10s':
-            doCard28Hold10Seconds(card);
+         case 'card28_ban_pick':
+            doCard28BanPick();
             return;
 
          case 'card29_steal_day_swap':
@@ -3949,9 +5467,9 @@ D.騎士
          case 'card36_equal_score':
             ok = doCard36EqualScore();
             break;
-         case 'card37_restart_slot':
-            ok = doCard37RestartSlot(card);
-            break;
+         case 'card37_star_platinum':
+            doCard37StarPlatinum();
+            return;
          case 'card38_speed_choice':
             ok = doCard38SpeedChoice(slotIndex);
             if (ok) return;
@@ -3971,6 +5489,12 @@ D.騎士
          case 'card17_extreme_redistribute':
             ok = doCard17ExtremeRedistribute();
             break;
+         case 'card44_blackjack':
+            doCard44Blackjack();
+            return;
+         case 'score_down_choice':
+            doScoreDownChoice(card, slotIndex);
+            return;
          case 'card17_score_duel_minigame':
             doCard17ScoreDuelMinigame(card);
             return;
@@ -4703,7 +6227,7 @@ D.騎士
 
    // 36 號卡：一視同仁（技能 + 配件 全部變成同一個隨機分數 1–5）
 
-   // 37. 殺手皇后：敗者食塵（直接回到拉霸階段）
+   // 37. The World
 
    function playCard40CompleteSound()
    {
@@ -5352,7 +6876,7 @@ D.騎士
          const isAddon = slot.type === 'addon';
          return {
             zh: isAddon ? (getAddonZh(candidate) || candidate) : (getPerkZh(candidate) || candidate),
-            en: candidate,
+            en: isAddon ? (window.ADDONS?.[candidate]?.en || candidate) : candidate,
             img: isAddon ? getAddonImg(candidate) : getPerkImg(candidate),
             score: isAddon ? getAddonScore(candidate) : getPerkScore(candidate)
          };
@@ -5689,25 +7213,328 @@ D.騎士
       processSlot(0);
    }
 
-   function doCard37RestartSlot(card)
+   function doCard37StarPlatinum()
    {
-      isActive = false;
-      currentCards = [];
-      currentState = null;
-
-      const container = document.getElementById('cardContainer');
-      if (container)
+      if (!currentState || document.getElementById('starPlatinumOverlay')) return;
+      const generation = roundGeneration;
+      const selectedSlots = new Set();
+      let selected = 1;
+      let page = 0;
+      let started = false;
+      let ended = false;
+      let settledChanges = null;
+      let deadline = 0;
+      let timer = null;
+      let timerTextAnimation = null;
+      let worldEffect = null;
+      const pools =
       {
-         container.innerHTML = '';
-         container.classList.remove('card-visible');
-      }
-
-      if (typeof window.resetSlotState === 'function')
+         addon: shuffle(getAddonNamesForKiller(currentState.killerKey)),
+         perk: shuffle(getAllPerkNames())
+      };
+      const overlay = document.createElement('div');
+      overlay.id = 'starPlatinumOverlay';
+      overlay.innerHTML = `
+         <style>
+         #starPlatinumOverlay{position:fixed;inset:0;z-index:100080;background:rgba(12,12,9,.94);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;color:#f3ead0;font-family:inherit}
+         #starPlatinumOverlay *{box-sizing:border-box}
+         .sp-announcement{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;background:#15140ddd;pointer-events:none;font-size:clamp(32px,7vw,80px);font-weight:900;letter-spacing:.08em;color:#f1e3ac;text-shadow:0 0 32px #debd6a;animation:sp-resume 2s ease forwards}@keyframes sp-resume{0%{opacity:0;transform:scale(.92)}15%,75%{opacity:1;transform:scale(1)}100%{opacity:0;visibility:hidden;transform:scale(1.05)}}
+         .sp-panel{width:min(1100px,100%);max-height:95dvh;overflow-y:auto;overflow-x:hidden;border:1px solid #b58a43;border-radius:22px;background:linear-gradient(145deg,#2c291f,#11120f);padding:24px;box-shadow:0 20px 90px #0009}
+         .sp-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px;overflow:hidden}.sp-heading h2{margin:0;font-size:28px;line-height:1.8;padding-top:4px}.sp-caption{color:#cbbd94;margin:5px 0 0}.sp-time{font-size:28px;font-weight:700;color:#f1e3ac;white-space:nowrap;line-height:1.3;text-align:right;min-width:5.5em;flex-shrink:0}.sp-time-text{display:inline-block}
+         .sp-intro p{line-height:1.7;margin:10px 0}.sp-intro img{display:block;width:100%;max-height:400px;margin:20px auto;object-fit:contain;border-radius:12px;background:#171a13}
+         .sp-button{font:inherit;color:#132413;border:1px solid #a3cf86;background:#83b66b;border-radius:10px;padding:12px 22px;cursor:pointer}.sp-button:hover{background:#a3cf86}.sp-primary{display:block;margin:18px auto 0;min-width:220px;font-weight:800}
+         .sp-slots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:20px}.sp-slot{min-width:0;border:1px solid #58804e;background:#1c2b1c;color:#eee;border-radius:12px;padding:10px 5px;font:inherit;cursor:pointer}.sp-slot.active{border:2px solid #b7dd9b;background:#436c37;box-shadow:0 0 20px #83b66b55}.sp-slot img{width:100%;height:72px;object-fit:contain}.sp-slot strong,.sp-slot small{display:block}.sp-slot strong{font-size:12px;min-height:30px;margin:6px 0}.sp-slot small{font-size:11px;color:#c8d5ba}.sp-slot:disabled{cursor:default;opacity:1}.sp-slot.changed small{color:#b8dc9e}.sp-slot.unchanged{border:2px solid #ff646e;background:#391b29;box-shadow:0 0 16px #ff48543d}.sp-slot.unchanged small{color:#ff9ca4}.sp-slot small.sp-status-pending{color:#ff8992;font-weight:700}
+         .sp-picker{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:12px;align-items:center}.sp-arrow{padding:12px 0;font-size:28px}.sp-arrow:disabled{opacity:.25;cursor:default}.sp-grid.addon-row{grid-template-rows:115px}.sp-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,115px);gap:9px}.sp-item{border:1px solid #557748;border-radius:10px;background:#243b23;color:#eee;padding:7px;font:inherit;cursor:pointer;min-width:0;display:flex;align-items:center;flex-direction:column;justify-content:center}.sp-item img{width:54px;height:54px;object-fit:contain}.sp-item span{font-size:12px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.sp-item small{color:#c1d3b2;font-size:11px}.sp-item:disabled{opacity:.3;cursor:default}.sp-item:hover:enabled{background:#4b773d;border-color:#b7dd9b}.sp-footer{display:flex;justify-content:space-between;margin-top:12px;color:#cbbd94;font-size:13px}
+         @media(max-width:700px){#starPlatinumOverlay{padding:8px}.sp-panel{padding:12px}.sp-slots{gap:4px}.sp-slot img{height:42px}.sp-slot strong{font-size:10px}.sp-picker{grid-template-columns:25px minmax(0,1fr) 25px;gap:5px}.sp-grid{gap:4px;grid-template-rows:repeat(3,100px)}.sp-grid.addon-row{grid-template-rows:100px}.sp-item img{width:38px;height:38px}.sp-item span{font-size:10px}.sp-heading h2{font-size:22px}.sp-heading{flex-wrap:wrap}.sp-time{width:100%;min-width:0;font-size:26px}}
+         </style>
+         <section class="sp-panel" role="dialog" aria-modal="true" aria-label="The World">
+            <header class="sp-heading"><div><h2><ruby class="the-world-title">The World<rp>（</rp><rt>ザ・ワールド</rt><rp>）</rp></ruby></h2><p class="sp-caption">無駄無駄無駄無駄!</p></div><div class="sp-time" role="timer" aria-live="off">準備開始</div></header>
+            <div class="sp-intro">
+               <p>開始後，你有 <b>12 秒</b>自由更換兩個配件與四個技能。點上方欄位，再點下方項目，配置會即時更新。<b>選擇原本相同的項目也算已更換，可免除該欄懲罰。</b></p>
+               <p>選擇區隨機排序，配件每頁 <b>5 欄 × 1 行</b>，技能每頁 <b>5 欄 × 3 行</b>，按左右箭頭翻頁。時間到時未更換的欄位會被扣分。</p>
+               <img src="images/star-platinum-guide.svg" alt="操作圖：點上方欄位使其高亮，再從下方十五格選擇項目，左右箭頭翻頁，選擇會即時顯示。">
+               <p style="font-size:12px;color:#bba8d0">殺手不變。配件最低 1 分、技能最低 0 分；若沒有可替換且不重複的目標分數項目，該欄保留。</p>
+               <button class="sp-button sp-primary" id="spStart">開始 · 12 秒</button>
+            </div>
+            <div class="sp-game" hidden><div class="sp-slots"></div><div class="sp-picker"><button class="sp-button sp-arrow" id="spPrev" aria-label="上一頁">‹</button><div class="sp-grid"></div><button class="sp-button sp-arrow" id="spNext" aria-label="下一頁">›</button></div><div class="sp-footer"><span id="spStatus"></span><span id="spPage"></span></div></div>
+         </section>`;
+      document.body.appendChild(overlay);
+      const q = selector => overlay.querySelector(selector);
+      const listFor = slot => slot < 3 ? currentState.addons : currentState.perks;
+      const indexFor = slot => slot < 3 ? slot - 1 : slot - 3;
+      const isChanged = slot => settledChanges ? settledChanges[slot - 1] : selectedSlots.has(slot);
+      function itemInfo(slot, name)
       {
-         window.resetSlotState();
+         if (slot === 0) return { name: getKillerZh(name), img: getKillerImg(name), score: null };
+         return slot < 3 ? { name: getAddonZh(name) || name, img: getAddonImg(name), score: getAddonScore(name) } :
+            { name: getPerkZh(name) || name, img: getPerkImg(name), score: getPerkScore(name) };
       }
-      return true;
+      function addImage(parent, src)
+      {
+         const image = document.createElement('img');
+         image.src = src;
+         image.alt = '';
+         image.draggable = false;
+         parent.appendChild(image);
+      }
+      function activePool()
+      {
+         return selected < 3 ? pools.addon : pools.perk;
+      }
+      function pageSize()
+      {
+         return selected < 3 ? 5 : 15;
+      }
+      function randomizePage()
+      {
+         const pages = Math.max(1, Math.ceil(activePool().length / pageSize()));
+         page = Math.floor(Math.random() * pages);
+      }
+      function preview()
+      {
+         if (typeof window.previewCardState === 'function') window.previewCardState(cloneState(currentState));
+      }
+      function render()
+      {
+         const slots = q('.sp-slots');
+         slots.replaceChildren();
+         for (let slot = 0; slot <= 6; slot++)
+         {
+            const name = slot === 0 ? currentState.killerKey : listFor(slot)[indexFor(slot)];
+            const info = itemInfo(slot, name);
+            const button = document.createElement('button');
+            button.className = 'sp-slot' + (!ended && selected === slot ? ' active' : '') + (slot ? (isChanged(slot) ? ' changed' : (ended ? ' unchanged' : '')) : '');
+            button.disabled = slot === 0 || ended;
+            button.setAttribute('aria-label', slot === 0 ? '目前殺手' : (slot < 3 ? '配件 ' + slot : '技能 ' + (slot - 2)));
+            button.setAttribute('aria-pressed', String(selected === slot));
+            addImage(button, info.img);
+            const title = document.createElement('strong');
+            title.textContent = info.name;
+            const status = document.createElement('small');
+            status.textContent = slot === 0 ? '殺手 · 固定' : `${info.score} 分 · ${isChanged(slot) ? '已更換' : '未更換'}`;
+            if (slot > 0 && !isChanged(slot)) status.className = 'sp-status-pending';
+            button.append(title, status);
+            button.onclick = () =>
+            {
+               if (!canAct()) return;
+               selected = slot;
+               randomizePage();
+               render();
+            };
+            slots.appendChild(button);
+         }
+         const pool = activePool();
+         const size = pageSize();
+         const pages = Math.max(1, Math.ceil(pool.length / size));
+         page = Math.min(page, pages - 1);
+         q('#spPrev').disabled = ended || pages <= 1;
+         q('#spNext').disabled = ended || pages <= 1;
+         q('#spPage').textContent = `${page + 1} / ${pages}`;
+         q('#spStatus').textContent = `選擇${selected < 3 ? '配件 ' + selected : '技能 ' + (selected - 2)} · 點擊項目立即替換`;
+         const grid = q('.sp-grid');
+         grid.className = 'sp-grid' + (selected < 3 ? ' addon-row' : '');
+         grid.replaceChildren();
+         for (const name of pool.slice(page * size, page * size + size))
+         {
+            const info = itemInfo(selected, name);
+            const button = document.createElement('button');
+            button.className = 'sp-item';
+            const usedByOtherSlot = listFor(selected).some((value, index) => index !== indexFor(selected) && value === name);
+            button.disabled = ended || usedByOtherSlot;
+            addImage(button, info.img);
+            const title = document.createElement('span');
+            title.textContent = info.name;
+            const score = document.createElement('small');
+            score.textContent = `${info.score} 分`;
+            button.append(title, score);
+            button.onclick = () =>
+            {
+               if (!canAct() || usedByOtherSlot) return;
+               listFor(selected)[indexFor(selected)] = name;
+               selectedSlots.add(selected);
+               preview();
+               render();
+            };
+            grid.appendChild(button);
+         }
+      }
+      function showTimerText(text)
+      {
+         const label = q('.sp-time');
+         if (label.textContent === text) return;
+         label.textContent = text;
+         const textNode = document.createElement('span');
+         textNode.className = 'sp-time-text';
+         textNode.textContent = text;
+         label.replaceChildren(textNode);
+         if (timerTextAnimation && typeof timerTextAnimation.cancel === 'function') timerTextAnimation.cancel();
+         if (typeof textNode.animate === 'function')
+         {
+            timerTextAnimation = textNode.animate(
+               [
+                  { transform: 'translateX(32px)', opacity: 0 },
+                  { transform: 'translateX(0)', opacity: 1 }
+               ],
+               { duration: 320, easing: 'cubic-bezier(.16,1,.3,1)' }
+            );
+         }
+      }
+      function cleanup()
+      {
+         clearInterval(timer);
+         document.removeEventListener('visibilitychange', tick);
+         if (worldEffect) worldEffect.dispose();
+         overlay.remove();
+      }
+      function finish()
+      {
+         if (ended) return;
+         ended = true;
+         clearInterval(timer);
+         if (generation !== roundGeneration || !currentState)
+         {
+            cleanup();
+            return;
+         }
+         const changed = Array.from({length: 6}, (_, i) => isChanged(i + 1));
+         let lowered = 0;
+         let retained = 0;
+         function lowerUntouched(kind, offset, getPool, getScore, minimum)
+         {
+            const list = currentState[kind];
+            const slots = list.map((name, index) => ({ name, index }))
+               .filter(item => !changed[item.index + offset]);
+            const used = new Set(list.filter((_, index) => changed[index + offset]));
+            const options = slots.map(item =>
+            {
+               const score = getScore(item.name);
+               const deduction = score >= 3 ? 1 : 2;
+               const target = Math.max(minimum, score - deduction);
+               const lower = target < score ? shuffle(getPool(target)).filter(name => !used.has(name)) : [];
+               return { ...item, lower, choices: [...lower, item.name] };
+            }).sort((a, b) => a.choices.length - b.choices.length);
+            let best = null;
+            let bestCount = -1;
+            const picked = [];
+            function search(index, count)
+            {
+               if (count + options.length - index <= bestCount) return;
+               if (index === options.length)
+               {
+                  bestCount = count;
+                  best = picked.slice();
+                  return;
+               }
+               const item = options[index];
+               for (const name of item.choices)
+               {
+                  if (used.has(name)) continue;
+                  used.add(name);
+                  picked[index] = name;
+                  search(index + 1, count + (item.lower.includes(name) ? 1 : 0));
+                  used.delete(name);
+                  if (bestCount === options.length) break;
+               }
+            }
+            search(0, 0);
+            if (best) options.forEach((item, index) => { list[item.index] = best[index]; });
+            lowered += Math.max(0, bestCount);
+            retained += slots.length - Math.max(0, bestCount);
+         }
+         settledChanges = changed;
+         render();
+         showTimerText('12秒過去');
+         const restoration = worldEffect ? worldEffect.resume() : null;
+         if (!worldEffect)
+         {
+         const announcement = document.createElement('div');
+         announcement.className = 'sp-announcement';
+         announcement.setAttribute('role', 'status');
+         announcement.textContent = '時間開始流動';
+         overlay.appendChild(announcement);
+         }
+         q('#spStatus').textContent = `時間到 · ${changed.filter(Boolean).length} 欄已更換，${changed.filter(value => !value).length} 欄未更換；確認結果後，紅框欄位扣分重抽。`; 
+         const done = document.createElement('button');
+         done.className = 'sp-button sp-primary';
+         done.textContent = '確認結果';
+         done.disabled = Boolean(restoration);
+         if (restoration) restoration.finally(() =>
+         {
+            if (overlay.isConnected && generation === roundGeneration) done.disabled = false;
+         });
+         done.onclick = () =>
+         {
+            if (done.disabled) return;
+            done.disabled = true;
+            done.textContent = '正在重抽…';
+            if (generation !== roundGeneration || !currentState || !overlay.isConnected) { cleanup(); return; }
+            lowerUntouched('addons', 0, score => getAddonNamesByScoresForKiller(currentState.killerKey, [score]), getAddonScore, 1);
+            lowerUntouched('perks', 2, score => getPerkNamesByScores([score]), getPerkScore, 0);
+            // 保留拉霸機目前的配置，交由套用卡片結果時播放欄位換裝動畫。
+            cleanup();
+            if (generation === roundGeneration && currentState) finishCardPhase();
+         };
+         q('.sp-game').appendChild(done);
+      }
+      function canAct()
+      {
+         if (generation !== roundGeneration || !currentState)
+         {
+            ended = true;
+            cleanup();
+            return false;
+         }
+         if (!started || ended) return false;
+         if (performance.now() >= deadline) { finish(); return false; }
+         return true;
+      }
+      function tick()
+      {
+         if (!canAct()) return;
+         const elapsed = Math.min(12, Math.floor((performance.now() - (deadline - 12000)) / 1000));
+         showTimerText(elapsed > 0 ? elapsed + '秒過去' : '時よ止まれ！');
+      }
+      function changePage(direction)
+      {
+         if (!canAct()) return;
+         const pages = Math.max(1, Math.ceil(activePool().length / pageSize()));
+         page = (page + direction + pages) % pages;
+         render();
+      }
+      q('#spPrev').onclick = () => changePage(-1);
+      q('#spNext').onclick = () => changePage(1);
+      q('#spStart').onclick = () =>
+      {
+         if (q('#spStart').disabled || started || generation !== roundGeneration || !currentState) return;
+         q('#spStart').disabled = true;
+         const rect = typeof q('#spStart').getBoundingClientRect === 'function' ? q('#spStart').getBoundingClientRect() : null;
+         const origin = rect ? {x: rect.left + rect.width / 2, y: rect.top + rect.height / 2} : null;
+         q('.sp-intro').hidden = true;
+         q('.sp-game').hidden = false;
+         selected = 1 + Math.floor(Math.random() * 6);
+         randomizePage();
+         render();
+         const images = Array.from(overlay.querySelectorAll('.sp-game img'));
+         Promise.all(images.map(image => image.decode ? image.decode().catch(() => {}) : Promise.resolve())).then(async () =>
+         {
+            if (generation !== roundGeneration || !currentState || !overlay.isConnected) { cleanup(); return; }
+            if (window.WorldStopEffects)
+            {
+               worldEffect = window.WorldStopEffects.create();
+               showTimerText('時よ止まれ！');
+               await worldEffect.enter(origin);
+               if (generation !== roundGeneration || !currentState || !overlay.isConnected) { cleanup(); return; }
+               overlay.style.background = 'rgba(12,12,9,.62)';
+            }
+            started = true;
+            deadline = performance.now() + 12000;
+            timer = setInterval(tick, 25);
+            document.addEventListener('visibilitychange', tick);
+            tick();
+         });
+      };
    }
+
 
    function doCard36EqualScore()
    {
@@ -5921,7 +7748,13 @@ D.騎士
          const idx = slotIndex - 3;
 
          // 全部技能池除去當前四個技能
-         const basePool = getAllPerksExcept(originalPerks);
+         const currentScore = getPerkScore(originalPerks[idx]);
+         const basePool = getAllPerksExcept(originalPerks).filter(name =>
+         {
+            if (card.id !== 'card10') return true;
+            const score = getPerkScore(name);
+            return typeof currentScore === 'number' && typeof score === 'number' && score >= currentScore;
+         });
          if (!basePool.length)
          {
 
@@ -8010,6 +9843,122 @@ D.騎士
       });
    }
 
+   function applyBlackjackLoss(wager)
+   {
+      const perks = currentState.perks.slice(), addons = currentState.addons.slice();
+      let remaining = Math.max(0, Math.floor(wager));
+      while (remaining > 0)
+      {
+         const choices = [];
+         for (const kind of ['perks', 'addons'])
+         {
+            const names = kind === 'perks' ? perks : addons;
+            const getScore = kind === 'perks' ? getPerkScore : getAddonScore;
+            const floor = kind === 'perks' ? 0 : 1;
+            names.forEach((name, index) =>
+            {
+               const score = getScore(name);
+               const other = names.filter((_, i) => i !== index);
+               for (let target = score - 1; target >= floor; target--)
+               {
+                  const cost = score - target;
+                  if (cost > remaining) break;
+                  const pool = (kind === 'perks' ? getPerkNamesByScores([target]) : getAddonNamesByScoresForKiller(currentState.killerKey, [target]))
+                     .filter(candidate => !other.includes(candidate));
+                  if (!pool.length) continue;
+                  choices.push({names, index, cost, pool});
+                  break;
+               }
+            });
+         }
+         if (!choices.length) break;
+         const choice = getRandomItem(choices);
+         choice.names[choice.index] = getRandomItem(choice.pool);
+         remaining -= choice.cost;
+      }
+      currentState.perks = perks;
+      currentState.addons = addons;
+      return true;
+   }
+   function doScoreDownChoice(card, slotIndex)
+   {
+      if (!currentState || slotIndex < 1 || slotIndex > 6) return;
+      const isAddon = slotIndex <= 2;
+      const index = slotIndex - (isAddon ? 1 : 3);
+      const kind = isAddon ? 'addons' : 'perks';
+      const original = currentState[kind][index];
+      const score = isAddon ? getAddonScore(original) : getPerkScore(original);
+      const data = card.effect.data;
+      const target = score - data.decrease;
+      if (!Number.isFinite(score) || target < (isAddon ? 1 : 0))
+      {
+         showInfoPopup(card.zh, `此欄位無法再減 ${data.decrease} 分，請選擇其他欄位。`);
+         return;
+      }
+      const used = new Set(currentState[kind]);
+      const pool = (isAddon ? getAddonNamesByScoresForKiller(currentState.killerKey, [target]) : getPerkNamesByScores([target]))
+         .filter(name => !used.has(name));
+      if (!pool.length)
+      {
+         showInfoPopup(card.zh, `沒有可用且不重複的 ${target} 分${isAddon ? '配件' : '技能'}，請選擇其他欄位。`);
+         return;
+      }
+      const candidates = shuffle(Array.from(new Set(pool))).slice(0, data.choices);
+      const generation = roundGeneration;
+      let applied = false;
+      showChoiceOverlay(
+      {
+         type: isAddon ? 'addon' : 'perk', candidates, doubleList: candidates.length > 5, showScores: true,
+         title: `${card.zh} · ${score} → ${target} 分 · ${candidates.length} 選 1`,
+         onPick: name =>
+         {
+            if (applied || generation !== roundGeneration || !currentState || !candidates.includes(name)) return;
+            applied = true; currentState[kind][index] = name; finishCardPhase();
+         }
+      });
+   }
+   function doCard44Blackjack()
+   {
+      if (!currentState || !window.CasinoCards || !window.BlackjackReward) return;
+      const generation = roundGeneration;
+      const total = currentState.perks.reduce((sum, name) => sum + (getPerkScore(name) || 0), 0)
+         + currentState.addons.reduce((sum, name) => sum + (getAddonScore(name) || 0), 0);
+      if (total < 1)
+      {
+         showInfoPopup('二十一點', '目前技能總分為 0，沒有可下注的技能點數。', () => finishCardPhase());
+         return;
+      }
+      window.CasinoCards.open(
+      {
+         catalog: window.PERKS,
+         maxWager: Math.min(15, total),
+         tieRule: 'push',
+         onComplete: (result, wager, settlement = {}) =>
+         {
+            if (generation !== roundGeneration || !currentState) return;
+            if (result === 'win')
+            {
+               window.BlackjackReward.open(
+               {
+                  state: cloneState(currentState),
+                  catalogs: {perks: window.PERKS, addons: window.ADDONS},
+                  budget: wager,
+                  onComplete: (chosen) =>
+                  {
+                     if (generation !== roundGeneration || !currentState) return;
+                     currentState.perks = chosen.perks.slice();
+                     currentState.addons = chosen.addons.slice();
+                     finishCardPhase();
+                  }
+               });
+               return;
+            }
+            if (result === 'lose') applyBlackjackLoss(Number.isInteger(settlement.lossAmount) ? settlement.lossAmount : wager);
+            finishCardPhase();
+         }
+      });
+   }
+
    function doCard17ScoreDuelMinigame()
    {
       if (!currentState || !Array.isArray(currentState.perks) || currentState.perks.length < 2) return;
@@ -8300,75 +10249,23 @@ D.騎士
    // 11. 結束卡片階段
    // ==========================
 
-   // 28 號：幫撐十秒（強制指定技能組 + 全螢幕圖片，點任意處關閉或 10.22 秒自動關）
-   function doCard28Hold10Seconds(card)
+   // 28 號：輪番取捨
+   function doCard28BanPick()
    {
-      if (!currentState) return;
-
-      const data = (card && card.effect && card.effect.data) ? card.effect.data :
+      if (!currentState || !window.BanPickCard) return;
+      const generation = roundGeneration;
+      window.BanPickCard.open(
       {
-      };
-      const timeoutMs = typeof data.timeoutMs === 'number' ? data.timeoutMs : 10220;
-      const imgSrc = data.image || './images/cards/card28_hold10s.gif';
-
-      const perkSetsZh = Array.isArray(data.perkSetsZh) ? data.perkSetsZh : [];
-      if (!perkSetsZh.length)
-      {
-
-         return;
-      }
-
-      // ✅ 立刻生效：先把技能組改掉
-      const pickedSetZh = getRandomItem(perkSetsZh) || [];
-      const forced = [];
-
-      pickedSetZh.forEach(zhName =>
-      {
-         const key = findPerkKeyByZh(zhName);
-         if (key && !forced.includes(key)) forced.push(key);
-      });
-
-      // 強制清單如果因為名稱對不上而變空 → 當作無效卡
-      if (!forced.length)
-      {
-
-         return;
-      }
-
-      // 補滿 4 格（避免 UI/流程怪掉）
-      const need = Math.max(0, 4 - forced.length);
-      if (need > 0)
-      {
-         const restPool = getAllPerksExcept(forced);
-         const extra = shuffle(restPool).slice(0, need);
-         currentState.perks = forced.concat(extra);
-      }
-      else
-      {
-         currentState.perks = forced.slice(0, 4);
-      }
-
-      // ✅ 同時把配件改成兩個藍配（抽不到兩個藍配就當作無效卡）
-      if (currentState && currentState.killerKey)
-      {
-         const okAddons = doReplaceAddonsByColor(['藍配', '藍配']);
-         if (!okAddons)
+         catalog: window.PERKS,
+         addonCatalog: Object.fromEntries(Object.entries(window.ADDONS).filter(([name, addon]) => addon && addon.killer === currentState.killerKey)),
+         onComplete: (result) =>
          {
-
-            return;
+            if (generation !== roundGeneration || !currentState) return;
+            currentState.perks = result.perks.slice();
+            currentState.addons = result.addons.slice();
+            finishCardPhase();
          }
-      }
-      else
-      {
-
-         return;
-      }
-      // ✅ 全螢幕圖片（GIF 可以；就是一張 <img>）
-      // 關閉後才結束卡片階段，避免直接把卡片階段收掉看不到過場
-      showFullscreenImage(imgSrc, () =>
-      {
-         finishCardPhase();
-      }, timeoutMs);
+      });
    }
    // 29 號：偷天換日（指定殺手 + 其餘重抽；技能不會抽到 5 分）
    function doCard29StealDaySwap(card)
@@ -8656,6 +10553,11 @@ D.騎士
       isActive = false;
       dragInfo = null;
       document.getElementById('card43ImmunityOverlay')?.remove();
+      document.getElementById('starPlatinumOverlay')?.remove();
+      window.WorldStopEffects?.disposeAll();
+      window.BanPickCard?.disposeAll();
+      window.CasinoCards?.disposeAll();
+      window.BlackjackReward?.disposeAll();
    }
 
    function prepareRound()
@@ -9088,3 +10990,5 @@ D.騎士
 
    document.addEventListener('mouseover', applyScoreTooltip);
 })();
+;
+/* END MERGED: original-card.js */
