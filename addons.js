@@ -297,7 +297,7 @@ window.ADDONS = {
   "Counterweight": {
     zh: "配重",
     score: 1,
-    aliases: ["白配"],
+    aliases: ["迷因配件", "白配"],
     img: "./images/addons/counterweight.png",
     killer: "The Hillbilly",
   },
