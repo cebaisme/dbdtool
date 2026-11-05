@@ -457,7 +457,7 @@ window.PERKS = {
   "Nemesis": {
     zh: "宿敵",
     score: 3,
-    aliases: ["nemesis", "報應", "暈", "遲鈍", "60秒", "氣場", "8秒"],
+    aliases: ["nemesis", "報應", "血祭品", "暈", "遲鈍", "60秒", "氣場", "8秒"],
     killer: "The Oni",
     img: "./images/perks/nemesis.png"
   },
