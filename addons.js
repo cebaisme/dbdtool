@@ -297,7 +297,7 @@ window.ADDONS = {
   "Counterweight": {
     zh: "配重",
     score: 1,
-    aliases: ["迷因配件", "白配"],
+    aliases: ["迷因配件", "白配", "垃圾"],
     img: "./images/addons/counterweight.png",
     killer: "The Hillbilly",
   },
@@ -6461,14 +6461,14 @@ window.ADDONS = {
   "Mirror of the Creators": {
     zh: "造物主之鏡",
     score: 1,
-    aliases: ["迷因配件", "神聖之光", "光柱", "反射", "障礙物", "2次", "0.4秒", "紅配"],
+    aliases: ["迷因配件", "神聖之光", "光柱", "反射", "障礙物", "2次", "0.4秒", "紅配", "垃圾"],
     img: "./images/addons/mirrorofthecreators.png",
     killer: "The Judgment",
   },
   "Obsidian Feather": {
     zh: "黑曜石羽毛",
     score: 1,
-    aliases: ["迷因配件", "神聖之光", "光柱", "自動施放", "無法取消", "移動速度", "100%", "操控時間", "25%", "恢復", "10%", "30%", "紅配"],
+    aliases: ["迷因配件", "神聖之光", "光柱", "自動施放", "無法取消", "移動速度", "100%", "操控時間", "25%", "恢復", "10%", "30%", "紅配", "垃圾"],
     img: "./images/addons/obsidianfeather.png",
     killer: "The Judgment",
   },
